@@ -53,7 +53,7 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
 // Create new mission
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, notes, team, participants, createdBy } = req.body;
+    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionCategory, missionDetails, notes, team, participants, createdBy } = req.body;
     const missionStart = new Date(startTime);
     const missionEnd = new Date(endTime);
     const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
@@ -68,7 +68,8 @@ router.post('/', async (req: Request, res: Response) => {
       startTime: missionStart,
       endTime: missionEnd,
       location,
-      missionType,
+      missionCategory,
+      missionDetails,
       notes: notes || '',
       team,
       participants: processedParticipants,
@@ -111,7 +112,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, notes, team, participants, createdBy } = req.body;
+    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionCategory, missionDetails, notes, team, participants, createdBy } = req.body;
 
     // Get old mission
     const oldMission = await Mission.findById(id);
@@ -161,7 +162,8 @@ router.put('/:id', async (req: Request, res: Response) => {
         startTime: newStart,
         endTime: newEnd,
         location,
-        missionType, 
+        missionCategory,
+        missionDetails,
         notes,
         team,
         participants: processedParticipants

@@ -10,7 +10,8 @@ export interface IMission extends Document {
     startTime: Date;
     endTime: Date;
     location: string;
-    missionType: string;
+    missionCategory: 'medic-fire' | 'public-service';  // Changed
+    missionDetails: string;  // Changed - specific details
     notes?: string;
     team: 'A' | 'B' | 'C';
     participants: IMissionParticipant[];
@@ -47,7 +48,12 @@ const MissionSchema = new Schema<IMission>({
         type: String,
         required: true
     },
-    missionType: {
+    missionCategory: {
+        type: String,
+        enum: ['medic-fire', 'public-service'],
+        required: true
+    },
+    missionDetails: {
         type: String,
         required: true
     },
