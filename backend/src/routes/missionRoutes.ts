@@ -53,41 +53,42 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
 // Create new mission
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { referenceNumber, vehicleNumber, startTime, endTime, location, team, participants, createdBy } = req.body;
-    
+    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, notes, team, participants, createdBy } = req.body;
     const missionStart = new Date(startTime);
     const missionEnd = new Date(endTime);
     const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
-    
+
     const processedParticipants = participants.map((p: any) => ({
       user: p.userId
     }));
-    
+
     const mission = new Mission({
       referenceNumber,
       vehicleNumber,
       startTime: missionStart,
       endTime: missionEnd,
       location,
+      missionType,
+      notes: notes || '',
       team,
       participants: processedParticipants,
       createdBy
     });
-    
+
     await mission.save();
-    
+
     // Update user stats based on overlap logic
     for (const participant of participants) {
       const userId = participant.userId;
-      
+
       // Check if user was on shift during mission
       const hadShift = await checkShiftOverlap(userId, missionStart, missionEnd);
-      
+
       // Increment mission count always
       await User.findByIdAndUpdate(userId, {
         $inc: { currentMonthMissions: 1 }
       });
-      
+
       // Add hours only if NOT on shift (to avoid double counting)
       if (!hadShift) {
         await User.findByIdAndUpdate(userId, {
@@ -95,11 +96,11 @@ router.post('/', async (req: Request, res: Response) => {
         });
       }
     }
-    
+
     const populatedMission = await Mission.findById(mission._id)
       .populate('participants.user')
       .populate('createdBy');
-    
+
     res.status(201).json(populatedMission);
   } catch (error) {
     res.status(500).json({ message: 'Error creating mission', error });
@@ -110,30 +111,30 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { referenceNumber, vehicleNumber, startTime, endTime, location, team, participants } = req.body;
-    
+    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, notes, team, participants, createdBy } = req.body;
+
     // Get old mission
     const oldMission = await Mission.findById(id);
     if (!oldMission) {
       return res.status(404).json({ message: 'Mission not found' });
     }
-    
+
     const oldStart = new Date(oldMission.startTime);
     const oldEnd = new Date(oldMission.endTime);
     const oldHours = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 60 * 60));
-    
+
     // Revert old mission stats
     for (const participant of oldMission.participants) {
       const userId = participant.user.toString();
-      
+
       // Decrement mission count
       await User.findByIdAndUpdate(userId, {
         $inc: { currentMonthMissions: -1 }
       });
-      
+
       // Check if user was on shift during old mission
       const hadShift = await checkShiftOverlap(userId, oldStart, oldEnd);
-      
+
       // Remove hours only if they were NOT on shift
       if (!hadShift) {
         await User.findByIdAndUpdate(userId, {
@@ -141,16 +142,16 @@ router.put('/:id', async (req: Request, res: Response) => {
         });
       }
     }
-    
+
     // Calculate new mission hours
     const newStart = new Date(startTime);
     const newEnd = new Date(endTime);
     const newHours = Math.round((newEnd.getTime() - newStart.getTime()) / (1000 * 60 * 60));
-    
+
     const processedParticipants = participants.map((p: any) => ({
       user: p.userId
     }));
-    
+
     // Update mission
     const updatedMission = await Mission.findByIdAndUpdate(
       id,
@@ -160,24 +161,26 @@ router.put('/:id', async (req: Request, res: Response) => {
         startTime: newStart,
         endTime: newEnd,
         location,
+        missionType, 
+        notes,
         team,
         participants: processedParticipants
       },
       { new: true }
     ).populate('participants.user').populate('createdBy');
-    
+
     // Add new mission stats
     for (const participant of participants) {
       const userId = participant.userId;
-      
+
       // Increment mission count
       await User.findByIdAndUpdate(userId, {
         $inc: { currentMonthMissions: 1 }
       });
-      
+
       // Check if user was on shift during new mission
       const hadShift = await checkShiftOverlap(userId, newStart, newEnd);
-      
+
       // Add hours only if NOT on shift
       if (!hadShift) {
         await User.findByIdAndUpdate(userId, {
@@ -185,7 +188,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         });
       }
     }
-    
+
     res.json(updatedMission);
   } catch (error) {
     res.status(500).json({ message: 'Error updating mission', error });
@@ -196,28 +199,28 @@ router.put('/:id', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    
+
     const mission = await Mission.findById(id);
     if (!mission) {
       return res.status(404).json({ message: 'Mission not found' });
     }
-    
+
     const missionStart = new Date(mission.startTime);
     const missionEnd = new Date(mission.endTime);
     const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
-    
+
     // Revert mission stats from all participants
     for (const participant of mission.participants) {
       const userId = participant.user.toString();
-      
+
       // Decrement mission count
       await User.findByIdAndUpdate(userId, {
         $inc: { currentMonthMissions: -1 }
       });
-      
+
       // Check if user was on shift during mission
       const hadShift = await checkShiftOverlap(userId, missionStart, missionEnd);
-      
+
       // Remove hours only if they were NOT on shift
       if (!hadShift) {
         await User.findByIdAndUpdate(userId, {
@@ -225,9 +228,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
         });
       }
     }
-    
+
     await Mission.findByIdAndDelete(id);
-    
+
     res.json({ message: 'Mission deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting mission', error });
