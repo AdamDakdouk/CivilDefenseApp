@@ -20,7 +20,7 @@ router.get('/', async (req: Request, res: Response) => {
     })
       .populate('participants.user')
       .populate('createdBy')
-      .sort({ startTime: -1 });
+      .sort({ startTime: 1 });
     res.json(missions);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching missions', error });
@@ -34,6 +34,11 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
     'participants.user': userId
   });
 
+  console.log('=== Checking Shift Overlap ===');
+  console.log('Mission Start:', missionStart);
+  console.log('Mission End:', missionEnd);
+  console.log('Found shifts:', shifts.length);
+
   // Check each shift's participants for overlap
   for (const shift of shifts) {
     const userParticipant = shift.participants.find(
@@ -44,9 +49,15 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
       const shiftStart = new Date(userParticipant.checkIn);
       const shiftEnd = new Date(userParticipant.checkOut);
 
+      console.log('Shift Start:', shiftStart);
+      console.log('Shift End:', shiftEnd);
+
       // Check if there's ANY overlap between mission and shift
-      // Overlap exists if: mission starts before shift ends AND mission ends after shift starts
       const hasOverlap = missionStart < shiftEnd && missionEnd > shiftStart;
+
+      console.log('Has overlap?', hasOverlap);
+      console.log('missionStart < shiftEnd:', missionStart < shiftEnd, '(', missionStart, '<', shiftEnd, ')');
+      console.log('missionEnd > shiftStart:', missionEnd > shiftStart, '(', missionEnd, '>', shiftStart, ')');
 
       if (hasOverlap) {
         return true;
@@ -54,23 +65,26 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
     }
   }
 
+  console.log('No overlap found');
   return false;
 };
 
 // Create new mission
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionCategory, missionDetails, notes, team, participants, createdBy } = req.body;
-    
+const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, missionDetails, notes, team, participants, createdBy } = req.body;    
     const missionStart = new Date(startTime);
     let missionEnd = new Date(endTime);
 
     // If end time is before start time, mission crosses midnight - add 1 day to end
-    if (missionEnd <= missionStart) {
+    if (missionEnd < missionStart) {
       missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
     }
 
     const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
+       console.log('Mission hours calculated:', missionHours);
+    console.log('Mission start:', missionStart);
+    console.log('Mission end:', missionEnd);
     
     const processedParticipants = participants.map((p: any) => ({
       user: p.userId
@@ -82,7 +96,7 @@ router.post('/', async (req: Request, res: Response) => {
       startTime: missionStart,
       endTime: missionEnd,
       location,
-      missionCategory,
+      missionType,
       missionDetails,
       notes: notes || '',
       team,
@@ -136,7 +150,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionCategory, missionDetails, notes, team, participants } = req.body;
+    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, missionDetails, notes, team, participants } = req.body;
     
     // Get old mission
     const oldMission = await Mission.findById(id);
@@ -148,7 +162,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     let oldEnd = new Date(oldMission.endTime);
 
     // Fix midnight crossing for old mission
-    if (oldEnd <= oldStart) {
+    if (oldEnd < oldStart) {
       oldEnd = new Date(oldEnd.getTime() + 24 * 60 * 60 * 1000);
     }
 
@@ -208,7 +222,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         startTime: newStart,
         endTime: newEnd,
         location,
-        missionCategory,
+        missionType,
         missionDetails,
         notes: notes || '',
         team,
@@ -265,7 +279,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     let missionEnd = new Date(mission.endTime);
 
     // Fix midnight crossing
-    if (missionEnd <= missionStart) {
+    if (missionEnd < missionStart) {
       missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
     }
 

@@ -54,7 +54,7 @@ router.get('/available-months', async (req: Request, res: Response) => {
 // Get current month data (from User model)
 router.get('/current', async (req: Request, res: Response) => {
   try {
-    const users = await User.find().select('name role team currentMonthHours currentMonthMissions');
+    const users = await User.find().select('name middleName motherName autoNumber cardNumber role team currentMonthHours currentMonthMissions currentMonthDays');
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching current month data', error });

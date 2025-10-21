@@ -2,10 +2,15 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IUser extends Document {
   name: string;
+  middleName: string;
+  cardNumber: string;
+  motherName: string;
+  autoNumber: string;
   role: 'volunteer' | 'employee' | 'head' | 'administrative staff';
   team: 'A' | 'B' | 'C';
   currentMonthHours: number;
   currentMonthMissions: number;
+  currentMonthDays: number;
   createdAt: Date;
 }
 
@@ -14,6 +19,22 @@ const UserSchema = new Schema<IUser>({
     type: String,
     required: true,
     trim: true
+  },
+  middleName: {  
+    type: String,
+    default: ''
+  },
+  cardNumber: {
+    type: String,
+    default: ''
+  },
+  motherName: {
+    type: String,
+    default: ''
+  },
+  autoNumber: {  
+    type: String,
+    default: ''
   },
   role: {
     type: String,
@@ -30,6 +51,10 @@ const UserSchema = new Schema<IUser>({
     default: 0
   },
   currentMonthMissions: {
+    type: Number,
+    default: 0
+  },
+  currentMonthDays: {
     type: Number,
     default: 0
   },
