@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import Mission from '../models/Mission';
 import Shift from '../models/Shift';
 import User from '../models/User';
+import Settings from '../models/Settings';
 
 const router = express.Router();
 
@@ -34,11 +35,6 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
     'participants.user': userId
   });
 
-  console.log('=== Checking Shift Overlap ===');
-  console.log('Mission Start:', missionStart);
-  console.log('Mission End:', missionEnd);
-  console.log('Found shifts:', shifts.length);
-
   // Check each shift's participants for overlap
   for (const shift of shifts) {
     const userParticipant = shift.participants.find(
@@ -49,30 +45,21 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
       const shiftStart = new Date(userParticipant.checkIn);
       const shiftEnd = new Date(userParticipant.checkOut);
 
-      console.log('Shift Start:', shiftStart);
-      console.log('Shift End:', shiftEnd);
-
       // Check if there's ANY overlap between mission and shift
       const hasOverlap = missionStart < shiftEnd && missionEnd > shiftStart;
-
-      console.log('Has overlap?', hasOverlap);
-      console.log('missionStart < shiftEnd:', missionStart < shiftEnd, '(', missionStart, '<', shiftEnd, ')');
-      console.log('missionEnd > shiftStart:', missionEnd > shiftStart, '(', missionEnd, '>', shiftStart, ')');
 
       if (hasOverlap) {
         return true;
       }
     }
   }
-
-  console.log('No overlap found');
   return false;
 };
 
 // Create new mission
 router.post('/', async (req: Request, res: Response) => {
   try {
-const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, missionDetails, notes, team, participants, createdBy } = req.body;    
+    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, missionDetails, notes, team, participants, createdBy } = req.body;
     const missionStart = new Date(startTime);
     let missionEnd = new Date(endTime);
 
@@ -82,14 +69,11 @@ const { referenceNumber, vehicleNumber, startTime, endTime, location, missionTyp
     }
 
     const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
-       console.log('Mission hours calculated:', missionHours);
-    console.log('Mission start:', missionStart);
-    console.log('Mission end:', missionEnd);
-    
+
     const processedParticipants = participants.map((p: any) => ({
       user: p.userId
     }));
-    
+
     const mission = new Mission({
       referenceNumber,
       vehicleNumber,
@@ -103,30 +87,31 @@ const { referenceNumber, vehicleNumber, startTime, endTime, location, missionTyp
       participants: processedParticipants,
       createdBy
     });
-    
+
     await mission.save();
-    
-    // Only update user stats if this is the current month
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const missionMonth = missionStart.getMonth();
-    const missionYear = missionStart.getFullYear();
-    const isCurrentMonth = (missionMonth === currentMonth && missionYear === currentYear);
+
+    // Only update user stats if this is the ACTIVE month
+    const settings = await Settings.findOne();
+    const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
+    const activeYear = settings?.activeYear || new Date().getFullYear();
+
+    const missionMonth = missionStart.getUTCMonth() + 1;
+    const missionYear = missionStart.getUTCFullYear();
+    const isCurrentMonth = (missionMonth === activeMonth && missionYear === activeYear);
 
     if (isCurrentMonth) {
       // Update user stats based on overlap logic
       for (const participant of participants) {
         const userId = participant.userId;
-        
+
         // Check if user was on shift during mission
         const hadShift = await checkShiftOverlap(userId, missionStart, missionEnd);
-        
+
         // Increment mission count always
         await User.findByIdAndUpdate(userId, {
           $inc: { currentMonthMissions: 1 }
         });
-        
+
         // Add hours only if NOT on shift (to avoid double counting)
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
@@ -135,11 +120,11 @@ const { referenceNumber, vehicleNumber, startTime, endTime, location, missionTyp
         }
       }
     }
-    
+
     const populatedMission = await Mission.findById(mission._id)
       .populate('participants.user')
       .populate('createdBy');
-    
+
     res.status(201).json(populatedMission);
   } catch (error) {
     res.status(500).json({ message: 'Error creating mission', error });
@@ -151,13 +136,13 @@ router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, missionDetails, notes, team, participants } = req.body;
-    
+
     // Get old mission
     const oldMission = await Mission.findById(id);
     if (!oldMission) {
       return res.status(404).json({ message: 'Mission not found' });
     }
-    
+
     let oldStart = new Date(oldMission.startTime);
     let oldEnd = new Date(oldMission.endTime);
 
@@ -167,28 +152,29 @@ router.put('/:id', async (req: Request, res: Response) => {
     }
 
     const oldHours = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 60 * 60));
-    
-    // Check if old mission was in current month
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const oldMissionMonth = oldStart.getMonth();
-    const oldMissionYear = oldStart.getFullYear();
-    const oldWasCurrentMonth = (oldMissionMonth === currentMonth && oldMissionYear === currentYear);
+
+    const settings = await Settings.findOne();
+    const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
+    const activeYear = settings?.activeYear || new Date().getFullYear();
+
+    const oldMissionMonth = oldStart.getUTCMonth() + 1;
+    const oldMissionYear = oldStart.getUTCFullYear();
+    const oldWasCurrentMonth = (oldMissionMonth === activeMonth && oldMissionYear === activeYear);
 
     // Revert old mission stats from OLD participants (only if current month)
     if (oldWasCurrentMonth) {
       for (const participant of oldMission.participants) {
+
         const userId = participant.user.toString();
-        
+
         // Decrement mission count
         await User.findByIdAndUpdate(userId, {
           $inc: { currentMonthMissions: -1 }
         });
-        
+
         // Check if user was on shift during old mission
         const hadShift = await checkShiftOverlap(userId, oldStart, oldEnd);
-        
+
         // Remove hours only if they were NOT on shift
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
@@ -197,7 +183,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         }
       }
     }
-    
+
     // Calculate new mission hours
     const newStart = new Date(startTime);
     let newEnd = new Date(endTime);
@@ -207,12 +193,14 @@ router.put('/:id', async (req: Request, res: Response) => {
       newEnd = new Date(newEnd.getTime() + 24 * 60 * 60 * 1000);
     }
 
-    const newHours = Math.round((newEnd.getTime() - newStart.getTime()) / (1000 * 60 * 60));
+    console.log('Adjusted mission time:', oldStart, 'to', oldEnd);
     
+    const newHours = Math.round((newEnd.getTime() - newStart.getTime()) / (1000 * 60 * 60));
+
     const processedParticipants = participants.map((p: any) => ({
       user: p.userId
     }));
-    
+
     // Update mission
     const updatedMission = await Mission.findByIdAndUpdate(
       id,
@@ -230,25 +218,24 @@ router.put('/:id', async (req: Request, res: Response) => {
       },
       { new: true }
     ).populate('participants.user').populate('createdBy');
-    
-    // Check if new mission is in current month
-    const newMissionMonth = newStart.getMonth();
-    const newMissionYear = newStart.getFullYear();
-    const newIsCurrentMonth = (newMissionMonth === currentMonth && newMissionYear === currentYear);
+
+    const newMissionMonth = newStart.getUTCMonth() + 1;
+    const newMissionYear = newStart.getUTCFullYear();
+    const newIsCurrentMonth = (newMissionMonth === activeMonth && newMissionYear === activeYear);
 
     // Add new mission stats to NEW participants (only if current month)
     if (newIsCurrentMonth) {
       for (const participant of participants) {
         const userId = participant.userId;
-        
+
         // Increment mission count
         await User.findByIdAndUpdate(userId, {
           $inc: { currentMonthMissions: 1 }
         });
-        
+
         // Check if user was on shift during new mission
         const hadShift = await checkShiftOverlap(userId, newStart, newEnd);
-        
+
         // Add hours only if NOT on shift
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
@@ -257,7 +244,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         }
       }
     }
-    
+
     res.json(updatedMission);
   } catch (error) {
     console.error('Mission update error:', error);
@@ -269,12 +256,12 @@ router.put('/:id', async (req: Request, res: Response) => {
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    
+
     const mission = await Mission.findById(id);
     if (!mission) {
       return res.status(404).json({ message: 'Mission not found' });
     }
-    
+
     const missionStart = new Date(mission.startTime);
     let missionEnd = new Date(mission.endTime);
 
@@ -284,28 +271,29 @@ router.delete('/:id', async (req: Request, res: Response) => {
     }
 
     const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
-    
-    // Check if mission is in current month
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const missionMonth = missionStart.getMonth();
-    const missionYear = missionStart.getFullYear();
-    const isCurrentMonth = (missionMonth === currentMonth && missionYear === currentYear);
+
+    // Only update user stats if this is the ACTIVE month
+    const settings = await Settings.findOne();
+    const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
+    const activeYear = settings?.activeYear || new Date().getFullYear();
+
+    const missionMonth = missionStart.getUTCMonth() + 1;
+    const missionYear = missionStart.getUTCFullYear();
+    const isCurrentMonth = (missionMonth === activeMonth && missionYear === activeYear);
 
     // Revert mission stats from all participants (only if current month)
     if (isCurrentMonth) {
       for (const participant of mission.participants) {
         const userId = participant.user.toString();
-        
+
         // Decrement mission count
         await User.findByIdAndUpdate(userId, {
           $inc: { currentMonthMissions: -1 }
         });
-        
+
         // Check if user was on shift during mission
         const hadShift = await checkShiftOverlap(userId, missionStart, missionEnd);
-        
+
         // Remove hours only if they were NOT on shift
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
@@ -314,9 +302,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
         }
       }
     }
-    
+
     await Mission.findByIdAndDelete(id);
-    
+
     res.json({ message: 'Mission deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting mission', error });

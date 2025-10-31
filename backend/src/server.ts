@@ -10,6 +10,8 @@ import missionRoutes from './routes/missionRoutes';
 import monthlyReportRoutes from './routes/monthlyReportRoutes';
 import volunteerStatsRoutes from './routes/volunteerStatsRoutes'
 import attendanceRoutes from './routes/attendanceRoutes';
+import monthRolloverRoutes from './routes/monthRolloverRoutes'
+import settingsRoutes from './routes/settingsRoutes';
 
 dotenv.config();
 
@@ -32,6 +34,8 @@ app.use('/api/missions', missionRoutes);
 app.use('/api/monthly-reports', monthlyReportRoutes);
 app.use('/api/volunteer-stats', volunteerStatsRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/month-rollover', monthRolloverRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Connect to database and start server
 const startServer = async () => {

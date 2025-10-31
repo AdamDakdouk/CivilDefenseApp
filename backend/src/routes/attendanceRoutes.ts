@@ -28,4 +28,50 @@ router.get('/month', async (req: Request, res: Response) => {
   }
 });
 
+// Update attendance code
+// router.put('/update', async (req: Request, res: Response) => {
+//   try {
+//     const { userId, date, code } = req.body;
+    
+//     const attendanceDate = new Date(date);
+//     attendanceDate.setHours(0, 0, 0, 0);
+    
+//     const attendance = await Attendance.findOneAndUpdate(
+//       { userId, date: attendanceDate },
+//       { code },
+//       { upsert: true, new: true }
+//     );
+    
+//     res.json(attendance);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error updating attendance', error });
+//   }
+// });
+
+router.put('/update', async (req: Request, res: Response) => {
+  try {
+    const { userId, date, code } = req.body;
+    
+    // Parse as UTC date
+    const attendanceDate = new Date(date);
+    const normalizedDate = new Date(Date.UTC(
+      attendanceDate.getUTCFullYear(),
+      attendanceDate.getUTCMonth(),
+      attendanceDate.getUTCDate(),
+      0, 0, 0, 0
+    ));
+    
+    const attendance = await Attendance.findOneAndUpdate(
+      { userId, date: normalizedDate },
+      { code },
+      { upsert: true, new: true }
+    ).populate('userId');
+    
+    res.json(attendance);
+  } catch (error) {
+    console.error('Error updating attendance:', error);
+    res.status(500).json({ message: 'Error updating attendance', error });
+  }
+});
+
 export default router;

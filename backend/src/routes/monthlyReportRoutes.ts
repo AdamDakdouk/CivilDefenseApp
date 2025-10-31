@@ -61,4 +61,25 @@ router.get('/current', async (req: Request, res: Response) => {
   }
 });
 
+// Get monthly reports for a specific month
+router.get('/reports', async (req: Request, res: Response) => {
+  try {
+    const { month, year } = req.query;
+
+    if (!month || !year) {
+      return res.status(400).json({ message: 'Month and year are required' });
+    }
+
+    const reports = await MonthlyReport.find({
+      month: Number(month),
+      year: Number(year)
+    }).populate('userId', 'name middleName motherName autoNumber cardNumber role team');
+
+    res.json(reports);
+  } catch (error) {
+    console.error('Error fetching monthly reports:', error);
+    res.status(500).json({ message: 'Error fetching monthly reports', error });
+  }
+});
+
 export default router;

@@ -1,15 +1,28 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IMonthlyReport extends Document {
+  userId: mongoose.Types.ObjectId;
   month: number;
   year: number;
-  userId: mongoose.Types.ObjectId;
   totalHours: number;
   totalMissions: number;
+  totalDays: number;
+  missionTypeCounts: {
+    fire: number;
+    rescue: number;
+    medic: number;
+    publicService: number;
+    misc: number;
+  };
   createdAt: Date;
 }
 
 const MonthlyReportSchema = new Schema<IMonthlyReport>({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   month: {
     type: Number,
     required: true,
@@ -20,20 +33,24 @@ const MonthlyReportSchema = new Schema<IMonthlyReport>({
     type: Number,
     required: true
   },
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
   totalHours: {
     type: Number,
-    required: true,
     default: 0
   },
   totalMissions: {
     type: Number,
-    required: true,
     default: 0
+  },
+  totalDays: {
+    type: Number,
+    default: 0
+  },
+  missionTypeCounts: {
+    fire: { type: Number, default: 0 },
+    rescue: { type: Number, default: 0 },
+    medic: { type: Number, default: 0 },
+    publicService: { type: Number, default: 0 },
+    misc: { type: Number, default: 0 }
   },
   createdAt: {
     type: Date,
