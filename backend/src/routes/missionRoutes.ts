@@ -21,7 +21,7 @@ router.get('/', async (req: Request, res: Response) => {
     })
       .populate('participants.user')
       .populate('createdBy')
-      .sort({ startTime: 1 });
+      .sort({ startTime:-1 });
     res.json(missions);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching missions', error });

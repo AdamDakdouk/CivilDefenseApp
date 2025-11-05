@@ -23,7 +23,7 @@ router.get('/', async (req: Request, res: Response) => {
     })
       .populate('participants.user')
       .populate('createdBy')
-      .sort({ date: -1 });
+      .sort({ date: 1 });
     res.json(shifts);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching shifts', error });
