@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api'; // Add this import
 
 interface Admin {
   id: string;
@@ -35,21 +36,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/auth/verify', {
-          headers: {
-            'Authorization': `Bearer ${storedToken}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setAdmin(data.admin);
-          setToken(storedToken);
-        } else {
-          sessionStorage.removeItem('token');
-          setToken(null);
-          setAdmin(null);
-        }
+        // ✅ Fixed: Use api instance instead of fetch
+        const response = await api.get('/auth/verify');
+        setAdmin(response.data.admin);
+        setToken(storedToken);
       } catch (error) {
         console.error('Token verification failed:', error);
         sessionStorage.removeItem('token');
@@ -65,24 +55,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
-      }
-
-      const data = await response.json();
-      sessionStorage.setItem('token', data.token);
-      setToken(data.token);
-      setAdmin(data.admin);
+      // ✅ Fixed: Use api instance instead of fetch
+      const response = await api.post('/auth/login', { email, password });
+      
+      sessionStorage.setItem('token', response.data.token);
+      setToken(response.data.token);
+      setAdmin(response.data.admin);
       navigate('/dashboard');
     } catch (error: any) {
-      throw error;
+      const errorMessage = error.response?.data?.message || 'Login failed';
+      throw new Error(errorMessage);
     }
   };
 
