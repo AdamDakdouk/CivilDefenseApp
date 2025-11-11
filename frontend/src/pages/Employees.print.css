@@ -1,0 +1,44 @@
+@media print {
+
+  /* Hide everything except the content */
+  .navbar,
+  .add-employee-btn,
+  button,
+  .edit-cell-dropdown,
+  .month-selector-header {
+    display: none !important;
+  }
+
+  /* Force landscape orientation */
+  @page {
+    size: A4 landscape;
+    margin: 0.3cm;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    margin: 0;
+    margin-top: 7rem;
+    padding: 0;
+  }
+
+   .legend-container {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+
+  .legend-table {
+    table-layout: auto !important;
+  }
+
+  .legend-table td {
+    display: table-cell !important;
+  }
+
+  .legend-code,
+  .legend-text {
+    display: table-cell !important;
+    visibility: visible !important;
+  }
+}

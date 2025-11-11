@@ -1,0 +1,201 @@
+.report-container {
+  font-family: 'Arial', sans-serif;
+  direction: rtl;
+  padding: 13px;
+}
+
+.month-selector-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 13px;
+}
+
+.month-selector-header label {
+  font-weight: 600;
+}
+
+.month-selector-header select {
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  width: 70px;
+  direction: rtl;
+  background-color: #fff;
+}
+
+/* Header */
+.header-section {
+  margin-bottom: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  margin-right: 2.7rem;
+  font-weight: bold;
+  font-size: 15.5px;
+}
+
+.date {
+  font-size: 15.5px;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: 10%;
+}
+
+/* Table */
+.report-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 7px;
+  border-top: 2px solid #000;
+  border-left: 2px solid #000;
+  border-right: 2px solid #000;
+  border-bottom: 1px solid #000;
+  table-layout: fixed;
+}
+
+/* Column headers */
+.report-container th {
+  font-weight: bold;
+  padding: 7px;
+  text-align: center;
+  font-size: 11px;
+}
+
+/* Inner borders (columns) */
+.report-container th, 
+.report-container td {
+  border-right: 1.5px solid #000;
+  border-left: 1.5px solid #000;
+}
+
+/* Remove double borders */
+.report-container th:first-child, 
+.report-container td:first-child {
+  border-right: none;
+}
+
+.report-container th:last-child, 
+.report-container td:last-child {
+  border-left: none;
+}
+
+/* Row borders */
+.report-container td {
+  border-bottom: 1px solid #000;
+  text-align: center;
+  height: 18px;
+  vertical-align: middle;
+  font-size: 11px;
+}
+
+/* Header row border */
+.report-container thead tr {
+  border-bottom: 1.5px solid #000;
+}
+
+/* Sub-header row */
+.report-container .sub-header {
+  border-bottom: 1.5px solid #000;
+}
+
+/* Keep subcolumn borders from extending upward */
+.report-container thead tr:first-child th:nth-child(5),
+.report-container thead tr:first-child th:nth-child(6),
+.report-container thead tr:first-child th:nth-child(7),
+.report-container thead tr:first-child th:nth-child(8),
+.report-container thead tr:first-child th:nth-child(9) {
+  border-left: none;
+  border-right: none;
+}
+
+/* Last row */
+.report-container tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Footer */
+.footer-text {
+  font-weight: bold;
+  text-align: center;
+  margin-right: 42.5%;
+  font-size: 12px;
+  margin-top: 7px;
+}
+
+/* Column widths */
+.report-container th:nth-child(4), 
+.report-container td:nth-child(4),
+.report-container th:nth-child(5), 
+.report-container td:nth-child(5),
+.report-container th:nth-child(6), 
+.report-container td:nth-child(6),
+.report-container th:nth-child(7), 
+.report-container td:nth-child(7),
+.report-container th:nth-child(8), 
+.report-container td:nth-child(8),
+.report-container th:nth-child(9), 
+.report-container td:nth-child(9),
+.report-container th:nth-child(10), 
+.report-container td:nth-child(10) {
+  width: 7.5%;
+  overflow: hidden;
+}
+
+.report-container th:nth-child(1), 
+.report-container td:nth-child(1),
+.report-container th:nth-child(2), 
+.report-container td:nth-child(2),
+.report-container th:nth-child(3), 
+.report-container td:nth-child(3),
+.report-container th:nth-child(11), 
+.report-container td:nth-child(11) {
+  width: 15%;
+}
+
+/* Smaller font for data cells */
+.report-container tbody td:nth-child(2),
+.report-container tbody td:nth-child(4),
+.report-container tbody td:nth-child(5),
+.report-container tbody td:nth-child(6),
+.report-container tbody td:nth-child(7),
+.report-container tbody td:nth-child(8),
+.report-container tbody td:nth-child(9),
+.report-container tbody td:nth-child(10) {
+  font-size: 9px;
+  direction: ltr;
+}
+
+.print-btn {
+  background-color: #27ae60;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  margin-left: 20px;
+  margin-bottom: 1rem;
+}
+
+.print-btn:hover {
+  background-color: #229954;
+}
+
+.report-container tbody tr:nth-child(3) td,
+.report-container tbody tr:nth-child(5) td,
+.report-container tbody tr:nth-child(10) td {
+  border-bottom: 2px solid #c41e1e;
+}
+
+@media print {
+  .print-btn {
+    display: none !important;
+  }
+}

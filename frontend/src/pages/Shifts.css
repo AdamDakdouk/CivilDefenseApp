@@ -1,0 +1,68 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.shift-card {
+  margin-bottom: 20px;
+  padding: 14px;
+  background-color: #fafafa;
+  border-radius: 6px;
+  border: 1px solid #8e8b8b;
+}
+
+.shift-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  /* border-bottom: 2px solid #000; */
+}
+
+.shift-date {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.shift-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800 !important;
+}
+
+.btn-delete {
+  background-color: #c41e3a !important;
+  color: #fff !important;
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.btn-delete:hover {
+  background-color: #a01629 !important;
+}
+
+.shift-card table {
+  margin-top: 0;
+  background-color: white;
+  font-size: 11px;
+}
+
+.shift-card table th,
+.shift-card table td {
+  padding: 10px 12px;
+  line-height: 1.6;
+}

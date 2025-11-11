@@ -1,0 +1,188 @@
+* {
+    font-weight: bold;
+}
+
+.attendance-container {
+  padding: 16px;
+  background-color: white;
+}
+
+.main-title {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.sub-title {
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.top-section {
+  display: grid;
+  grid-template-columns: 2fr 8fr 2fr;
+  align-items: start;
+  width: 100%;
+  position: relative;
+}
+
+.org-info {
+  text-align: right;
+  justify-self: end;
+  margin-top: 10px;
+  font-size: 11px;
+}
+
+.org-name {
+  font-weight: bold;
+  margin-right: 2rem;
+}
+
+.info-line {
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+.legend-container {
+  text-align: left;
+  justify-self: start;
+  margin-bottom: 0.5rem;
+}
+
+/* .titles-container {
+  text-align: center;
+  justify-self: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+} */
+
+.legend-table {
+  border: 2px solid black;
+  border-collapse: collapse;
+  font-size: 9px;
+  margin-bottom: 6px;
+}
+
+.legend-table td {
+  border: 1px solid black;
+}
+
+.legend-code {
+  padding: 2px 4px;
+  width: 20px;
+  text-align: center;
+}
+
+.legend-text {
+  padding: 2px 8px;
+}
+
+/* Main Table */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.main-table {
+  width: 100%;
+  border: 2px solid black;
+  border-collapse: collapse;
+  font-size: 8px;
+}
+
+.main-table th,
+.main-table td {
+  border: 1px solid black;
+  padding: 4px 2px;
+  font-weight: bold;
+}
+
+.main-table .day-cell {
+  width: 16px;
+  text-align: center;
+  padding: 4px 2px;
+}
+
+.main-table .center-text {
+  text-align: center;
+}
+
+.main-table .col-serial {
+  width: 30px;
+}
+
+.main-table .col-overtime {
+  width: 60px;
+  font-size: 7px;
+}
+
+.main-table .col-signature {
+  width: 70px;
+}
+
+/* Footer Section */
+.footer-section {
+  margin-top: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Notes Section */
+.notes-section {
+  text-align: right;
+  width: 15%;
+  margin-right: 10%;
+  font-size: 10px;
+}
+
+.notes-content div {
+  margin-bottom: 2px;
+  font-weight: normal;
+  font-size: 9px;
+}
+
+.notes-title {
+  margin-bottom: 6px;
+  margin-top: 26.5%;
+}
+
+.notes-content {
+  text-align: right;
+  margin-top: 4%;
+  margin-left: 3%;
+}
+
+/* Signatures Section */
+.signatures-section {
+  display: flex;
+  gap: 120px;
+  margin-left: 10%;
+  margin-top: 12px;
+  font-size: 10px;
+}
+
+.print-btn {
+  background-color: #27ae60;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+  margin-left: 12px;
+}
+
+.print-btn:hover {
+  background-color: #229954;
+}
+
+@media print {
+  .print-btn {
+    display: none !important;
+  }
+}

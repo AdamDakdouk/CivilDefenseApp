@@ -1,0 +1,29 @@
+@media print {
+  /* Hide everything except the content */
+  .navbar,
+  .add-volunteer-btn,
+  button,
+  .month-selector-header {
+    display: none !important;
+  }
+
+  /* Force landscape orientation */
+  @page {
+    size: A4 landscape;
+    margin: 0.3cm;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    margin: 0;
+    margin-top: 1rem;
+    padding: 0;
+  }
+
+  .report-container tbody tr:nth-child(3) td,
+  .report-container tbody tr:nth-child(5) td,
+  .report-container tbody tr:nth-child(10) td {
+    border-bottom: 1px solid #000 !important;
+  }
+}

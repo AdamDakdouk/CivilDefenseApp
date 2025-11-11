@@ -1,0 +1,484 @@
+/* ==================== BASE STYLES (SHARED) ==================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+input, select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+  direction: rtl;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #000;
+}
+
+textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+  direction: rtl;
+  font-family: inherit;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1001;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-item:hover {
+  background-color: #f5f5f5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: flex-start;
+}
+
+.modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #999 !important;
+}
+
+.modal-actions button:disabled:hover {
+  background-color: #999 !important;
+}
+
+.btn-cancel {
+  background-color: #6c757d !important;
+  color: #fff !important;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268 !important;
+}
+
+.btn-remove {
+  align-self: left;
+  justify-self: left;
+  margin-top: 5px;
+}
+
+.btn-remove:hover {
+  background-color: #a01629 !important;
+}
+
+.btn-danger {
+  background-color: #c41e3a !important;
+  color: #fff !important;
+}
+
+.btn-danger:hover {
+  background-color: #a01629 !important;
+}
+
+.confirm-modal {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.confirm-modal h3 {
+  margin-bottom: 25px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* ==================== ADDSHIFT SPECIFIC STYLES (SCALED DOWN 20-25%) ==================== */
+
+.shift-modal.modal-content {
+  padding: 30px;
+  border-radius: 6px;
+  max-width: 720px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+.shift-modal h2 {
+  margin-bottom: 16px;
+  font-size: 19px;
+}
+
+.shift-form-group {
+  margin-bottom: 16px;
+}
+
+.shift-form-group label {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.shift-modal input,
+.shift-modal select {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.shift-participants-list {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+.shift-participants-list h3 {
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.shift-participant-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #b1b1b170;
+  border-radius: 5px;
+  position: relative;
+  width: 100%;
+}
+
+.shift-participant-name {
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 100px;
+  max-width: 100px;
+  flex-shrink: 0;
+}
+
+.shift-datetime-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.shift-btn-remove {
+  align-self: center;
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.shift-modal .suggestions {
+  max-height: 160px;
+}
+
+.shift-modal .suggestion-item {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.shift-modal .modal-actions {
+  margin-top: 16px;
+}
+
+/* ==================== ADDMISSION SPECIFIC STYLES (SCALED DOWN 25-30%) ==================== */
+
+.mission-modal.modal-content {
+  padding: 20px;
+  border-radius: 6px;
+  max-width: 600px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+.mission-modal.modal-large {
+  max-width: 650px;
+}
+
+.mission-modal h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.mission-form-group {
+  margin-bottom: 14px;
+}
+
+.mission-form-group label {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.mission-modal input,
+.mission-modal select,
+.mission-modal textarea {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.mission-modal textarea {
+  padding: 8px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.mission-form-row {
+  gap: 15px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.radio-group {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.mission-radio-group {
+  gap: 15px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.mission-radio-label {
+  gap: 6px;
+  font-size: 14px;
+}
+
+.radio-label input[type="radio"] {
+  width: auto;
+  cursor: pointer;
+}
+
+.selected-participants {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mission-selected-participants {
+  margin-top: 8px;
+  gap: 6px;
+}
+
+.participant-tag {
+  background-color: #f0f0f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.mission-participant-tag {
+  padding: 5px 10px;
+  border-radius: 16px;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.remove-tag {
+  background: none;
+  border: none;
+  color: #c41e3a;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: auto;
+  min-width: auto;
+}
+
+.mission-remove-tag {
+  font-size: 18px;
+}
+
+.remove-tag:hover {
+  color: #a01629;
+  opacity: 1;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  padding-left: 35px;
+}
+
+.mission-input-wrapper input {
+  padding-left: 30px;
+}
+
+.error-icon {
+  position: absolute;
+  left: 10px;
+  color: #c41e3a;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.mission-error-icon {
+  left: 8px;
+  font-size: 16px;
+}
+
+.form-group label.required::after {
+  content: " *";
+  color: #c41e3a;
+  font-weight: bold;
+}
+
+.mission-required::after {
+  content: " *";
+  color: #c41e3a;
+  font-weight: bold;
+}
+
+.mission-modal .suggestions {
+  max-height: 150px;
+}
+
+.mission-modal .suggestion-item {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.mission-modal .modal-actions {
+  gap: 8px;
+  margin-top: 15px;
+}
+
+/* ==================== LEGACY STYLES (KEEP FOR BACKWARDS COMPATIBILITY) ==================== */
+
+.participants-list {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+.participants-list h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.participant-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 4px;
+}
+
+.participant-row span {
+  min-width: 150px;
+  font-weight: 600;
+}
+
+.participant-row input {
+  flex: 1;
+}
+
+.participant-datetime-row {
+  display: grid;
+  grid-template-columns: auto 1fr 150px;
+  gap: 30px;
+  align-items: start;
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: #b1b1b170;
+  border-radius: 6px;
+}
+
+.participant-name {
+  font-weight: 600;
+  padding-top: 35px;
+  min-width: 150px;
+}
+
+.datetime-inputs {
+  gap: 30px;
+}

@@ -1,0 +1,54 @@
+.time-picker {
+  margin-bottom: 20px;
+}
+
+.time-picker label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.time-picker-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-picker-inputs select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 80px;
+  background-color: #fff;
+}
+
+.time-separator {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.datetime-picker {
+  margin-bottom: 20px;
+}
+
+.datetime-picker label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.datetime-picker-row {
+  display: flex;
+  align-items: center;
+}
+
+.date-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  width: auto;
+  direction: ltr;
+}

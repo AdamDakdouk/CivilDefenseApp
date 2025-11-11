@@ -1,0 +1,68 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl;
+  text-align: right;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Modern container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Default buttons (save/confirm) - Green */
+button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+/* Yellow edit buttons */
+.btn-edit, .btn-edit-small {
+  background-color: #ffc107;
+  color: #fff;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.btn-edit:hover, .btn-edit-small:hover {
+  background-color: #e0a800;
+}
+
+/* Red delete buttons */
+.btn-delete, .btn-delete-small, .btn-remove {
+  background-color: #c41e3a;
+  color: #fff;
+}
+
+.btn-delete:hover, .btn-delete-small:hover, .btn-remove:hover {
+  background-color: #a01629;
+}
+
+/* Gray cancel buttons */
+.btn-cancel {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}

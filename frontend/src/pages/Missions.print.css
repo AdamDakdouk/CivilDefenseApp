@@ -1,0 +1,31 @@
+@media print {
+
+    /* Hide everything except the content */
+    .navbar,
+    .missions-header button,
+    .edit-btn,
+    .delete-btn,
+    .page-header,
+    button {
+        display: none !important;
+    }
+
+        table tr th:last-child,
+        table tr td:last-child {
+            display: none;
+        }
+
+
+        /* Portrait orientation for list */
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+
+        body {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+            margin: 0;
+            padding: 0;
+        }
+    }
