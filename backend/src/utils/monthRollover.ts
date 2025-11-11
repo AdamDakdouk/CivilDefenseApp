@@ -7,10 +7,11 @@ import Settings from '../models/Settings';
 
 export const rolloverMonth = async (month: number, year: number) => {
     try {
-        console.log(`Starting month rollover for ${month}/${year}...`);
+        console.log(`\n🔄 Starting month rollover for ${month}/${year}...`);
 
         // Get all users
         const users = await User.find();
+        console.log(`📊 Found ${users.length} users`);
 
         // Get missions for this month to calculate mission type counts
         const startDate = new Date(year, month - 1, 1);
@@ -22,6 +23,8 @@ export const rolloverMonth = async (month: number, year: number) => {
                 $lte: endDate
             }
         }).populate('participants.user');
+
+        console.log(`📋 Found ${missions.length} missions for ${month}/${year}`);
 
         // // Delete all attendance records for the closed month
         // const attendanceStartDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
@@ -39,40 +42,51 @@ export const rolloverMonth = async (month: number, year: number) => {
         // Count mission types per user
         const userMissionCounts: any = {};
         for (const mission of missions) {
-            for (const participant of mission.participants) {
-                const userId = participant.user._id.toString();
+            try {
+                for (const participant of mission.participants) {
+                    if (!participant.user) {
+                        console.warn(`⚠️  Mission ${mission._id} has participant without user data`);
+                        continue;
+                    }
 
-                if (!userMissionCounts[userId]) {
-                    userMissionCounts[userId] = {
-                        fire: 0,
-                        rescue: 0,
-                        medic: 0,
-                        publicService: 0,
-                        misc: 0
-                    };
-                }
+                    const userId = participant.user._id.toString();
 
-                switch (mission.missionType) {
-                    case 'fire':
-                        userMissionCounts[userId].fire++;
-                        break;
-                    case 'rescue':
-                        userMissionCounts[userId].rescue++;
-                        break;
-                    case 'medic':
-                        userMissionCounts[userId].medic++;
-                        break;
-                    case 'public-service':
-                        userMissionCounts[userId].publicService++;
-                        break;
-                    case 'misc':
-                        userMissionCounts[userId].misc++;
-                        break;
+                    if (!userMissionCounts[userId]) {
+                        userMissionCounts[userId] = {
+                            fire: 0,
+                            rescue: 0,
+                            medic: 0,
+                            publicService: 0,
+                            misc: 0
+                        };
+                    }
+
+                    switch (mission.missionType) {
+                        case 'fire':
+                            userMissionCounts[userId].fire++;
+                            break;
+                        case 'rescue':
+                            userMissionCounts[userId].rescue++;
+                            break;
+                        case 'medic':
+                            userMissionCounts[userId].medic++;
+                            break;
+                        case 'public-service':
+                            userMissionCounts[userId].publicService++;
+                            break;
+                        case 'misc':
+                            userMissionCounts[userId].misc++;
+                            break;
+                    }
                 }
+            } catch (err) {
+                console.error(`⚠️  Error processing mission ${mission._id}:`, err);
             }
         }
+        console.log(`📊 Counted mission types for ${Object.keys(userMissionCounts).length} users`);
 
         // Create monthly reports for all users
+        let reportsCreated = 0;
         for (const user of users) {
             const missionCounts = userMissionCounts[(user._id as mongoose.Types.ObjectId).toString()] || {
                 fire: 0,
@@ -99,11 +113,13 @@ export const rolloverMonth = async (month: number, year: number) => {
                     totalDays: user.currentMonthDays,
                     missionTypeCounts: missionCounts
                 });
+                reportsCreated++;
             }
         }
+        console.log(`📝 Created ${reportsCreated} monthly reports`);
 
         // Reset current month fields for all users
-        await User.updateMany(
+        const resetResult = await User.updateMany(
             {},
             {
                 $set: {
@@ -113,30 +129,31 @@ export const rolloverMonth = async (month: number, year: number) => {
                 }
             }
         );
+        console.log(`🔄 Reset stats for ${resetResult.modifiedCount} users`);
 
         // Update active month to next month
         const nextMonth = month === 12 ? 1 : month + 1;
         const nextYear = month === 12 ? year + 1 : year;
 
-        let settings = await Settings.findOne();
-        if (!settings) {
-            settings = await Settings.create({
+        console.log(`🔄 Updating settings from ${month}/${year} to ${nextMonth}/${nextYear}...`);
+
+        const settings = await Settings.findOneAndUpdate(
+            {},
+            {
                 activeMonth: nextMonth,
                 activeYear: nextYear
-            });
-        } else {
-            settings.activeMonth = nextMonth;
-            settings.activeYear = nextYear;
-            settings.updatedAt = new Date();
-            await settings.save();
-        }
+            },
+            {
+                upsert: true,
+                new: true,
+                runValidators: true
+            }
+        );
 
-        console.log(`✅ Advanced active month to ${nextMonth}/${nextYear}`);
-
-        console.log(`✅ Month rollover completed for ${month}/${year}`);
+        console.log(`✅ Settings updated successfully:`, settings);
         return { success: true, usersProcessed: users.length };
     } catch (error) {
-        console.error('Month rollover error:', error);
+        console.error('\n❌ Month rollover ERROR:', error);
         throw error;
     }
 };

@@ -1,7 +1,11 @@
 import express, { Request, Response } from 'express';
 import Mission from '../models/Mission';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 // Get mission type counts for volunteers in a specific month
 router.get('/mission-counts', async (req: Request, res: Response) => {

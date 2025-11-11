@@ -1,7 +1,11 @@
 import express, { Request, Response } from 'express';
 import { rolloverMonth } from '../utils/monthRollover';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 // Manually trigger month rollover
 router.post('/rollover', async (req: Request, res: Response) => {
@@ -16,12 +20,18 @@ router.post('/rollover', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid month' });
     }
     
-    const result = await rolloverMonth(month, year);
+    await rolloverMonth(month, year);
     
-    res.json({
-      message: `Month ${month}/${year} archived successfully`,
-      ...result
+    // Calculate new month and year
+    const newMonth = month === 12 ? 1 : month + 1;
+    const newYear = month === 12 ? year + 1 : year;
+    
+    res.json({ 
+      message: 'Month rollover completed successfully',
+      newActiveMonth: newMonth,
+      newActiveYear: newYear
     });
+    
   } catch (error) {
     console.error('Month rollover error:', error);
     res.status(500).json({ message: 'Error during month rollover', error });

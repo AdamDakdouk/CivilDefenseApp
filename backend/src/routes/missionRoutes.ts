@@ -3,8 +3,12 @@ import Mission from '../models/Mission';
 import Shift from '../models/Shift';
 import User from '../models/User';
 import Settings from '../models/Settings';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 // Get current month missions
 router.get('/', async (req: Request, res: Response) => {
@@ -21,7 +25,7 @@ router.get('/', async (req: Request, res: Response) => {
     })
       .populate('participants.user')
       .populate('createdBy')
-      .sort({ startTime:-1 });
+      .sort({ startTime: 1 });
     res.json(missions);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching missions', error });
@@ -59,7 +63,7 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
 // Create new mission
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, missionDetails, notes, team, participants, createdBy } = req.body;
+    const { referenceNumber, vehicleNumbers, startTime, endTime, location, missionType, missionDetails, notes, team, participants, createdBy } = req.body;
     const missionStart = new Date(startTime);
     let missionEnd = new Date(endTime);
 
@@ -76,7 +80,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     const mission = new Mission({
       referenceNumber,
-      vehicleNumber,
+      vehicleNumbers,
       startTime: missionStart,
       endTime: missionEnd,
       location,
@@ -135,7 +139,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { referenceNumber, vehicleNumber, startTime, endTime, location, missionType, missionDetails, notes, team, participants } = req.body;
+    const { referenceNumber, vehicleNumbers, startTime, endTime, location, missionType, missionDetails, notes, team, participants } = req.body;
 
     // Get old mission
     const oldMission = await Mission.findById(id);
@@ -206,7 +210,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       id,
       {
         referenceNumber,
-        vehicleNumber,
+        vehicleNumbers,
         startTime: newStart,
         endTime: newEnd,
         location,
@@ -331,7 +335,7 @@ router.get('/by-month', async (req: Request, res: Response) => {
     })
       .populate('participants.user')
       .populate('createdBy')
-      .sort({ startTime: -1 });
+      .sort({ startTime: 1 });
 
     res.json(missions);
   } catch (error) {

@@ -5,8 +5,12 @@ import User from '../models/User';
 import Mission from '../models/Mission';
 import Attendance from '../models/Attendance';
 import Settings from '../models/Settings';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 // Get current month shifts
 router.get('/', async (req: Request, res: Response) => {

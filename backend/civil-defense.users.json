@@ -1,0 +1,345 @@
+[{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf493"
+  },
+  "name": "جهاد الحلواني",
+  "role": "employee",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.739Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "middleName": "شايم",
+  "autoNumber": "220446"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf494"
+  },
+  "name": "وائل المهتار",
+  "role": "employee",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.740Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "autoNumber": "220575",
+  "middleName": "يوسف"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf495"
+  },
+  "name": "نعيم المهتار",
+  "role": "employee",
+  "team": "B",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.741Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "middleName": "وفيق",
+  "autoNumber": "219743"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf496"
+  },
+  "name": "جمال المهتار",
+  "role": "employee",
+  "team": "B",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.741Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "middleName": "الدين عدنان",
+  "autoNumber": "220181"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf497"
+  },
+  "name": "ناجي ابو غنام",
+  "role": "employee",
+  "team": "C",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.741Z"
+  },
+  "__v": 0,
+  "middleName": "رامز",
+  "autoNumber": "220571",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf498"
+  },
+  "name": "سامي الحلواني",
+  "role": "employee",
+  "team": "C",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.741Z"
+  },
+  "__v": 0,
+  "middleName": "سعيد",
+  "autoNumber": "219912",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf499"
+  },
+  "name": "آدم دقدوق",
+  "role": "volunteer",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.741Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "cardNumber": "125 12 23 50182"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf49a"
+  },
+  "name": "جاد سليم الجوهري",
+  "role": "volunteer",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "cardNumber": "125 12 20 25673"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf49b"
+  },
+  "name": "عمار ابو غنام",
+  "role": "volunteer",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "cardNumber": "125 12 24 50381"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf49c"
+  },
+  "name": "دانيال المهتار",
+  "role": "volunteer",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "cardNumber": "125 12 21 50015"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf49d"
+  },
+  "name": "بهاء الحلبي",
+  "role": "volunteer",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "cardNumber": "125 12 22 50109"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf49e"
+  },
+  "name": "ريّان المهتار",
+  "role": "volunteer",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "cardNumber": ""
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf49f"
+  },
+  "name": "سلطان رافع",
+  "role": "volunteer",
+  "team": "B",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "cardNumber": "125 13 20 25740",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf4a0"
+  },
+  "name": "غاندي الجوهري",
+  "role": "volunteer",
+  "team": "B",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "cardNumber": "125 12 15 25263",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf4a1"
+  },
+  "name": "فداء رافع",
+  "role": "volunteer",
+  "team": "B",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "cardNumber": "125 12 23 50183",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf4a3"
+  },
+  "name": "كنان المهتار",
+  "role": "volunteer",
+  "team": "C",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.742Z"
+  },
+  "__v": 0,
+  "cardNumber": "125 12 22 50110",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf4a4"
+  },
+  "name": "ياسر المهتار",
+  "role": "volunteer",
+  "team": "C",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.743Z"
+  },
+  "__v": 0,
+  "cardNumber": "125 12 20 25764",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf4a5"
+  },
+  "name": "جاد عصام الجوهري",
+  "role": "volunteer",
+  "team": "C",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.743Z"
+  },
+  "__v": 0,
+  "cardNumber": "",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf4a6"
+  },
+  "name": "ايهاب شعبان",
+  "role": "volunteer",
+  "team": "C",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.743Z"
+  },
+  "__v": 0,
+  "cardNumber": "",
+  "currentMonthDays": 0
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf4a7"
+  },
+  "name": "زياد المهتار",
+  "role": "head",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.743Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "cardNumber": "",
+  "autoNumber": "219095",
+  "middleName": "شوقي"
+},
+{
+  "_id": {
+    "$oid": "68dd0eff69489a1b798bf4a8"
+  },
+  "name": "منار المهتار",
+  "role": "administrative staff",
+  "team": "A",
+  "currentMonthHours": 0,
+  "currentMonthMissions": 0,
+  "createdAt": {
+    "$date": "2025-10-01T11:22:39.743Z"
+  },
+  "__v": 0,
+  "currentMonthDays": 0,
+  "autoNumber": "220336",
+  "middleName": "جهاد"
+}]

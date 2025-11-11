@@ -1,7 +1,11 @@
 import express, { Request, Response } from 'express';
 import Attendance from '../models/Attendance';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 // Get attendance records for a specific month
 router.get('/month', async (req: Request, res: Response) => {

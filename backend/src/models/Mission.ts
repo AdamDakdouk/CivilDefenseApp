@@ -6,7 +6,7 @@ export interface IMissionParticipant {
 
 export interface IMission extends Document {
     referenceNumber: string;
-    vehicleNumber: string;
+    vehicleNumbers: string;
     startTime: Date;
     endTime: Date;
     location: string;
@@ -32,7 +32,7 @@ const MissionSchema = new Schema<IMission>({
         type: String,
         required: true
     },
-    vehicleNumber: {
+    vehicleNumbers: {
         type: String,
         required: true
     },

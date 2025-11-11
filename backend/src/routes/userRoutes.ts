@@ -1,7 +1,11 @@
 import express, { Request, Response } from 'express';
 import User from '../models/User';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 // Get all users
 router.get('/', async (req: Request, res: Response) => {

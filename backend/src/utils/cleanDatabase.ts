@@ -37,7 +37,7 @@ const cleanDatabase = async () => {
     console.log(`✅ Deleted ${settingsResult.deletedCount} settings records`);
 
     // Reset all user stats
-    await User.updateMany(
+    const updateResult = await User.updateMany(
       {},
       {
         $set: {
@@ -47,12 +47,22 @@ const cleanDatabase = async () => {
         }
       }
     );
-    console.log('✅ Reset all user stats to 0');
+    console.log(`✅ Reset stats for ${updateResult.modifiedCount} users`);
 
-    console.log('✅ Database cleaned successfully!');
+    console.log('\n✅ Database cleaned successfully!');
+    
+    // Properly close the connection
+    await mongoose.connection.close();
+    console.log('✅ MongoDB connection closed');
     process.exit(0);
   } catch (error) {
     console.error('❌ Error:', error);
+    // Close connection on error too
+    try {
+      await mongoose.connection.close();
+    } catch (closeError) {
+      console.error('❌ Error closing connection:', closeError);
+    }
     process.exit(1);
   }
 };

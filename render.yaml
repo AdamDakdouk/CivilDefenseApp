@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: civil-defense-app
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: civil-defense-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+
+databases:
+  - name: civil-defense-db
+    plan: free
+    region: oregon

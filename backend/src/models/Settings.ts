@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ISettings extends Document {
   activeMonth: number;
   activeYear: number;
+  createdAt: Date;
   updatedAt: Date;
 }
 
@@ -16,11 +17,10 @@ const SettingsSchema = new Schema<ISettings>({
   activeYear: {
     type: Number,
     required: true
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
+  // Remove the manual updatedAt field
+}, {
+  timestamps: true  // Let Mongoose handle createdAt and updatedAt automatically
 });
 
 export default mongoose.model<ISettings>('Settings', SettingsSchema);

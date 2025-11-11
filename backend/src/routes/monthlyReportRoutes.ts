@@ -1,8 +1,12 @@
 import express, { Request, Response } from 'express';
 import MonthlyReport from '../models/MonthlyReport';
 import User from '../models/User';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
+
+// Apply authentication to all routes
+router.use(authenticateToken);
 
 // Get all monthly reports for a specific month/year
 router.get('/', async (req: Request, res: Response) => {
