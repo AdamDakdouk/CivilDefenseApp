@@ -1,9 +1,14 @@
 import axios from 'axios';
 import { User, Mission, Shift } from '../types';
 
-const API_URL = process.env.NODE_ENV === 'production'
-  ? '/api'  // In production, use relative URL (same domain)
-  : 'http://localhost:5000/api';  // In development, use localhost
+// Check hostname at runtime (most reliable)
+const isLocalhost = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1';
+
+const API_URL = isLocalhost ? 'http://localhost:5000/api' : '/api';
+
+console.log('🌍 Running on:', window.location.hostname);
+console.log('🔗 API URL:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
