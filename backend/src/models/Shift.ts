@@ -9,7 +9,7 @@ export interface IShiftParticipant {
 
 export interface IShift extends Document {
   date: Date;
-  team: 'A' | 'B' | 'C';
+  team: '1' | '2' | '3';
   participants: IShiftParticipant[];
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -42,7 +42,7 @@ const ShiftSchema = new Schema<IShift>({
   },
   team: {
     type: String,
-    enum: ['A', 'B', 'C'],
+    enum: ['1', '2', '3'],
     required: true
   },
   participants: [ShiftParticipantSchema],

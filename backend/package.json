@@ -7,10 +7,10 @@
     "build": "tsc",
     "postbuild": "echo Build complete",
     "start": "node dist/server.js",
-    "create-admin": "ts-node src/utils/createAdmin.ts",
-    "seed": "ts-node src/utils/seedUsers.ts",
-    "clean": "ts-node src/utils/cleanDatabase.ts",
-    "update-admin-email": "ts-node src/utils/updateAdminEmail.ts"
+    "create-admin": "ts-node src/scripts/createAdmin.ts",
+    "seed": "ts-node src/scripts/seedUsers.ts",
+    "clean": "ts-node src/scripts/cleanDatabase.ts",
+    "update-admin-email": "ts-node src/scripts/updateAdminEmail.ts"
   },
   "keywords": [],
   "author": "",

@@ -7,7 +7,7 @@ export interface IUser extends Document {
   motherName: string;
   autoNumber: string;
   role: 'volunteer' | 'employee' | 'head' | 'administrative staff';
-  team: 'A' | 'B' | 'C';
+  team: '1' | '2' | '3';
   currentMonthHours: number;
   currentMonthMissions: number;
   currentMonthDays: number;
@@ -43,7 +43,7 @@ const UserSchema = new Schema<IUser>({
   },
   team: {
     type: String,
-    enum: ['A', 'B', 'C'],
+    enum: ['1', '2', '3'],
     required: true
   },
   currentMonthHours: {

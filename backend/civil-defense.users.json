@@ -4,7 +4,7 @@
   },
   "name": "جهاد الحلواني",
   "role": "employee",
-  "team": "A",
+  "team": "3",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -21,7 +21,7 @@
   },
   "name": "وائل المهتار",
   "role": "employee",
-  "team": "A",
+  "team": "3",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -38,7 +38,7 @@
   },
   "name": "نعيم المهتار",
   "role": "employee",
-  "team": "B",
+  "team": "1",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -55,7 +55,7 @@
   },
   "name": "جمال المهتار",
   "role": "employee",
-  "team": "B",
+  "team": "1",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -72,7 +72,7 @@
   },
   "name": "ناجي ابو غنام",
   "role": "employee",
-  "team": "C",
+  "team": "2",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -89,7 +89,7 @@
   },
   "name": "سامي الحلواني",
   "role": "employee",
-  "team": "C",
+  "team": "2",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -106,7 +106,7 @@
   },
   "name": "آدم دقدوق",
   "role": "volunteer",
-  "team": "A",
+  "team": "3",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -122,7 +122,7 @@
   },
   "name": "جاد سليم الجوهري",
   "role": "volunteer",
-  "team": "A",
+  "team": "3",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -138,7 +138,7 @@
   },
   "name": "عمار ابو غنام",
   "role": "volunteer",
-  "team": "A",
+  "team": "3",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -154,7 +154,7 @@
   },
   "name": "دانيال المهتار",
   "role": "volunteer",
-  "team": "A",
+  "team": "3",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -170,7 +170,7 @@
   },
   "name": "بهاء الحلبي",
   "role": "volunteer",
-  "team": "A",
+  "team": "3",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -186,7 +186,7 @@
   },
   "name": "ريّان المهتار",
   "role": "volunteer",
-  "team": "A",
+  "team": "3",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -202,7 +202,7 @@
   },
   "name": "سلطان رافع",
   "role": "volunteer",
-  "team": "B",
+  "team": "1",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -218,7 +218,7 @@
   },
   "name": "غاندي الجوهري",
   "role": "volunteer",
-  "team": "B",
+  "team": "1",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -234,7 +234,7 @@
   },
   "name": "فداء رافع",
   "role": "volunteer",
-  "team": "B",
+  "team": "1",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -250,7 +250,7 @@
   },
   "name": "كنان المهتار",
   "role": "volunteer",
-  "team": "C",
+  "team": "2",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -266,7 +266,7 @@
   },
   "name": "ياسر المهتار",
   "role": "volunteer",
-  "team": "C",
+  "team": "2",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -282,7 +282,7 @@
   },
   "name": "جاد عصام الجوهري",
   "role": "volunteer",
-  "team": "C",
+  "team": "2",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -298,7 +298,7 @@
   },
   "name": "ايهاب شعبان",
   "role": "volunteer",
-  "team": "C",
+  "team": "2",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -314,7 +314,7 @@
   },
   "name": "زياد المهتار",
   "role": "head",
-  "team": "A",
+  "team": "1",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {
@@ -332,7 +332,7 @@
   },
   "name": "منار المهتار",
   "role": "administrative staff",
-  "team": "A",
+  "team": "1",
   "currentMonthHours": 0,
   "currentMonthMissions": 0,
   "createdAt": {

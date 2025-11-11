@@ -13,7 +13,7 @@ export interface IMission extends Document {
     missionType: 'fire' | 'rescue' | 'medic' | 'public-service' | 'misc';
     missionDetails: string;  // Changed - specific details
     notes?: string;
-    team: 'A' | 'B' | 'C';
+    team: '1' | '2' | '3';
     participants: IMissionParticipant[];
     createdBy: mongoose.Types.ObjectId;
     createdAt: Date;
@@ -63,7 +63,7 @@ const MissionSchema = new Schema<IMission>({
     },
     team: {
         type: String,
-        enum: ['A', 'B', 'C'],
+        enum: ['1', '2', '3'],
         required: true
     },
     participants: [MissionParticipantSchema],
