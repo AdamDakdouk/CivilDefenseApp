@@ -30,11 +30,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Test route
-app.get('/', (req, res) => {
-  res.json({ message: 'Civil Defense API is running' });
-});
-
 // API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/shifts', shiftRoutes);
