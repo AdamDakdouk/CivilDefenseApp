@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { User, Mission, Shift } from '../types';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.NODE_ENV === 'production'
+  ? '/api'  // In production, use relative URL (same domain)
+  : 'http://localhost:5000/api';  // In development, use localhost
 
 const api = axios.create({
   baseURL: API_URL,
