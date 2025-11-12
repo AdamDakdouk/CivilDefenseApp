@@ -41,8 +41,32 @@ router.post('/', async (req: Request, res: Response) => {
 
     // Calculate hours for each participant
     const processedParticipants = participants.map((p: any) => {
-      const checkIn = new Date(p.checkIn);
-      const checkOut = new Date(p.checkOut);
+      const checkInParts = p.checkIn.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+      const checkOutParts = p.checkOut.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+
+      if (!checkInParts || !checkOutParts) {
+        throw new Error('Invalid datetime format');
+      }
+
+      // Create dates in UTC to avoid timezone conversion
+      const checkIn = new Date(Date.UTC(
+        parseInt(checkInParts[1]), // year
+        parseInt(checkInParts[2]) - 1, // month (0-indexed)
+        parseInt(checkInParts[3]), // day
+        parseInt(checkInParts[4]), // hour
+        parseInt(checkInParts[5]), // minute
+        0, 0 // seconds, milliseconds
+      ));
+
+      const checkOut = new Date(Date.UTC(
+        parseInt(checkOutParts[1]),
+        parseInt(checkOutParts[2]) - 1,
+        parseInt(checkOutParts[3]),
+        parseInt(checkOutParts[4]),
+        parseInt(checkOutParts[5]),
+        0, 0
+      ));
+
       const hoursServed = Math.round((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60));
 
       return {
@@ -500,7 +524,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
               const hasOverlap = missionStart < otherShiftEnd && missionEnd > otherShiftStart;
               if (hasOverlap) {
                 coveredByOtherShift = true;
-                break; 
+                break;
               }
             }
           }
