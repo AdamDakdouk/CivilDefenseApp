@@ -279,6 +279,16 @@ const Missions: React.FC = () => {
                 </table>
             )}
 
+            {showModal && (
+                <AddMissionModal
+                    isOpen={showModal}
+                    onClose={() => { setShowModal(false); setEditingMission(null); }}
+                    onSave={handleSaveMission}
+                    editMode={!!editingMission}
+                    initialData={editingMission}
+                />
+            )}
+
             {showConfirmDelete && (
                 <ConfirmModal
                     message="هل أنت متأكد من حذف هذه المهمة؟"
@@ -298,14 +308,6 @@ const Missions: React.FC = () => {
                     message={alertMessage}
                     onClose={() => setShowAlert(false)}
                     type={alertType} // ✅ Use alertType from state
-                />
-            )}
-
-            {showAlert && (
-                <CustomAlert
-                    message={alertMessage}
-                    onClose={() => setShowAlert(false)}
-                    type="warning"
                 />
             )}
         </div>

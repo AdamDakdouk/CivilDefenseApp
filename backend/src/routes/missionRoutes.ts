@@ -64,8 +64,33 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { referenceNumber, vehicleNumbers, startTime, endTime, location, missionType, missionDetails, notes, team, participants, createdBy } = req.body;
-    const missionStart = new Date(startTime);
-    let missionEnd = new Date(endTime);
+    
+    // ✅ Parse datetime strings properly to avoid timezone conversion
+    const startTimeParts = startTime.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    const endTimeParts = endTime.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    
+    if (!startTimeParts || !endTimeParts) {
+      return res.status(400).json({ message: 'Invalid datetime format' });
+    }
+
+    // Create dates in UTC to avoid timezone conversion
+    const missionStart = new Date(Date.UTC(
+      parseInt(startTimeParts[1]), // year
+      parseInt(startTimeParts[2]) - 1, // month (0-indexed)
+      parseInt(startTimeParts[3]), // day
+      parseInt(startTimeParts[4]), // hour
+      parseInt(startTimeParts[5]), // minute
+      0, 0 // seconds, milliseconds
+    ));
+
+    let missionEnd = new Date(Date.UTC(
+      parseInt(endTimeParts[1]),
+      parseInt(endTimeParts[2]) - 1,
+      parseInt(endTimeParts[3]),
+      parseInt(endTimeParts[4]),
+      parseInt(endTimeParts[5]),
+      0, 0
+    ));
 
     // If end time is before start time, mission crosses midnight - add 1 day to end
     if (missionEnd < missionStart) {
@@ -168,7 +193,6 @@ router.put('/:id', async (req: Request, res: Response) => {
     // Revert old mission stats from OLD participants (only if current month)
     if (oldWasCurrentMonth) {
       for (const participant of oldMission.participants) {
-
         const userId = participant.user.toString();
 
         // Decrement mission count
@@ -188,16 +212,39 @@ router.put('/:id', async (req: Request, res: Response) => {
       }
     }
 
-    // Calculate new mission hours
-    const newStart = new Date(startTime);
-    let newEnd = new Date(endTime);
+    // ✅ Calculate new mission hours with proper timezone handling
+    const startTimeParts = startTime.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    const endTimeParts = endTime.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    
+    if (!startTimeParts || !endTimeParts) {
+      return res.status(400).json({ message: 'Invalid datetime format' });
+    }
+
+    // Create dates in UTC to avoid timezone conversion
+    const newStart = new Date(Date.UTC(
+      parseInt(startTimeParts[1]), // year
+      parseInt(startTimeParts[2]) - 1, // month (0-indexed)
+      parseInt(startTimeParts[3]), // day
+      parseInt(startTimeParts[4]), // hour
+      parseInt(startTimeParts[5]), // minute
+      0, 0 // seconds, milliseconds
+    ));
+
+    let newEnd = new Date(Date.UTC(
+      parseInt(endTimeParts[1]),
+      parseInt(endTimeParts[2]) - 1,
+      parseInt(endTimeParts[3]),
+      parseInt(endTimeParts[4]),
+      parseInt(endTimeParts[5]),
+      0, 0
+    ));
 
     // Fix midnight crossing for new mission
     if (newEnd <= newStart) {
       newEnd = new Date(newEnd.getTime() + 24 * 60 * 60 * 1000);
     }
 
-    console.log('Adjusted mission time:', oldStart, 'to', oldEnd);
+    console.log('Adjusted mission time:', newStart, 'to', newEnd);
     
     const newHours = Math.round((newEnd.getTime() - newStart.getTime()) / (1000 * 60 * 60));
 
