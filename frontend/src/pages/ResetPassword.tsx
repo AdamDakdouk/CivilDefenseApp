@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../services/api'; // Add this import
 import './Login.css';
 
 const ResetPassword: React.FC = () => {
@@ -46,25 +47,16 @@ const ResetPassword: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resetToken, newPassword })
-      });
+      // ✅ Fixed: Use api instance
+      await api.post('/auth/reset-password', { resetToken, newPassword });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('تم تغيير كلمة المرور بنجاح');
-        sessionStorage.removeItem('resetToken');
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
-      } else {
-        setError(data.message || 'حدث خطأ');
-      }
-    } catch (err) {
-      setError('حدث خطأ في الاتصال');
+      setMessage('تم تغيير كلمة المرور بنجاح');
+      sessionStorage.removeItem('resetToken');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'حدث خطأ في الاتصال');
     } finally {
       setLoading(false);
     }

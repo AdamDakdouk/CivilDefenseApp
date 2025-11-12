@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../services/api'; // Add this import
 import './Login.css';
 
 const ForgotPassword: React.FC = () => {
@@ -18,22 +19,13 @@ const ForgotPassword: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
+      // ✅ Fixed: Use api instance
+      const response = await api.post('/auth/forgot-password', { email });
 
-      const data = await response.json();
-
-      if (response.ok || response.status === 200) {
-        setMessage('تم إرسال رمز التحقق إلى بريدك الإلكتروني');
-        setStep('code');
-      } else {
-        setError(data.message || 'حدث خطأ');
-      }
-    } catch (err) {
-      setError('حدث خطأ في الاتصال');
+      setMessage('تم إرسال رمز التحقق إلى بريدك الإلكتروني');
+      setStep('code');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'حدث خطأ في الاتصال');
     } finally {
       setLoading(false);
     }
@@ -46,26 +38,17 @@ const ForgotPassword: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/verify-reset-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code })
-      });
+      // ✅ Fixed: Use api instance
+      const response = await api.post('/auth/verify-reset-code', { email, code });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('تم التحقق من الرمز بنجاح');
-        // Store the reset token and navigate to password reset
-        sessionStorage.setItem('resetToken', data.resetToken);
-        setTimeout(() => {
-          navigate('/reset-password');
-        }, 1000);
-      } else {
-        setError(data.message || 'رمز غير صحيح أو منتهي الصلاحية');
-      }
-    } catch (err) {
-      setError('حدث خطأ في الاتصال');
+      setMessage('تم التحقق من الرمز بنجاح');
+      // Store the reset token and navigate to password reset
+      sessionStorage.setItem('resetToken', response.data.resetToken);
+      setTimeout(() => {
+        navigate('/reset-password');
+      }, 1000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'رمز غير صحيح أو منتهي الصلاحية');
     } finally {
       setLoading(false);
     }
