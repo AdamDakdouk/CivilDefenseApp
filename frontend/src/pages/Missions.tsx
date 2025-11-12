@@ -21,6 +21,7 @@ const Missions: React.FC = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
+    const [deletingMission, setDeletingMission] = useState(false);
 
     useEffect(() => {
         fetchMissions();
@@ -102,16 +103,22 @@ const Missions: React.FC = () => {
     };
 
     const handleDeleteMission = async () => {
-        if (missionToDelete) {
+        if (missionToDelete && !deletingMission) { // ✅ Check if not already deleting
+            setDeletingMission(true); // ✅ Set deleting state
             try {
                 await deleteMission(missionToDelete);
                 fetchMissions();
                 setShowConfirmDelete(false);
                 setMissionToDelete(null);
+                setAlertMessage('تم حذف المهمة بنجاح');
+                setAlertType('success');
+                setShowAlert(true);
             } catch (error) {
                 setAlertMessage('حدث خطأ أثناء حذف المهمة');
                 setAlertType('warning');
                 setShowAlert(true);
+            } finally {
+                setDeletingMission(false); // ✅ Reset deleting state
             }
         }
     };
@@ -272,24 +279,25 @@ const Missions: React.FC = () => {
                 </table>
             )}
 
-            {showModal && (
-                <AddMissionModal
-                    isOpen={showModal}
-                    onClose={() => { setShowModal(false); setEditingMission(null); }}
-                    onSave={handleSaveMission}
-                    editMode={!!editingMission}
-                    initialData={editingMission}
-                />
-            )}
-
             {showConfirmDelete && (
                 <ConfirmModal
                     message="هل أنت متأكد من حذف هذه المهمة؟"
                     onConfirm={handleDeleteMission}
                     onCancel={() => {
-                        setShowConfirmDelete(false);
-                        setMissionToDelete(null);
+                        if (!deletingMission) { // ✅ Only allow cancel if not deleting
+                            setShowConfirmDelete(false);
+                            setMissionToDelete(null);
+                        }
                     }}
+                    loading={deletingMission} // ✅ Pass loading state to modal
+                />
+            )}
+
+            {showAlert && (
+                <CustomAlert
+                    message={alertMessage}
+                    onClose={() => setShowAlert(false)}
+                    type={alertType} // ✅ Use alertType from state
                 />
             )}
 

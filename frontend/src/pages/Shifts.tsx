@@ -18,6 +18,7 @@ const Shifts: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
+   const [deletingShift, setDeletingShift] = useState(false); // ✅ Add this
 
   useEffect(() => {
     fetchShifts();
@@ -102,17 +103,23 @@ const Shifts: React.FC = () => {
   };
 
   const handleDeleteShift = async () => {
-    if (shiftToDelete) {
+    if (shiftToDelete && !deletingShift) { // ✅ Check if not already deleting
+      setDeletingShift(true); // ✅ Set deleting state
       try {
         await deleteShift(shiftToDelete);
         fetchShifts();
         setShowConfirmDelete(false);
         setShiftToDelete(null);
+        setAlertMessage('تم حذف المناوبة بنجاح');
+        setAlertType('success');
+        setShowAlert(true);
       } catch (error) {
         console.error('Error deleting shift:', error);
         setAlertMessage('حدث خطأ أثناء حذف المناوبة');
         setAlertType('warning');
         setShowAlert(true);
+      } finally {
+        setDeletingShift(false); 
       }
     }
   };
@@ -234,9 +241,12 @@ const Shifts: React.FC = () => {
           message="هل أنت متأكد من حذف هذه المناوبة؟"
           onConfirm={handleDeleteShift}
           onCancel={() => {
-            setShowConfirmDelete(false);
-            setShiftToDelete(null);
+            if (!deletingShift) { // ✅ Only allow cancel if not deleting
+              setShowConfirmDelete(false);
+              setShiftToDelete(null);
+            }
           }}
+          loading={deletingShift} // ✅ Pass loading state to modal
         />
       )}
 

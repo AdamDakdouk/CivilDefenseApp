@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './CustomAlert.css';
 
 interface CustomAlertProps {
@@ -9,16 +9,27 @@ interface CustomAlertProps {
 
 const CustomAlert: React.FC<CustomAlertProps> = ({ message, onClose, type }) => {
   const alertConfig = {
-    success: { icon: '✓', showButton: false },
-    error: { icon: '⚠️', showButton: true },
-    warning: { icon: '⚠', showButton: true },
-    info: { icon: 'ℹ', showButton: true },
+    success: { icon: '✓', showButton: false, autoDismiss: true },
+    error: { icon: '⚠️', showButton: true, autoDismiss: false },
+    warning: { icon: '⚠', showButton: true, autoDismiss: false },
+    info: { icon: 'ℹ', showButton: true, autoDismiss: false },
   };
 
   const config = alertConfig[type];
   const overlayClass = type === 'success' 
     ? 'custom-alert-overlay-success' 
     : 'custom-alert-overlay';
+
+  // ✅ Auto-dismiss success alerts after 2 seconds
+  useEffect(() => {
+    if (config.autoDismiss) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 1500); 
+
+      return () => clearTimeout(timer); // Cleanup timer on unmount
+    }
+  }, [config.autoDismiss, onClose]);
 
   return (
     <div className={overlayClass} onClick={onClose}>

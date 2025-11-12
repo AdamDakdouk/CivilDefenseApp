@@ -5,16 +5,17 @@ interface ConfirmModalProps {
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
+  loading?: boolean;
 }
 
-const ConfirmModal: React.FC<ConfirmModalProps> = ({ message, onConfirm, onCancel }) => {
+const ConfirmModal: React.FC<ConfirmModalProps> = ({ message, onConfirm, onCancel, loading = false }) => {
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
         <h3>{message}</h3>
         <div className="modal-actions">
-          <button onClick={onConfirm} className="btn-danger">تأكيد الحذف</button>
-          <button onClick={onCancel} className="btn-cancel">إلغاء</button>
+          <button onClick={onConfirm} className="btn-danger" disabled={loading}>{loading ? 'جاري الحذف...' : 'تأكيد'}</button>
+          <button onClick={onCancel} className="btn-cancel" disabled={loading}>إلغاء</button>
         </div>
       </div>
     </div>
