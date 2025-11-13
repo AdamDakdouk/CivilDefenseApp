@@ -9,7 +9,6 @@
     "start": "node dist/server.js",
     "create-admin": "ts-node src/scripts/createAdmin.ts",
     "seed": "ts-node src/scripts/seedUsers.ts",
-    "clean": "ts-node src/scripts/cleanDatabase.ts",
     "update-admin-email": "ts-node src/scripts/updateAdminEmail.ts"
   },
   "keywords": [],
@@ -21,6 +20,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "googleapis": "^166.0.0",
     "jsonwebtoken": "^9.0.2",
     "moment-timezone": "^0.6.0",
     "mongoose": "^8.18.3",
