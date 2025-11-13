@@ -108,15 +108,15 @@ router.post('/', async (req: Request, res: Response) => {
       createdBy
     });
 
-    await mission.save();
+    await mission.save();;
 
     // Only update user stats if this is the ACTIVE month
     const settings = await Settings.findOne();
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
-    const missionMonth = missionStart.getMonth() + 1;
-    const missionYear = missionStart.getFullYear();
+    const missionMonth = missionStart.getUTCMonth() + 1;
+    const missionYear = missionStart.getUTCFullYear();
     const isCurrentMonth = (missionMonth === activeMonth && missionYear === activeYear);
 
     if (isCurrentMonth) {

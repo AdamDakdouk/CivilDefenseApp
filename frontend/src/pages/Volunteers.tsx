@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getCurrentMonthData, getMonthlyReports, getAvailableMonths, getAvailableShiftMonths, getAvailableMissionMonths, getVolunteerMissionCounts } from '../services/api';
+import { getCurrentMonthData, getMonthlyReports, getVolunteerMissionCounts } from '../services/api';
 import { useMonth } from '../contexts/MonthContext';
 import './Volunteers.css';
 import './Volunteers.print.css';
-
-interface MonthOption {
-  month: number;
-  year: number;
-  label: string;
-}
 
 const Volunteers: React.FC = () => {
   const [volunteers, setVolunteers] = useState<any[]>([]);
@@ -141,8 +135,6 @@ const Volunteers: React.FC = () => {
   if (loading) {
     return <div className="container">جاري التحميل...</div>;
   }
-
-  const emptyRows = Math.max(0, 15 - volunteers.length);
 
   return (
     <div className="report-container">
