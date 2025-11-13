@@ -40,8 +40,14 @@ table {
 table th, table td {
   border: 1px solid #000;
   text-align: center;
-  padding: 4px 5px;
+  padding: 10px 8px;
 }
+
+.mission-table th,
+.mission-table td {
+  padding: 2px 4px; /* المسافة الصغيرة */
+}
+
 
 table th[colspan] {
   text-align: center;

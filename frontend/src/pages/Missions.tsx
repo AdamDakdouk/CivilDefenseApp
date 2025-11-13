@@ -224,7 +224,7 @@ const Missions: React.FC = () => {
             {missions.length === 0 ? (
                 <p>لا توجد مهمات مسجلة</p>
             ) : (
-                <table>
+                <table className='mission-table'>
                     <thead>
                         <tr>
                             <th rowSpan={2}>التاريخ</th>
