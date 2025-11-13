@@ -65,9 +65,20 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     const { referenceNumber, vehicleNumbers, startTime, endTime, location, missionType, missionDetails, notes, team, participants, createdBy } = req.body;
     
-    // Parse times preserving the local time
-    const missionStart = new Date(startTime);
-    let missionEnd = new Date(endTime);
+    // Parse as Lebanon timezone by appending timezone offset
+    // Lebanon is UTC+2 (or UTC+3 during DST)
+    // For simplicity, we'll assume UTC+2 (EET - Eastern European Time)
+    const parseLebanonTime = (timeString: string) => {
+      // If no timezone info, assume it's Lebanon local time
+      if (!timeString.includes('Z') && !timeString.includes('+') && !timeString.includes('-')) {
+        // Append +02:00 for Lebanon timezone
+        return new Date(timeString + '+02:00');
+      }
+      return new Date(timeString);
+    };
+    
+    const missionStart = parseLebanonTime(startTime);
+    let missionEnd = parseLebanonTime(endTime);
 
     // If end time is before start time, mission crosses midnight - add 1 day to end
     if (missionEnd < missionStart) {
@@ -101,7 +112,6 @@ router.post('/', async (req: Request, res: Response) => {
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
-    // Use local timezone methods for month/year comparison
     const missionMonth = missionStart.getMonth() + 1;
     const missionYear = missionStart.getFullYear();
     const isCurrentMonth = (missionMonth === activeMonth && missionYear === activeYear);
