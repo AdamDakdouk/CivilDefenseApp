@@ -9,6 +9,9 @@ import CustomAlert from './CustomAlert';
 interface Participant {
     userId: string;
     name: string;
+    customStartTime?: string;  // NEW: Optional custom start time
+    customEndTime?: string;    // NEW: Optional custom end time
+    showCustomTimes?: boolean; // NEW: Flag to show/hide custom time inputs
 }
 
 interface AddMissionModalProps {
@@ -75,6 +78,19 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         }
     }, [isOpen, activeMonth, editMode]);
 
+    useEffect(() => {
+        if (editMode && initialData?.participants) {
+            const transformedParticipants = initialData.participants.map((p: any) => ({
+                userId: p.user._id || p.user,
+                name: p.user.name || '',
+                customStartTime: p.customStartTime,
+                customEndTime: p.customEndTime,
+                showCustomTimes: !!(p.customStartTime && p.customEndTime)
+            }));
+            setParticipants(transformedParticipants);
+        }
+    }, [editMode, initialData]);
+
     const fetchAllUsers = async () => {
         const users = await getUsers();
         setAllUsers(users);
@@ -87,7 +103,8 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
 
         const employeeParticipants: Participant[] = teamEmployees.map(emp => ({
             userId: emp._id,
-            name: emp.name
+            name: emp.name,
+            showCustomTimes: false  // NEW: Initialize with custom times disabled
         }));
 
         setParticipants(employeeParticipants);
@@ -109,7 +126,8 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         if (!participants.find(p => p.userId === user._id)) {
             setParticipants([...participants, {
                 userId: user._id,
-                name: user.name
+                name: user.name,
+                showCustomTimes: false  // NEW: Initialize with custom times disabled
             }]);
         }
         setSearchQuery('');
@@ -120,48 +138,124 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         setParticipants(participants.filter(p => p.userId !== userId));
     };
 
+    // Toggle custom times for a participant
+    const toggleCustomTimes = (userId: string) => {
+        setParticipants(participants.map(p => {
+            if (p.userId === userId) {
+                if (!p.showCustomTimes) {
+                    // When enabling custom times, initialize with mission times
+                    return {
+                        ...p,
+                        showCustomTimes: true,
+                        customStartTime: startTime,
+                        customEndTime: endTime
+                    };
+                } else {
+                    // When disabling, remove custom times
+                    return {
+                        ...p,
+                        showCustomTimes: false,
+                        customStartTime: undefined,
+                        customEndTime: undefined
+                    };
+                }
+            }
+            return p;
+        }));
+    };
+
+    // Update custom start time for a participant
+    const updateCustomStartTime = (userId: string, time: string) => {
+        setParticipants(participants.map(p => {
+            if (p.userId === userId) {
+                const date = p.customStartTime?.split('T')[0] || startTime.split('T')[0];
+                return {
+                    ...p,
+                    customStartTime: `${date}T${time}`
+                };
+            }
+            return p;
+        }));
+    };
+
+    // Update custom end time for a participant
+    const updateCustomEndTime = (userId: string, time: string) => {
+        setParticipants(participants.map(p => {
+            if (p.userId === userId) {
+                const date = p.customEndTime?.split('T')[0] || endTime.split('T')[0];
+                return {
+                    ...p,
+                    customEndTime: `${date}T${time}`
+                };
+            }
+            return p;
+        }));
+    };
+
     const handleSubmit = async () => {
-    const newErrors: { [key: string]: boolean } = {};
+        const newErrors: { [key: string]: boolean } = {};
 
-    if (!referenceNumber) newErrors.referenceNumber = true;
-    if (vehicleNumbers.length === 0) newErrors.vehicleNumber = true;
-    if (!location) newErrors.location = true;
-    if (!missionDetails) newErrors.missionDetails = true;
-    if (participants.length === 0) newErrors.participants = true;
+        if (!referenceNumber) newErrors.referenceNumber = true;
+        if (vehicleNumbers.length === 0) newErrors.vehicleNumber = true;
+        if (!location) newErrors.location = true;
+        if (!missionDetails) newErrors.missionDetails = true;
+        if (participants.length === 0) newErrors.participants = true;
 
-    if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
 
-        // Scroll to first error
-        const firstErrorField = Object.keys(newErrors)[0];
-        const element = document.querySelector(`[data-field="${firstErrorField}"]`);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Scroll to first error
+            const firstErrorField = Object.keys(newErrors)[0];
+            const element = document.querySelector(`[data-field="${firstErrorField}"]`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
         }
-        return;
-    }
 
-    setErrors({});
-    setIsSubmitting(true);
-    try {
-        await onSave({
-            ...(editMode && initialData?._id ? { id: initialData._id } : {}),
-            referenceNumber,
-            vehicleNumbers: vehicleNumbers.join(', '),
-            startTime, // Send as-is: "2025-11-13T08:00"
-            endTime,   // Send as-is: "2025-11-13T10:00"
-            location,
-            missionType,
-            missionDetails,
-            notes,
-            team,
-            participants,
-            createdBy: '674c8f9e8e7b4c001234abcd'
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
-};
+        setErrors({});
+        setIsSubmitting(true);
+
+        // DEBUG: Check participants state before submission
+        console.log('🔍 Participants state before submit:', participants);
+        console.log('🔍 Mapped participants for API:', participants.map(p => ({
+            userId: p.userId,
+            showCustomTimes: p.showCustomTimes,
+            customStartTime: p.customStartTime,
+            customEndTime: p.customEndTime
+        })));
+
+        try {
+            const payload = {
+                ...(editMode && initialData?._id ? { id: initialData._id } : {}),
+                referenceNumber,
+                vehicleNumbers: vehicleNumbers.join(', '),
+                startTime, // Send as-is: "2025-11-13T08:00"
+                endTime,   // Send as-is: "2025-11-13T10:00"
+                location,
+                missionType,
+                missionDetails,
+                notes,
+                team,
+                // NEW: Include custom times in participants if they exist
+                participants: participants.map(p => ({
+                    userId: p.userId,
+                    // Only include custom times if they were set
+                    ...(p.customStartTime && p.customEndTime ? {
+                        customStartTime: p.customStartTime,
+                        customEndTime: p.customEndTime
+                    } : {})
+                })),
+                createdBy: '674c8f9e8e7b4c001234abcd'
+            };
+
+            console.log('🔍 Final payload being sent:', JSON.stringify(payload, null, 2));
+
+            await onSave(payload);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -270,17 +364,26 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                             مختلف
                         </label>
                     </div>
-                    <input
-                        type="text"
+                    <select
                         value={missionDetails}
                         onChange={(e) => {
                             setMissionDetails(e.target.value);
                             if (errors.missionDetails) setErrors({ ...errors, missionDetails: false });
                         }}
-                        placeholder="حدد تفاصيل المهمة"
                         style={{ marginTop: '10px', borderColor: errors.missionDetails ? '#c41e3a' : '#ddd' }}
                         data-field="missionDetails"
-                    />
+                    >
+                        <option value="">حدد تفاصيل المهمة</option>
+                        <option value="اطفاء حريق اعشاب">اطفاء حريق اعشاب</option>
+                        <option value="اطفاء حريق اعشاب واشجار">اطفاء حريق اعشاب واشجار</option>
+                        <option value="اطفاء حريق اعشاب ونفايات">اطفاء حريق اعشاب ونفايات</option>
+                        <option value="اطفاء حريق سيارة">اطفاء حريق سيارة</option>
+                        <option value="اطفاء حريق مستودع">اطفاء حريق مستودع</option>
+                        <option value="اطفاء حريق شقة">اطفاء حريق شقة</option>
+                        <option value="تزود الية الاطفاء بالمحروقات">تزود الية الاطفاء بالمحروقات</option>
+                        <option value="تزود الية الاطفاء بالمياه">تزود الية الاطفاء بالمياه</option>
+                    </select>
+
                 </div>
 
                 <div className="form-group mission-form-group">
@@ -347,10 +450,52 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                     {participants.length > 0 && (
                         <div className="selected-participants mission-selected-participants">
                             {participants.map(p => (
-                                <span key={p.userId} className="participant-tag mission-participant-tag">
-                                    {p.name}
-                                    <button onClick={() => removeParticipant(p.userId)} className="remove-tag mission-remove-tag">×</button>
-                                </span>
+                                <div key={p.userId} style={{ marginBottom: '10px', width: '100%' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span className="participant-tag mission-participant-tag">
+                                            {p.name}
+                                            <button onClick={() => removeParticipant(p.userId)} className="remove-tag mission-remove-tag">×</button>
+                                        </span>
+                                        {/* NEW: Toggle button for custom times */}
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleCustomTimes(p.userId)}
+                                            style={{
+                                                padding: '4px 8px',
+                                                fontSize: '12px',
+                                                backgroundColor: p.showCustomTimes ? '#28a745' : '#007bff',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            {p.showCustomTimes ? '✓ وقت خاص' : '⏱ تعديل الوقت'}
+                                        </button>
+                                    </div>
+
+                                    {/* NEW: Show custom time pickers if enabled */}
+                                    {p.showCustomTimes && (
+                                        <div style={{ marginTop: '8px', marginRight: '20px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+                                            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                                <div style={{ flex: '1', minWidth: '150px' }}>
+                                                    <TimePicker
+                                                        label="بداية"
+                                                        value={p.customStartTime?.split('T')[1] || startTime.split('T')[1]}
+                                                        onChange={(time) => updateCustomStartTime(p.userId, time)}
+                                                    />
+                                                </div>
+                                                <div style={{ flex: '1', minWidth: '150px' }}>
+                                                    <TimePicker
+                                                        label="نهاية"
+                                                        value={p.customEndTime?.split('T')[1] || endTime.split('T')[1]}
+                                                        onChange={(time) => updateCustomEndTime(p.userId, time)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     )}

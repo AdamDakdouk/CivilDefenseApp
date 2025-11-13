@@ -8,6 +8,7 @@
     "postbuild": "echo Build complete",
     "start": "node dist/server.js",
     "create-admin": "ts-node src/scripts/createAdmin.ts",
+    "clean":"ts-node src/scripts/cleanDatabase.ts",
     "seed": "ts-node src/scripts/seedUsers.ts",
     "update-admin-email": "ts-node src/scripts/updateAdminEmail.ts"
   },

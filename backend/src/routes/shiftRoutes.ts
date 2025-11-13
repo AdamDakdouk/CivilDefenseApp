@@ -35,6 +35,33 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
+// Helper function to get participant's actual hours in a mission (custom or mission hours)
+const getParticipantMissionHours = (mission: any, userId: string): number => {
+  // Find this participant in the mission
+  const missionParticipant = mission.participants.find(
+    (p: any) => p.user.toString() === userId
+  );
+
+  let missionStart: Date;
+  let missionEnd: Date;
+
+  // Use custom times if they exist, otherwise use mission times
+  if (missionParticipant && missionParticipant.customStartTime && missionParticipant.customEndTime) {
+    missionStart = new Date(missionParticipant.customStartTime);
+    missionEnd = new Date(missionParticipant.customEndTime);
+  } else {
+    missionStart = new Date(mission.startTime);
+    missionEnd = new Date(mission.endTime);
+  }
+
+  // Handle midnight crossing
+  if (missionEnd <= missionStart) {
+    missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
+  }
+
+  return Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
+};
+
 // Create new shift
 router.post('/', async (req: Request, res: Response) => {
   try {
@@ -121,15 +148,7 @@ router.post('/', async (req: Request, res: Response) => {
         // Calculate hours to remove from missions that now overlap
         let hoursToRemove = 0;
         for (const mission of overlappingMissions) {
-          let missionStart = new Date(mission.startTime);
-          let missionEnd = new Date(mission.endTime);
-
-          // Fix midnight crossing
-          if (missionEnd <= missionStart) {
-            missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
-          }
-
-          const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
+          const missionHours = getParticipantMissionHours(mission, participant.user.toString());
           hoursToRemove += missionHours;
         }
 
@@ -203,13 +222,27 @@ router.put('/:id', async (req: Request, res: Response) => {
         });
 
         for (const mission of overlappingMissions) {
-          let missionStart = new Date(mission.startTime);
-          let missionEnd = new Date(mission.endTime);
+          // NEW: Get participant's actual mission times (custom or mission)
+          const missionParticipant = mission.participants.find(
+            (p: any) => p.user.toString() === userId
+          );
+
+          let missionStart: Date;
+          let missionEnd: Date;
+
+          if (missionParticipant && missionParticipant.customStartTime && missionParticipant.customEndTime) {
+            missionStart = new Date(missionParticipant.customStartTime);
+            missionEnd = new Date(missionParticipant.customEndTime);
+          } else {
+            missionStart = new Date(mission.startTime);
+            missionEnd = new Date(mission.endTime);
+          }
 
           if (missionEnd < missionStart) {
             missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
           }
 
+          // KEEP: Check if covered by other shifts
           const oldShiftDateNormalized = new Date(Date.UTC(
             oldShiftDate.getUTCFullYear(),
             oldShiftDate.getUTCMonth(),
@@ -237,6 +270,7 @@ router.put('/:id', async (req: Request, res: Response) => {
           }
 
           if (!coveredByOther) {
+            // NEW: Use calculated missionStart/missionEnd (which includes custom times)
             const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
             await User.findByIdAndUpdate(userId, {
               $inc: { currentMonthHours: missionHours }
@@ -295,8 +329,21 @@ router.put('/:id', async (req: Request, res: Response) => {
 
         let hoursToRemove = 0;
         for (const mission of overlappingMissions) {
-          let missionStart = new Date(mission.startTime);
-          let missionEnd = new Date(mission.endTime);
+          // Get participant's actual mission times (custom or mission)
+          const missionParticipant = mission.participants.find(
+            (p: any) => p.user.toString() === participant.user.toString()
+          );
+
+          let missionStart: Date;
+          let missionEnd: Date;
+
+          if (missionParticipant && missionParticipant.customStartTime && missionParticipant.customEndTime) {
+            missionStart = new Date(missionParticipant.customStartTime);
+            missionEnd = new Date(missionParticipant.customEndTime);
+          } else {
+            missionStart = new Date(mission.startTime);
+            missionEnd = new Date(mission.endTime);
+          }
 
           if (missionEnd < missionStart) {
             missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
@@ -437,8 +484,21 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
         // For each overlapping mission, check if it's still covered by another shift
         for (const mission of overlappingMissions) {
-          let missionStart = new Date(mission.startTime);
-          let missionEnd = new Date(mission.endTime);
+          // NEW: Get participant's actual mission times (custom or mission)
+          const missionParticipant = mission.participants.find(
+            (p: any) => p.user.toString() === userId
+          );
+
+          let missionStart: Date;
+          let missionEnd: Date;
+
+          if (missionParticipant && missionParticipant.customStartTime && missionParticipant.customEndTime) {
+            missionStart = new Date(missionParticipant.customStartTime);
+            missionEnd = new Date(missionParticipant.customEndTime);
+          } else {
+            missionStart = new Date(mission.startTime);
+            missionEnd = new Date(mission.endTime);
+          }
 
           // Fix midnight crossing
           if (missionEnd < missionStart) {

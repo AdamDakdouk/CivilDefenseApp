@@ -15,6 +15,8 @@ export interface User {
 
 export interface MissionParticipant {
   user: User;
+  customStartTime?: string;  // NEW: Optional custom start time for this participant
+  customEndTime?: string;    // NEW: Optional custom end time for this participant
 }
 
 export interface Mission {

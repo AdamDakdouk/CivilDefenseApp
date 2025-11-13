@@ -2,6 +2,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IMissionParticipant {
     user: mongoose.Types.ObjectId;
+    customStartTime?: Date;  // NEW: Optional custom start time for this participant
+    customEndTime?: Date;    // NEW: Optional custom end time for this participant
 }
 
 export interface IMission extends Document {
@@ -24,6 +26,14 @@ const MissionParticipantSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    customStartTime: {  // NEW: Optional custom start time
+        type: Date,
+        required: false
+    },
+    customEndTime: {    // NEW: Optional custom end time
+        type: Date,
+        required: false
     }
 });
 

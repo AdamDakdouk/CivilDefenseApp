@@ -4,8 +4,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendResetCode = async (email: string, code: string): Promise<boolean> => {
   try {
-    await resend.emails.send({
-      from: 'Civil Defense <onboarding@resend.dev>', // Use your verified domain later
+    console.log('📧 Attempting to send email to:', email);
+    console.log('🔑 Using Resend API key:', process.env.RESEND_API_KEY ? 'Present' : 'MISSING');
+    
+    const result = await resend.emails.send({
+      from: 'Civil Defense <noreply@civildefense.online>',
       to: email,
       subject: 'كود إعادة تعيين كلمة المرور - الدفاع المدني',
       html: `
@@ -37,10 +40,12 @@ export const sendResetCode = async (email: string, code: string): Promise<boolea
       `
     });
 
+    console.log('✅ Resend API response:', JSON.stringify(result, null, 2));
     console.log(`✅ Reset code sent to ${email}`);
     return true;
   } catch (error) {
     console.error('❌ Error sending email:', error);
+    console.error('❌ Full error details:', JSON.stringify(error, null, 2));
     return false;
   }
 };
