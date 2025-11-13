@@ -4,6 +4,7 @@ import Shift from '../models/Shift';
 import User from '../models/User';
 import Settings from '../models/Settings';
 import { authenticateToken } from '../middleware/auth';
+import moment from 'moment-timezone';
 
 const router = express.Router();
 
@@ -63,29 +64,31 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
 // Create new mission
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { referenceNumber, vehicleNumbers, startTime, endTime, location, missionType, missionDetails, notes, team, participants, createdBy } = req.body;
-    
-    // Parse as Lebanon timezone by appending timezone offset
-    // Lebanon is UTC+2 (or UTC+3 during DST)
-    // For simplicity, we'll assume UTC+2 (EET - Eastern European Time)
-    const parseLebanonTime = (timeString: string) => {
-      // If no timezone info, assume it's Lebanon local time
-      if (!timeString.includes('Z') && !timeString.includes('+') && !timeString.includes('-')) {
-        // Append +02:00 for Lebanon timezone
-        return new Date(timeString + '+02:00');
-      }
-      return new Date(timeString);
-    };
-    
-    const missionStart = parseLebanonTime(startTime);
-    let missionEnd = parseLebanonTime(endTime);
+    const {
+      referenceNumber,
+      vehicleNumbers,
+      startTime,
+      endTime,
+      location,
+      missionType,
+      missionDetails,
+      notes,
+      team,
+      participants,
+      createdBy
+    } = req.body;
 
-    // If end time is before start time, mission crosses midnight - add 1 day to end
+    // Convert input to Lebanon time and then to a Date object (UTC-aware)
+    const missionStart = moment.tz(startTime, 'Asia/Beirut').toDate();
+    let missionEnd = moment.tz(endTime, 'Asia/Beirut').toDate();
+
     if (missionEnd < missionStart) {
       missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
     }
 
-    const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
+    const missionHours = Math.round(
+      (missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60)
+    );
 
     const processedParticipants = participants.map((p: any) => ({
       user: p.userId
@@ -212,7 +215,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     }
 
     console.log('Adjusted mission time:', newStart, 'to', newEnd);
-    
+
     const newHours = Math.round((newEnd.getTime() - newStart.getTime()) / (1000 * 60 * 60));
 
     const processedParticipants = participants.map((p: any) => ({
