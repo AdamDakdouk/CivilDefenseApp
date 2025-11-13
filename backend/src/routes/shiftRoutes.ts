@@ -6,6 +6,7 @@ import Mission from '../models/Mission';
 import Attendance from '../models/Attendance';
 import Settings from '../models/Settings';
 import { authenticateToken } from '../middleware/auth';
+import moment from 'moment-timezone';
 
 const router = express.Router();
 
@@ -39,11 +40,15 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     const { date, team, participants, createdBy } = req.body;
 
-    // Calculate hours for each participant
+    // ✅ Parse all check-in/check-out times in Lebanon timezone
     const processedParticipants = participants.map((p: any) => {
-      const checkIn = new Date(p.checkIn);
-      const checkOut = new Date(p.checkOut);
-      const hoursServed = Math.round((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60));
+      const checkIn = moment.tz(p.checkIn, 'Asia/Beirut').toDate();
+      const checkOut = moment.tz(p.checkOut, 'Asia/Beirut').toDate();
+
+      // Same hour difference calculation (no logic change)
+      const hoursServed = Math.round(
+        (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60)
+      );
 
       return {
         user: p.userId,
@@ -53,6 +58,7 @@ router.post('/', async (req: Request, res: Response) => {
       };
     });
 
+    // Create the shift document
     const shift = new Shift({
       date,
       team,
@@ -62,23 +68,21 @@ router.post('/', async (req: Request, res: Response) => {
 
     await shift.save();
 
-    const [year, month, day] = date.split('-').map(Number);
-    const shiftDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+    // ✅ Parse shift date as Lebanon date (midnight Beirut time)
+    const shiftDate = moment.tz(date, 'YYYY-MM-DD', 'Asia/Beirut').startOf('day').toDate();
 
-    // Get all employees, head, and admin staff
+    // Fetch all staff that can appear in attendance
     const allStaff = await User.find({
       role: { $in: ['employee', 'head', 'administrative staff'] }
     });
 
-    // Get participant IDs from this shift
     const participantIds = processedParticipants.map((p: any) => p.user.toString());
 
-    // Mark attendance for all staff
+    // ✅ Attendance logic unchanged
     for (const staff of allStaff) {
       const staffId = (staff._id as mongoose.Types.ObjectId).toString();
       const code = participantIds.includes(staffId) ? 'ح' : 'ع';
 
-      // Upsert attendance record (create or update)
       await Attendance.findOneAndUpdate(
         { userId: staff._id, date: shiftDate },
         { code },
@@ -86,23 +90,22 @@ router.post('/', async (req: Request, res: Response) => {
       );
     }
 
-    // Only update user stats if this is the ACTIVE month (not calendar month)
+    // ✅ Active month/year (same as before)
     const settings = await Settings.findOne();
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
-    const shiftMonth = shiftDate.getUTCMonth() + 1; // Get month from UTC date
-    const shiftYear = shiftDate.getUTCFullYear();
+    const shiftMonth = shiftDate.getMonth() + 1;
+    const shiftYear = shiftDate.getFullYear();
 
-    const isCurrentMonth = (shiftMonth === activeMonth && shiftYear === activeYear);
+    const isCurrentMonth = shiftMonth === activeMonth && shiftYear === activeYear;
 
     if (isCurrentMonth) {
-      // Update user hours and handle existing missions
+      // 🧮 Update hours logic (unchanged)
       for (const participant of processedParticipants) {
-        const shiftStart = new Date(participant.checkIn);
-        const shiftEnd = new Date(participant.checkOut);
+        const shiftStart = participant.checkIn;
+        const shiftEnd = participant.checkOut;
 
-        // Find missions that overlap with this shift for this user
         const overlappingMissions = await Mission.find({
           'participants.user': participant.user,
           $or: [
@@ -115,22 +118,22 @@ router.post('/', async (req: Request, res: Response) => {
           ]
         });
 
-        // Calculate hours to remove from missions that now overlap
         let hoursToRemove = 0;
         for (const mission of overlappingMissions) {
-          let missionStart = new Date(mission.startTime);
-          let missionEnd = new Date(mission.endTime);
+          let missionStart = moment.tz(mission.startTime, 'Asia/Beirut').toDate();
+          let missionEnd = moment.tz(mission.endTime, 'Asia/Beirut').toDate();
 
-          // Fix midnight crossing
           if (missionEnd <= missionStart) {
             missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
           }
 
-          const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
+          const missionHours = Math.round(
+            (missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60)
+          );
+
           hoursToRemove += missionHours;
         }
 
-        // Add shift hours and remove overlapping mission hours
         await User.findByIdAndUpdate(participant.user, {
           $inc: {
             currentMonthHours: participant.hoursServed - hoursToRemove,
@@ -146,6 +149,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     res.status(201).json(populatedShift);
   } catch (error) {
+    console.error('Error creating shift:', error);
     res.status(500).json({ message: 'Error creating shift', error });
   }
 });
@@ -170,7 +174,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     const oldShiftDate = new Date(oldShift.date);
     const oldShiftMonth = oldShiftDate.getUTCMonth() + 1;
     const oldShiftYear = oldShiftDate.getUTCFullYear();
-    const oldWasCurrentMonth = (oldShiftMonth === activeMonth && oldShiftYear === activeYear);;
+    const oldWasCurrentMonth = (oldShiftMonth === activeMonth && oldShiftYear === activeYear);
 
     // Step 1: Completely revert the old shift as if deleting it
     if (oldWasCurrentMonth) {
@@ -179,7 +183,6 @@ router.put('/:id', async (req: Request, res: Response) => {
         const shiftStart = new Date(participant.checkIn);
         const shiftEnd = new Date(participant.checkOut);
 
-        // Remove old shift hours and day
         await User.findByIdAndUpdate(userId, {
           $inc: {
             currentMonthHours: -participant.hoursServed,
@@ -200,7 +203,6 @@ router.put('/:id', async (req: Request, res: Response) => {
           ]
         });
 
-        // Add back mission hours (they're no longer covered by OLD shift)
         for (const mission of overlappingMissions) {
           let missionStart = new Date(mission.startTime);
           let missionEnd = new Date(mission.endTime);
@@ -209,7 +211,6 @@ router.put('/:id', async (req: Request, res: Response) => {
             missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
           }
 
-          // Check if covered by OTHER shifts ON THE SAME DATE as the old shift
           const oldShiftDateNormalized = new Date(Date.UTC(
             oldShiftDate.getUTCFullYear(),
             oldShiftDate.getUTCMonth(),
@@ -218,12 +219,10 @@ router.put('/:id', async (req: Request, res: Response) => {
           ));
 
           const otherShiftsOnSameDate = await Shift.find({
-            _id: { $ne: id }, // Exclude this shift
-            date: oldShiftDateNormalized, // Only shifts on OLD date
+            _id: { $ne: id },
+            date: oldShiftDateNormalized,
             'participants.user': userId
           });
-
-          console.log('Found other shifts on same date:', otherShiftsOnSameDate.length);
 
           let coveredByOther = false;
           for (const other of otherShiftsOnSameDate) {
@@ -231,35 +230,27 @@ router.put('/:id', async (req: Request, res: Response) => {
             if (otherP) {
               const otherStart = new Date(otherP.checkIn);
               const otherEnd = new Date(otherP.checkOut);
-              console.log('Checking overlap with other shift:', otherStart, 'to', otherEnd);
-
               if (missionStart < otherEnd && missionEnd > otherStart) {
                 coveredByOther = true;
-                console.log('Mission IS covered by other shift');
                 break;
               }
             }
           }
 
-          // If not covered by another shift ON THE SAME DATE, add mission hours back
           if (!coveredByOther) {
             const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
-            console.log(`✅ Adding back ${missionHours} hours for mission`);
-            console.log(`Adding back ${missionHours} hours for mission on old date`);
             await User.findByIdAndUpdate(userId, {
               $inc: { currentMonthHours: missionHours }
             });
-          } else {
-            console.log(`Mission still covered by another shift on old date`);
           }
         }
       }
     }
 
-    // Step 2: Calculate new shift data
+    // Step 2: Calculate new shift data — FIXED TIMEZONE HERE
     const processedParticipants = participants.map((p: any) => {
-      const checkIn = new Date(p.checkIn);
-      const checkOut = new Date(p.checkOut);
+      const checkIn = moment.tz(p.checkIn, 'Asia/Beirut').toDate();
+      const checkOut = moment.tz(p.checkOut, 'Asia/Beirut').toDate();
       const hoursServed = Math.round((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60));
 
       return {
@@ -270,19 +261,18 @@ router.put('/:id', async (req: Request, res: Response) => {
       };
     });
 
-    // Step 3: Update the shift document
+    // Step 3: Normalize date to Beirut time too
+    const [year, month, day] = date.split('-').map(Number);
+    const newShiftDate = moment.tz({ year, month: month - 1, day }, 'Asia/Beirut').toDate();
+
+    // Step 4: Update the shift
     const updatedShift = await Shift.findByIdAndUpdate(
       id,
-      {
-        date,
-        team,
-        participants: processedParticipants
-      },
+      { date: newShiftDate, team, participants: processedParticipants },
       { new: true }
     ).populate('participants.user').populate('createdBy');
 
-    // Step 4: Apply the NEW shift (same logic as creating a shift)
-    const newShiftDate = new Date(date);
+    // Step 5: Apply NEW shift logic
     const newShiftMonth = newShiftDate.getUTCMonth() + 1;
     const newShiftYear = newShiftDate.getUTCFullYear();
     const newIsCurrentMonth = (newShiftMonth === activeMonth && newShiftYear === activeYear);
@@ -292,10 +282,6 @@ router.put('/:id', async (req: Request, res: Response) => {
         const shiftStart = new Date(participant.checkIn);
         const shiftEnd = new Date(participant.checkOut);
 
-        console.log('=== Applying NEW shift ===');
-        console.log('New shift time:', shiftStart, 'to', shiftEnd);
-
-        // Find overlapping missions for NEW shift
         const overlappingMissions = await Mission.find({
           'participants.user': participant.user,
           $or: [
@@ -308,8 +294,6 @@ router.put('/:id', async (req: Request, res: Response) => {
           ]
         });
 
-        console.log('Found potential overlapping missions:', overlappingMissions.length);
-
         let hoursToRemove = 0;
         for (const mission of overlappingMissions) {
           let missionStart = new Date(mission.startTime);
@@ -319,24 +303,12 @@ router.put('/:id', async (req: Request, res: Response) => {
             missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
           }
 
-          console.log('Checking mission:', missionStart, 'to', missionEnd);
-
-          // Check if mission ACTUALLY overlaps with THIS SPECIFIC participant's NEW shift time
-          const actuallyOverlaps = missionStart < shiftEnd && missionEnd > shiftStart;
-
-          console.log('Actually overlaps?', actuallyOverlaps);
-
-          if (actuallyOverlaps) {
+          if (missionStart < shiftEnd && missionEnd > shiftStart) {
             const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
             hoursToRemove += missionHours;
           }
         }
 
-        console.log('Total hours to remove:', hoursToRemove);
-        console.log('Shift hours:', participant.hoursServed);
-        console.log('Net hours to add:', participant.hoursServed - hoursToRemove);
-
-        // Add NEW shift hours, subtract overlapping mission hours, add day
         await User.findByIdAndUpdate(participant.user, {
           $inc: {
             currentMonthHours: participant.hoursServed - hoursToRemove,
@@ -346,8 +318,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       }
     }
 
-    // Update attendance records for both old and new dates
-    // Normalize to UTC midnight to avoid timezone issues
+    // Attendance recalculation (unchanged)
     const normalizedOldDate = new Date(Date.UTC(
       oldShiftDate.getUTCFullYear(),
       oldShiftDate.getUTCMonth(),
@@ -366,14 +337,12 @@ router.put('/:id', async (req: Request, res: Response) => {
       role: { $in: ['employee', 'head', 'administrative staff'] }
     });
 
-    // Recalculate attendance for OLD date
     const otherShiftsOnOldDate = await Shift.find({
       date: normalizedOldDate,
       _id: { $ne: id }
     });
 
     if (otherShiftsOnOldDate.length === 0) {
-      // No shifts on old date anymore - everyone gets 'ع'
       for (const staff of allStaff) {
         await Attendance.findOneAndUpdate(
           { userId: staff._id, date: normalizedOldDate },
@@ -382,7 +351,6 @@ router.put('/:id', async (req: Request, res: Response) => {
         );
       }
     } else {
-      // Recalculate based on remaining shifts on old date
       const oldParticipantIds = otherShiftsOnOldDate.flatMap(s =>
         s.participants.map((p: any) => p.user.toString())
       );
@@ -397,9 +365,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       }
     }
 
-    // Set attendance for NEW date
     const newParticipantIds = processedParticipants.map((p: any) => p.user.toString());
-
     for (const staff of allStaff) {
       const code = newParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString()) ? 'ح' : 'ع';
       await Attendance.findOneAndUpdate(
@@ -500,7 +466,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
               const hasOverlap = missionStart < otherShiftEnd && missionEnd > otherShiftStart;
               if (hasOverlap) {
                 coveredByOtherShift = true;
-                break; 
+                break;
               }
             }
           }

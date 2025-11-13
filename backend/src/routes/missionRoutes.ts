@@ -155,48 +155,59 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { referenceNumber, vehicleNumbers, startTime, endTime, location, missionType, missionDetails, notes, team, participants } = req.body;
+    const {
+      referenceNumber,
+      vehicleNumbers,
+      startTime,
+      endTime,
+      location,
+      missionType,
+      missionDetails,
+      notes,
+      team,
+      participants
+    } = req.body;
 
-    // Get old mission
+    // 🧭 Fetch old mission
     const oldMission = await Mission.findById(id);
     if (!oldMission) {
       return res.status(404).json({ message: 'Mission not found' });
     }
 
-    let oldStart = new Date(oldMission.startTime);
-    let oldEnd = new Date(oldMission.endTime);
+    // ✅ Parse old mission times safely
+    let oldStart = moment.tz(oldMission.startTime, 'Asia/Beirut').toDate();
+    let oldEnd = moment.tz(oldMission.endTime, 'Asia/Beirut').toDate();
 
-    // Fix midnight crossing for old mission
+    // Handle midnight crossing
     if (oldEnd < oldStart) {
       oldEnd = new Date(oldEnd.getTime() + 24 * 60 * 60 * 1000);
     }
 
-    const oldHours = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 60 * 60));
+    const oldHours = Math.round(
+      (oldEnd.getTime() - oldStart.getTime()) / (1000 * 60 * 60)
+    );
 
+    // 🧾 Get active month/year
     const settings = await Settings.findOne();
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
-    // Changed from getUTCMonth() to getMonth()
     const oldMissionMonth = oldStart.getMonth() + 1;
     const oldMissionYear = oldStart.getFullYear();
-    const oldWasCurrentMonth = (oldMissionMonth === activeMonth && oldMissionYear === activeYear);
+    const oldWasCurrentMonth =
+      oldMissionMonth === activeMonth && oldMissionYear === activeYear;
 
-    // Revert old mission stats from OLD participants (only if current month)
+    // 🧮 Revert old mission stats (if current month)
     if (oldWasCurrentMonth) {
       for (const participant of oldMission.participants) {
-
         const userId = participant.user.toString();
 
-        // Decrement mission count
         await User.findByIdAndUpdate(userId, {
           $inc: { currentMonthMissions: -1 }
         });
 
-        // Check if user was on shift during old mission
         const hadShift = await checkShiftOverlap(userId, oldStart, oldEnd);
 
-        // Remove hours only if they were NOT on shift
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
             $inc: { currentMonthHours: -oldHours }
@@ -205,24 +216,26 @@ router.put('/:id', async (req: Request, res: Response) => {
       }
     }
 
-    // Calculate new mission hours
-    const newStart = new Date(startTime);
-    let newEnd = new Date(endTime);
+    // ✅ Parse NEW mission times in Lebanon timezone
+    const newStart = moment.tz(startTime, 'Asia/Beirut').toDate();
+    let newEnd = moment.tz(endTime, 'Asia/Beirut').toDate();
 
-    // Fix midnight crossing for new mission
+    // Fix midnight crossing
     if (newEnd <= newStart) {
       newEnd = new Date(newEnd.getTime() + 24 * 60 * 60 * 1000);
     }
 
     console.log('Adjusted mission time:', newStart, 'to', newEnd);
 
-    const newHours = Math.round((newEnd.getTime() - newStart.getTime()) / (1000 * 60 * 60));
+    const newHours = Math.round(
+      (newEnd.getTime() - newStart.getTime()) / (1000 * 60 * 60)
+    );
 
     const processedParticipants = participants.map((p: any) => ({
       user: p.userId
     }));
 
-    // Update mission
+    // 🧱 Update mission document
     const updatedMission = await Mission.findByIdAndUpdate(
       id,
       {
@@ -238,27 +251,27 @@ router.put('/:id', async (req: Request, res: Response) => {
         participants: processedParticipants
       },
       { new: true }
-    ).populate('participants.user').populate('createdBy');
+    )
+      .populate('participants.user')
+      .populate('createdBy');
 
-    // Changed from getUTCMonth() to getMonth()
+    // 🧾 Check if new mission is in the active month
     const newMissionMonth = newStart.getMonth() + 1;
     const newMissionYear = newStart.getFullYear();
-    const newIsCurrentMonth = (newMissionMonth === activeMonth && newMissionYear === activeYear);
+    const newIsCurrentMonth =
+      newMissionMonth === activeMonth && newMissionYear === activeYear;
 
-    // Add new mission stats to NEW participants (only if current month)
+    // 🔁 Add stats for new participants
     if (newIsCurrentMonth) {
       for (const participant of participants) {
         const userId = participant.userId;
 
-        // Increment mission count
         await User.findByIdAndUpdate(userId, {
           $inc: { currentMonthMissions: 1 }
         });
 
-        // Check if user was on shift during new mission
         const hadShift = await checkShiftOverlap(userId, newStart, newEnd);
 
-        // Add hours only if NOT on shift
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
             $inc: { currentMonthHours: newHours }
