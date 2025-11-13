@@ -1,45 +1,11 @@
-import nodemailer from 'nodemailer';
-import { google } from 'googleapis';
-import dotenv from 'dotenv';
+import { Resend } from 'resend';
 
-dotenv.config();
-
-// Configure OAuth2 client
-const oAuth2Client = new google.auth.OAuth2(
-  process.env.CLIENT_ID,
-  process.env.CLIENT_SECRET,
-  'https://developers.google.com/oauthplayground' // redirect URI used to get refresh token
-);
-
-oAuth2Client.setCredentials({
-  refresh_token: process.env.REFRESH_TOKEN
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendResetCode = async (email: string, code: string): Promise<boolean> => {
   try {
-    // Get access token dynamically
-    const accessTokenObj = await oAuth2Client.getAccessToken();
-    const accessToken = accessTokenObj?.token;
-
-    if (!accessToken) {
-      throw new Error('Failed to retrieve access token');
-    }
-
-    // Create transporter
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        type: 'OAuth2',
-        user: process.env.EMAIL_USER,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN,
-        accessToken
-      }
-    });
-
-    const mailOptions = {
-      from: `Civil Defense <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: 'Civil Defense <onboarding@resend.dev>', // Use your verified domain later
       to: email,
       subject: 'كود إعادة تعيين كلمة المرور - الدفاع المدني',
       html: `
@@ -69,9 +35,8 @@ export const sendResetCode = async (email: string, code: string): Promise<boolea
           </div>
         </div>
       `
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
     console.log(`✅ Reset code sent to ${email}`);
     return true;
   } catch (error) {
