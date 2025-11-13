@@ -144,12 +144,29 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         setErrors({});
         setIsSubmitting(true);
         try {
+
+            // Parse times as local Lebanon timezone dates
+            const startDate = new Date(startTime);
+            const endDate = new Date(endTime);
+
+            // Convert to ISO string but keep the local time (not UTC)
+            // This preserves the user's intended time
+            const formatLocalISO = (date: Date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+            };
+
             await onSave({
                 ...(editMode && initialData?._id ? { id: initialData._id } : {}),
                 referenceNumber,
                 vehicleNumbers: vehicleNumbers.join(', '),
-                startTime,
-                endTime,
+                startTime: formatLocalISO(startDate),
+                endTime: formatLocalISO(endDate),
                 location,
                 missionType,
                 missionDetails,

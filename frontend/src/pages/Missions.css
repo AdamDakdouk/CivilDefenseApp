@@ -2,6 +2,7 @@
   display: flex;
   gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btn-edit-small {
@@ -9,6 +10,7 @@
   color: #000 !important;
   padding: 5px 10px;
   font-size: 11px;
+  white-space: nowrap;
 }
 
 .btn-edit-small:hover {
@@ -20,6 +22,7 @@
   color: #fff !important;
   padding: 5px 10px;
   font-size: 11px;
+  white-space: nowrap;
 }
 
 .btn-delete-small:hover {
@@ -60,7 +63,7 @@ table thead tr:last-child th {
 }
 
 .header-right {
-  position:absolute ;
+  position: absolute;
   top: 15px;
   right: 15px;
   text-align: right;
@@ -71,6 +74,7 @@ table thead tr:last-child th {
 
 .doc-info {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .header-center {
@@ -152,11 +156,14 @@ table thead tr:last-child th {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .header-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .export-btn {
@@ -168,9 +175,232 @@ table thead tr:last-child th {
   cursor: pointer;
   font-weight: bold;
   font-size: 14px;
+  white-space: nowrap;
 }
 
 .export-btn:hover {
   background-color: #229954;
 }
 
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .report-header {
+    padding: 12px;
+  }
+
+  .header-right {
+    position: static;
+    text-align: center;
+    margin-right: 0;
+    margin-bottom: 10px;
+    font-size: 10px;
+  }
+
+  .header-center {
+    padding: 20px 20px 12px 20px;
+  }
+
+  .main-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .hierarchy {
+    font-size: 10px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  /* Wrap table in a scrollable container on mobile */
+  table {
+    font-size: 10px;
+    border: 1px solid #000;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table thead,
+  table tbody {
+    display: table;
+    width: 100%;
+  }
+
+  table th, table td {
+    padding: 8px 6px;
+    font-size: 10px;
+  }
+
+  table thead tr:first-child th,
+  table thead tr:last-child th {
+    border: 1px solid #000;
+  }
+
+  .action-buttons {
+    gap: 6px;
+  }
+
+  .btn-edit-small,
+  .btn-delete-small {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .missions-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .header-buttons {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .export-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .inline-input,
+  .date-display,
+  .date-display-overlay {
+    font-size: 10px;
+    min-width: 75px;
+  }
+
+  .date-input-arabic {
+    width: 75px;
+  }
+}
+
+@media (max-width: 480px) {
+  .report-header {
+    padding: 10px;
+  }
+
+  .header-center {
+    padding: 15px 10px 10px 10px;
+  }
+
+  .main-title {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .hierarchy {
+    font-size: 9px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    margin-top: 5px;
+  }
+
+  table {
+    font-size: 9px;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table th, table td {
+    padding: 6px 4px;
+    font-size: 9px;
+    min-width: 60px;
+  }
+
+  .action-buttons {
+    gap: 4px;
+    flex-direction: column;
+  }
+
+  .btn-edit-small,
+  .btn-delete-small {
+    padding: 6px 10px;
+    font-size: 10px;
+    width: 100%;
+  }
+
+  .missions-header {
+    margin-bottom: 15px;
+  }
+
+  .export-btn {
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+
+  .inline-input {
+    width: 80px;
+    padding: 2px;
+    font-size: 9px;
+    padding-left: 30px;
+  }
+
+  .date-display,
+  .date-display-overlay {
+    font-size: 9px;
+    min-width: 70px;
+    padding: 2px;
+  }
+
+  .date-input-arabic {
+    width: 70px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 360px) {
+  .main-title {
+    font-size: 12px;
+  }
+
+  .hierarchy {
+    font-size: 8px;
+  }
+
+  .subtitle {
+    font-size: 10px;
+  }
+
+  table {
+    font-size: 8px;
+  }
+
+  table th, table td {
+    padding: 5px 3px;
+    font-size: 8px;
+    min-width: 50px;
+  }
+
+  .btn-edit-small,
+  .btn-delete-small {
+    font-size: 9px;
+    padding: 5px 8px;
+  }
+
+  .export-btn {
+    font-size: 11px;
+    padding: 9px 12px;
+  }
+}
+
+/* Landscape mode for tablets */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .header-center {
+    padding: 20px 100px 12px 100px;
+  }
+
+  table {
+    font-size: 10px;
+  }
+
+  table th, table td {
+    padding: 8px 6px;
+  }
+}

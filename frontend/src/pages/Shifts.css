@@ -3,6 +3,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .shift-card {
@@ -19,6 +21,8 @@
   align-items: center;
   margin-bottom: 10px;
   padding-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
   /* border-bottom: 2px solid #000; */
 }
 
@@ -31,6 +35,7 @@
 .shift-actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .btn-edit {
@@ -38,6 +43,7 @@
   color: #000 !important;
   padding: 6px 12px;
   font-size: 11px;
+  white-space: nowrap;
 }
 
 .btn-edit:hover {
@@ -49,6 +55,7 @@
   color: #fff !important;
   padding: 6px 12px;
   font-size: 11px;
+  white-space: nowrap;
 }
 
 .btn-delete:hover {
@@ -59,10 +66,187 @@
   margin-top: 0;
   background-color: white;
   font-size: 11px;
+  width: 100%;
 }
 
 .shift-card table th,
 .shift-card table td {
   padding: 10px 12px;
   line-height: 1.6;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .shift-card {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .shift-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .shift-date {
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .shift-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    padding: 7px 14px;
+    font-size: 11px;
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .shift-card table {
+    font-size: 10px;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .shift-card table thead,
+  .shift-card table tbody {
+    display: table;
+    width: 100%;
+  }
+
+  .shift-card table th,
+  .shift-card table td {
+    padding: 8px 10px;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+
+  .shift-card {
+    padding: 10px;
+    margin-bottom: 14px;
+    border-radius: 5px;
+  }
+
+  .shift-header {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    gap: 8px;
+  }
+
+  .shift-date {
+    font-size: 13px;
+  }
+
+  .shift-actions {
+    gap: 6px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    padding: 7px 12px;
+    font-size: 10px;
+    flex: 1;
+  }
+
+  .shift-card table {
+    font-size: 9px;
+  }
+
+  .shift-card table th,
+  .shift-card table td {
+    padding: 7px 8px;
+    font-size: 9px;
+    line-height: 1.4;
+    min-width: 60px;
+  }
+}
+
+@media (max-width: 360px) {
+  .shift-card {
+    padding: 8px;
+    margin-bottom: 12px;
+  }
+
+  .shift-header {
+    margin-bottom: 6px;
+    padding-bottom: 5px;
+  }
+
+  .shift-date {
+    font-size: 12px;
+  }
+
+  .shift-actions {
+    gap: 5px;
+    flex-direction: column;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    padding: 7px 10px;
+    font-size: 10px;
+    width: 100%;
+  }
+
+  .shift-card table {
+    font-size: 8px;
+  }
+
+  .shift-card table th,
+  .shift-card table td {
+    padding: 6px 6px;
+    font-size: 8px;
+    min-width: 50px;
+  }
+}
+
+/* Landscape mode for tablets */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .shift-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .shift-actions {
+    width: auto;
+  }
+
+  .shift-card table {
+    font-size: 10px;
+  }
+
+  .shift-card table th,
+  .shift-card table td {
+    padding: 8px 10px;
+  }
+}
+
+/* Improve touch targets on mobile */
+@media (hover: none) and (pointer: coarse) {
+  .btn-edit,
+  .btn-delete {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
