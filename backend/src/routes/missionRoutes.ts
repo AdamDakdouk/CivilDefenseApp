@@ -262,12 +262,8 @@ router.put('/:id', async (req: Request, res: Response) => {
           oldParticipantStart = new Date(participant.customStartTime);
           oldParticipantEnd = new Date(participant.customEndTime);
           
-          // Handle midnight crossing
-          const oldStartTimeStr = participant.customStartTime.toISOString().split('T')[1].substring(0, 5);
-          const oldEndTimeStr = participant.customEndTime.toISOString().split('T')[1].substring(0, 5);
-          if (oldEndTimeStr < oldStartTimeStr) {
-            oldParticipantEnd = new Date(oldParticipantEnd.getTime() + 24 * 60 * 60 * 1000);
-          }
+          // No need to handle midnight crossing here!
+          // The database already stores the correct end date (next day if needed)
           
           oldParticipantHours = Math.round(
             (oldParticipantEnd.getTime() - oldParticipantStart.getTime()) / (1000 * 60 * 60)
@@ -441,12 +437,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
           participantStart = new Date(participant.customStartTime);
           participantEnd = new Date(participant.customEndTime);
           
-          // Handle midnight crossing
-          const startTimeStr = participant.customStartTime.toISOString().split('T')[1].substring(0, 5);
-          const endTimeStr = participant.customEndTime.toISOString().split('T')[1].substring(0, 5);
-          if (endTimeStr < startTimeStr) {
-            participantEnd = new Date(participantEnd.getTime() + 24 * 60 * 60 * 1000);
-          }
+          // No need to handle midnight crossing here!
+          // The database already stores the correct end date (next day if needed)
+          // This was set correctly during CREATE
           
           participantHours = Math.round(
             (participantEnd.getTime() - participantStart.getTime()) / (1000 * 60 * 60)
