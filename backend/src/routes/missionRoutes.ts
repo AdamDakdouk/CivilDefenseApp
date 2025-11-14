@@ -163,7 +163,9 @@ router.post('/', async (req: Request, res: Response) => {
           participantEnd = moment.tz(participant.customEndTime, 'Asia/Beirut').toDate();
           
           // Handle midnight crossing for custom times
-          if (participantEnd < participantStart) {
+          const startTimeOnly = participant.customStartTime.split('T')[1];
+          const endTimeOnly = participant.customEndTime.split('T')[1];
+          if (endTimeOnly < startTimeOnly) {
             participantEnd = new Date(participantEnd.getTime() + 24 * 60 * 60 * 1000);
           }
           
@@ -261,7 +263,9 @@ router.put('/:id', async (req: Request, res: Response) => {
           oldParticipantEnd = new Date(participant.customEndTime);
           
           // Handle midnight crossing
-          if (oldParticipantEnd < oldParticipantStart) {
+          const oldStartTimeStr = participant.customStartTime.toISOString().split('T')[1].substring(0, 5);
+          const oldEndTimeStr = participant.customEndTime.toISOString().split('T')[1].substring(0, 5);
+          if (oldEndTimeStr < oldStartTimeStr) {
             oldParticipantEnd = new Date(oldParticipantEnd.getTime() + 24 * 60 * 60 * 1000);
           }
           
@@ -362,7 +366,9 @@ router.put('/:id', async (req: Request, res: Response) => {
           participantEnd = moment.tz(participant.customEndTime, 'Asia/Beirut').toDate();
           
           // Handle midnight crossing for custom times
-          if (participantEnd < participantStart) {
+          const startTimeOnly = participant.customStartTime.split('T')[1];
+          const endTimeOnly = participant.customEndTime.split('T')[1];
+          if (endTimeOnly < startTimeOnly) {
             participantEnd = new Date(participantEnd.getTime() + 24 * 60 * 60 * 1000);
           }
           
@@ -436,7 +442,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
           participantEnd = new Date(participant.customEndTime);
           
           // Handle midnight crossing
-          if (participantEnd < participantStart) {
+          const startTimeStr = participant.customStartTime.toISOString().split('T')[1].substring(0, 5);
+          const endTimeStr = participant.customEndTime.toISOString().split('T')[1].substring(0, 5);
+          if (endTimeStr < startTimeStr) {
             participantEnd = new Date(participantEnd.getTime() + 24 * 60 * 60 * 1000);
           }
           
