@@ -5,6 +5,7 @@ import AddShiftModal from '../components/AddShiftModal';
 import ConfirmModal from '../components/ConfirmModal';
 import { useMonth } from '../contexts/MonthContext';
 import CustomAlert from '../components/CustomAlert';
+import { formatDateArabic } from '../utils/timeUtils';
 import './Shifts.css';
 
 const Shifts: React.FC = () => {
@@ -18,7 +19,7 @@ const Shifts: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
-   const [deletingShift, setDeletingShift] = useState(false); // ✅ Add this
+  const [deletingShift, setDeletingShift] = useState(false); // ✅ Add this
 
   useEffect(() => {
     fetchShifts();
@@ -49,9 +50,15 @@ const Shifts: React.FC = () => {
         await createShift(shiftData);
         setShowModal(false);
         fetchShifts();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error creating shift:', error);
-        setAlertMessage('حدث خطأ أثناء إضافة المناوبة');
+        console.error('Full error object:', JSON.stringify(error, null, 2));
+        console.error('Error response data:', error.response?.data);
+        console.error('Error response status:', error.response?.status);
+        console.error('Error message:', error.message);
+        console.error('Shift data sent:', shiftData);
+        const errorMsg = error.response?.data?.message || error.message || 'حدث خطأ أثناء إضافة المناوبة';
+        setAlertMessage(errorMsg);
         setAlertType('warning');
         setShowAlert(true);
       }
@@ -59,28 +66,26 @@ const Shifts: React.FC = () => {
   };
 
   const handleEditShift = (shift: Shift) => {
+    // No formatting needed! Backend already sends data in Civil Defense Clock format
+    // date: "YYYY-MM-DD", checkIn: "HH:mm", checkOut: "HH:mm"
     const formattedShift = {
       ...shift,
-      date: new Date(shift.date).toISOString().split('T')[0],
+      date: shift.date,
       participants: shift.participants.map(p => {
-        const checkInDate = new Date(p.checkIn);
-        const checkOutDate = new Date(p.checkOut);
+        const checkIn = `${shift.date}T${p.checkIn}`;
 
-        // Format without timezone conversion
-        const formatDateTime = (date: Date) => {
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
-          return `${year}-${month}-${day}T${hours}:${minutes}`;
-        };
+        // detect next-day checkout
+        const checkOutDate = new Date(shift.date);
+        if (p.checkOut <= p.checkIn) {
+          checkOutDate.setDate(checkOutDate.getDate() + 1);
+        }
+        const checkOutDateStr = checkOutDate.toISOString().split('T')[0];
 
         return {
           userId: p.user._id,
           name: p.user.name,
-          checkIn: formatDateTime(checkInDate),
-          checkOut: formatDateTime(checkOutDate)
+          checkIn,
+          checkOut: `${checkOutDateStr}T${p.checkOut}`
         };
       })
     };
@@ -119,7 +124,7 @@ const Shifts: React.FC = () => {
         setAlertType('warning');
         setShowAlert(true);
       } finally {
-        setDeletingShift(false); 
+        setDeletingShift(false);
       }
     }
   };
@@ -129,20 +134,9 @@ const Shifts: React.FC = () => {
     setShowConfirmDelete(true);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ar-LB', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+  const formatTime = (timeString: string) => {
+    // Time is already in HH:mm format, return as-is
+    return timeString;
   };
 
   const isCurrentMonth = () => {
@@ -173,7 +167,7 @@ const Shifts: React.FC = () => {
         shifts.map(shift => (
           <div key={shift._id} className="shift-card">
             <div className="shift-header">
-              <h3 className="shift-date">{formatDate(shift.date)}</h3>
+              <h3 className="shift-date">{formatDateArabic(shift.date)}</h3>
               {isCurrentMonth() && (
                 <div className="shift-actions">
                   <button onClick={() => handleEditShift(shift)} className="btn-edit">

@@ -200,9 +200,9 @@ textarea:focus {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding: 14px;
+  gap: 4px;
+  margin-bottom: 4px;
+  padding: 4;
   background-color: #b1b1b170;
   border-radius: 5px;
   position: relative;

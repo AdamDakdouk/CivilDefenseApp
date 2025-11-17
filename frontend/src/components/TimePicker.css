@@ -24,6 +24,26 @@
   background-color: #fff;
 }
 
+.time-picker-inputs select:hover {
+  border-color: #999;
+}
+
+.time-input {
+  padding: 10px;
+  border: 1px solid #4a90e2;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 80px;
+  text-align: center;
+  background-color: #f0f7ff;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #2c5aa0;
+  box-shadow: 0 0 4px rgba(44, 90, 160, 0.3);
+}
+
 .time-separator {
   font-size: 20px;
   font-weight: bold;

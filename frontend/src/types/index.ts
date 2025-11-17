@@ -15,16 +15,17 @@ export interface User {
 
 export interface MissionParticipant {
   user: User;
-  customStartTime?: string;  // NEW: Optional custom start time for this participant
-  customEndTime?: string;    // NEW: Optional custom end time for this participant
+  customStartTime?: string;  // HH:mm format (e.g., "08:00")
+  customEndTime?: string;    // HH:mm format (e.g., "21:00")
 }
 
 export interface Mission {
   _id: string;
   referenceNumber: string;
   vehicleNumbers: string;
-  startTime: string;
-  endTime: string;
+  date: string;              // YYYY-MM-DD format (e.g., "2025-11-14")
+  startTime: string;         // HH:mm format (e.g., "08:00")
+  endTime: string;           // HH:mm format (e.g., "21:00")
   location: string;
   missionType: 'fire' | 'rescue' | 'medic' | 'public-service' | 'misc';
   missionDetails: string;
@@ -36,7 +37,7 @@ export interface Mission {
 
 export interface Shift {
   _id: string;
-  date: string;
+  date: string;              // YYYY-MM-DD format (e.g., "2025-11-14")
   team: '1' | '2' | '3';
   participants: ShiftParticipant[];
   createdAt: string;
@@ -44,15 +45,15 @@ export interface Shift {
 
 export interface ShiftParticipant {
   user: User;
-  checkIn: string;
-  checkOut: string;
+  checkIn: string;           // HH:mm format (e.g., "08:00")
+  checkOut: string;          // HH:mm format (e.g., "21:00")
   hoursServed: number;
 }
 
 export interface Attendance {
   _id: string;
   userId: string;
-  date: string;
+  date: string;              // YYYY-MM-DD format (e.g., "2025-11-14")
   code: 'ح' | 'مأ' | 'غ' | 'ع' | 'م' | 'ب';
   createdAt: string;
 }

@@ -9,8 +9,8 @@ import CustomAlert from './CustomAlert';
 interface Participant {
     userId: string;
     name: string;
-    checkIn: string;
-    checkOut: string;
+    checkIn: string;   // YYYY-MM-DDTHH:mm format
+    checkOut: string;  // YYYY-MM-DDTHH:mm format
 }
 
 interface AddShiftModalProps {
@@ -30,6 +30,7 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
         const day = String(now.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     };
+    
     const { activeMonth, activeYear, selectedMonth } = useMonth();
     const today = getToday();
     const [date, setDate] = useState(initialData?.date || today);
@@ -53,7 +54,6 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
 
             if (!userA || !userB) return 0;
 
-            // Priority order: head > administrative staff > employee > volunteer
             const rolePriority: { [key: string]: number } = {
                 'head': 1,
                 'administrative staff': 2,
@@ -68,9 +68,38 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                 return priorityA - priorityB;
             }
 
-            // If same role, sort by name
             return userA.name.localeCompare(userB.name, 'ar');
         });
+    };
+
+    // Helper: Update participant dates when shift date changes
+    const updateParticipantDates = (newShiftDate: string, currentParticipants: Participant[]) => {
+        return currentParticipants.map(p => {
+            // Extract time from existing check-in/check-out
+            const checkInTime = p.checkIn.split('T')[1] || '08:00';
+            const checkOutTime = p.checkOut.split('T')[1] || '08:00';
+            
+            // Calculate next day for checkout
+            const nextDay = new Date(newShiftDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const nextDayStr = `${nextDay.getFullYear()}-${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
+            
+            return {
+                ...p,
+                checkIn: `${newShiftDate}T${checkInTime}`,
+                checkOut: `${nextDayStr}T${checkOutTime}`
+            };
+        });
+    };
+
+    // Helper: Validate datetime change (allow day change, block month/year change)
+    const validateDateTimeChange = (newDatetime: string, shiftDate: string): boolean => {
+        const newDate = new Date(newDatetime.split('T')[0]);
+        const shiftDateObj = new Date(shiftDate);
+        
+        // Check if month and year are the same
+        return newDate.getMonth() === shiftDateObj.getMonth() && 
+               newDate.getFullYear() === shiftDateObj.getFullYear();
     };
 
     useEffect(() => {
@@ -112,10 +141,9 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
 
         const selectedDate = new Date(date);
         const dayOfWeek = selectedDate.getDay();
-        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // Sunday or Saturday
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         const wasWeekend = prevDateRef.current ? new Date(prevDateRef.current).getDay() === 0 || new Date(prevDateRef.current).getDay() === 6 : false;
 
-        // Remove head and admin staff if switching TO weekend
         if (isWeekend && !wasWeekend) {
             setParticipants(prevParticipants =>
                 prevParticipants.filter(p => {
@@ -125,7 +153,6 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
             );
         }
 
-        // Add head and admin staff back if switching FROM weekend to weekday
         if (!isWeekend && wasWeekend && participants.length > 0) {
             const headAndAdmin = allUsers.filter(u =>
                 u.role === 'head' || u.role === 'administrative staff'
@@ -194,24 +221,6 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     const fetchAllUsers = async () => {
         const users = await getUsers();
         setAllUsers(users);
-    };
-
-    const updateParticipantDates = (newDate: string, currentParticipants: typeof participants) => {
-        const nextDay = new Date(newDate);
-        nextDay.setDate(nextDay.getDate() + 1);
-        const nextDayStr = nextDay.toISOString().split('T')[0];
-
-        return currentParticipants.map(p => {
-            // Extract just the time part from existing check-in/check-out
-            const checkInTime = p.checkIn.split('T')[1] || '08:00';
-            const checkOutTime = p.checkOut.split('T')[1] || '08:00';
-
-            return {
-                ...p,
-                checkIn: `${newDate}T${checkInTime}`,
-                checkOut: `${nextDayStr}T${checkOutTime}`
-            };
-        });
     };
 
     const autoFillEmployees = (selectedTeam: '1' | '2' | '3') => {
@@ -298,9 +307,9 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
 
     const addParticipant = (user: User) => {
         if (!participants.find(p => p.userId === user._id)) {
-            const [year, month, day] = date.split('-').map(Number);
-            const nextDayDate = new Date(year, month - 1, day + 1);
-            const nextDayStr = `${nextDayDate.getFullYear()}-${String(nextDayDate.getMonth() + 1).padStart(2, '0')}-${String(nextDayDate.getDate()).padStart(2, '0')}`;
+            const nextDay = new Date(date);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const nextDayStr = `${nextDay.getFullYear()}-${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
 
             setParticipants([...participants, {
                 userId: user._id,
@@ -318,6 +327,14 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     };
 
     const updateParticipant = (userId: string, field: 'checkIn' | 'checkOut', value: string) => {
+        // Validate that month/year didn't change
+        if (!validateDateTimeChange(value, date)) {
+            setAlertMessage('لا يمكن تغيير الشهر أو السنة، يمكنك تغيير اليوم فقط');
+            setAlertType('warning');
+            setShowAlert(true);
+            return;
+        }
+        
         setParticipants(participants.map(p =>
             p.userId === userId ? { ...p, [field]: value } : p
         ));
@@ -345,7 +362,11 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                 ...(editMode && initialData?._id ? { id: initialData._id } : {}),
                 date,
                 team,
-                participants,
+                participants: participants.map(p => ({
+                    userId: p.userId,
+                    checkIn: p.checkIn,
+                    checkOut: p.checkOut
+                })),
                 createdBy: '674c8f9e8e7b4c001234abcd'
             });
         } finally {
@@ -368,7 +389,6 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                             const dateMonth = selectedDate.getMonth() + 1;
                             const dateYear = selectedDate.getFullYear();
 
-                            // Only allow dates in active month
                             if (dateMonth === activeMonth && dateYear === activeYear) {
                                 setDate(newDate);
                                 setParticipants(updateParticipantDates(newDate, participants));
@@ -423,7 +443,6 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                         {participants
                             .filter(p => {
                                 const user = allUsers.find(u => u._id === p.userId);
-                                // Hide employees, head, and admin staff from the list
                                 return user && user.role !== 'employee' && user.role !== 'head' && user.role !== 'administrative staff';
                             }).map(p => (
                                 <div key={p.userId} className="participant-datetime-row shift-participant-row">

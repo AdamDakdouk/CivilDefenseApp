@@ -5,13 +5,14 @@ import TimePicker from './TimePicker';
 import './Modal.css';
 import { useMonth } from '../contexts/MonthContext';
 import CustomAlert from './CustomAlert';
+import { getCurrentDate } from '../utils/timeUtils';
 
 interface Participant {
     userId: string;
     name: string;
-    customStartTime?: string;  // NEW: Optional custom start time
-    customEndTime?: string;    // NEW: Optional custom end time
-    showCustomTimes?: boolean; // NEW: Flag to show/hide custom time inputs
+    customStartTime?: string;  // HH:mm format (e.g., "08:00")
+    customEndTime?: string;    // HH:mm format (e.g., "21:00")
+    showCustomTimes?: boolean; // Flag to show/hide custom time inputs
 }
 
 interface AddMissionModalProps {
@@ -23,15 +24,8 @@ interface AddMissionModalProps {
 }
 
 const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSave, editMode = false, initialData }) => {
-    const getToday = () => {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
     const { activeMonth, activeYear, selectedMonth } = useMonth();
-    const today = getToday();
+    const today = getCurrentDate(); // Use Civil Defense Clock
     const [referenceNumber, setReferenceNumber] = useState(initialData?.referenceNumber || '');
     const [vehicleNumbers, setVehicleNumbers] = useState<string[]>(() => {
         if (!initialData?.vehicleNumbers) return [];
@@ -39,8 +33,10 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         if (typeof initialData.vehicleNumbers === 'string') return initialData.vehicleNumbers.split(', ').filter(Boolean);
         return [];
     });
-    const [startTime, setStartTime] = useState(initialData?.startTime || `${today}T08:00`);
-    const [endTime, setEndTime] = useState(initialData?.endTime || `${today}T20:00`);
+    // Store date and times separately using Civil Defense Clock format
+    const [missionDate, setMissionDate] = useState(initialData?.date || today);
+    const [startTime, setStartTime] = useState(initialData?.startTime || '08:00');
+    const [endTime, setEndTime] = useState(initialData?.endTime || '20:00');
     const [location, setLocation] = useState(initialData?.location || '');
     const [missionType, setMissionType] = useState<'fire' | 'rescue' | 'medic' | 'public-service' | 'misc'>(initialData?.missionType || 'fire');
     const [missionDetails, setMissionDetails] = useState(initialData?.missionDetails || '');
@@ -71,10 +67,9 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         if (isOpen && !editMode) {
             // Only set defaults when ADDING (not editing)
             const defaultDate = `${activeYear}-${String(activeMonth).padStart(2, '0')}-01`;
-            const defaultStart = `${defaultDate}T08:00`;
-            const defaultEnd = `${defaultDate}T10:00`;
-            setStartTime(defaultStart);
-            setEndTime(defaultEnd);
+            setMissionDate(defaultDate);
+            setStartTime('08:00');
+            setEndTime('10:00');
         }
     }, [isOpen, activeMonth, editMode]);
 
@@ -143,7 +138,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         setParticipants(participants.map(p => {
             if (p.userId === userId) {
                 if (!p.showCustomTimes) {
-                    // When enabling custom times, initialize with mission times
+                    // When enabling custom times, initialize with mission times (HH:mm only)
                     return {
                         ...p,
                         showCustomTimes: true,
@@ -164,28 +159,26 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         }));
     };
 
-    // Update custom start time for a participant
+    // Update custom start time for a participant (HH:mm format only)
     const updateCustomStartTime = (userId: string, time: string) => {
         setParticipants(participants.map(p => {
             if (p.userId === userId) {
-                const date = p.customStartTime?.split('T')[0] || startTime.split('T')[0];
                 return {
                     ...p,
-                    customStartTime: `${date}T${time}`
+                    customStartTime: time
                 };
             }
             return p;
         }));
     };
 
-    // Update custom end time for a participant
+    // Update custom end time for a participant (HH:mm format only)
     const updateCustomEndTime = (userId: string, time: string) => {
         setParticipants(participants.map(p => {
             if (p.userId === userId) {
-                const date = p.customEndTime?.split('T')[0] || endTime.split('T')[0];
                 return {
                     ...p,
-                    customEndTime: `${date}T${time}`
+                    customEndTime: time
                 };
             }
             return p;
@@ -230,14 +223,15 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                 ...(editMode && initialData?._id ? { id: initialData._id } : {}),
                 referenceNumber,
                 vehicleNumbers: vehicleNumbers.join(', '),
-                startTime, // Send as-is: "2025-11-13T08:00"
-                endTime,   // Send as-is: "2025-11-13T10:00"
+                date: missionDate,     // YYYY-MM-DD format
+                startTime,             // HH:mm format
+                endTime,               // HH:mm format
                 location,
                 missionType,
                 missionDetails,
                 notes,
                 team,
-                // NEW: Include custom times in participants if they exist
+                // Include custom times in participants if they exist (HH:mm format)
                 participants: participants.map(p => ({
                     userId: p.userId,
                     // Only include custom times if they were set
@@ -268,7 +262,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                         <label>التاريخ *</label>
                         <input
                             type="date"
-                            value={startTime.split('T')[0]}
+                            value={missionDate}
                             onChange={(e) => {
                                 const newDate = e.target.value;
                                 const selectedDate = new Date(newDate);
@@ -277,10 +271,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
 
                                 // Only allow dates in active month
                                 if (dateMonth === activeMonth && dateYear === activeYear) {
-                                    const currentStartTime = startTime.split('T')[1] || '08:00';
-                                    const currentEndTime = endTime.split('T')[1] || '10:00';
-                                    setStartTime(`${newDate}T${currentStartTime}`);
-                                    setEndTime(`${newDate}T${currentEndTime}`);
+                                    setMissionDate(newDate);
                                 } else {
                                     setAlertMessage(`يمكنك فقط إضافة مهمات في الشهر النشط (${activeMonth}/${activeYear})`);
                                     setAlertType('error')
@@ -405,121 +396,6 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                 </div>
 
                 <div className="form-group mission-form-group">
-                    <label>الفريق</label>
-                    <select value={team} onChange={(e) => {
-                        setTeam(e.target.value as '1' | '2' | '3');
-                        if (errors.referenceNumber) setErrors({ ...errors, referenceNumber: false });
-                    }}>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-
-                    </select>
-                </div>
-
-                <div className="form-group mission-form-group">
-                    <label className='required mission-required'>العناصر المنفذة</label>
-                    <div style={{ position: 'relative' }}>
-                        <div className="input-wrapper mission-input-wrapper">
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => {
-                                    handleSearch(e.target.value);
-                                    if (errors.referenceNumber) setErrors({ ...errors, referenceNumber: false });
-                                }}
-                                placeholder="ابحث عن اسم..."
-                                style={{ borderColor: errors.participants ? '#c41e3a' : '#ddd' }}
-                                data-field="participants"
-                            />
-                        </div>
-                        {showSuggestions && searchResults.length > 0 && (
-                            <div className="suggestions">
-                                {searchResults.map(user => (
-                                    <div
-                                        key={user._id}
-                                        className="suggestion-item"
-                                        onClick={() => addParticipant(user)}
-                                    >
-                                        {user.name}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                    {participants.length > 0 && (
-                        <div className="selected-participants mission-selected-participants">
-                            {participants.map(p => (
-                                <div key={p.userId} style={{ marginBottom: '10px', width: '100%' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span className="participant-tag mission-participant-tag">
-                                            {p.name}
-                                            <button onClick={() => removeParticipant(p.userId)} className="remove-tag mission-remove-tag">×</button>
-                                        </span>
-                                        {/* NEW: Toggle button for custom times */}
-                                        <button
-                                            type="button"
-                                            onClick={() => toggleCustomTimes(p.userId)}
-                                            style={{
-                                                padding: '4px 8px',
-                                                fontSize: '12px',
-                                                backgroundColor: p.showCustomTimes ? '#28a745' : '#007bff',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            {p.showCustomTimes ? '✓ وقت خاص' : '⏱ تعديل الوقت'}
-                                        </button>
-                                    </div>
-
-                                    {/* NEW: Show custom time pickers if enabled */}
-                                    {p.showCustomTimes && (
-                                        <div style={{ marginTop: '8px', marginRight: '20px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                                            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                                                <div style={{ flex: '1', minWidth: '150px' }}>
-                                                    <TimePicker
-                                                        label="بداية"
-                                                        value={p.customStartTime?.split('T')[1] || startTime.split('T')[1]}
-                                                        onChange={(time) => updateCustomStartTime(p.userId, time)}
-                                                    />
-                                                </div>
-                                                <div style={{ flex: '1', minWidth: '150px' }}>
-                                                    <TimePicker
-                                                        label="نهاية"
-                                                        value={p.customEndTime?.split('T')[1] || endTime.split('T')[1]}
-                                                        onChange={(time) => updateCustomEndTime(p.userId, time)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <TimePicker
-                    label="الذهاب"
-                    value={startTime.split('T')[1] || '08:00'}
-                    onChange={(time) => {
-                        const date = startTime.split('T')[0] || today;
-                        setStartTime(`${date}T${time}`);
-                    }}
-                />
-
-                <TimePicker
-                    label="الإياب"
-                    value={endTime.split('T')[1] || '08:00'}
-                    onChange={(time) => {
-                        const date = endTime.split('T')[0] || startTime.split('T')[0] || today;
-                        setEndTime(`${date}T${time}`);
-                    }}
-                />
-
-                <div className="form-group mission-form-group">
                     <label className='required mission-required'>نوع الآلية</label>
                     <div className="radio-group mission-radio-group">
                         <label className="radio-label mission-radio-label">
@@ -594,6 +470,114 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                         </div>
                     )}
                     {errors.vehicleNumber && <span className="error-icon mission-error-icon" style={{ position: 'static', marginTop: '5px', display: 'block' }}>⚠ يرجى اختيار آلية واحدة على الأقل</span>}
+                </div>
+
+                <TimePicker
+                    label="الذهاب"
+                    value={startTime}
+                    onChange={(time) => setStartTime(time)}
+                />
+
+                <TimePicker
+                    label="الإياب"
+                    value={endTime}
+                    onChange={(time) => setEndTime(time)}
+                />
+                <div className="form-group mission-form-group">
+                    <label>الفريق</label>
+                    <select value={team} onChange={(e) => {
+                        setTeam(e.target.value as '1' | '2' | '3');
+                        if (errors.referenceNumber) setErrors({ ...errors, referenceNumber: false });
+                    }}>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+
+                    </select>
+                </div>
+
+                <div className="form-group mission-form-group">
+                    <label className='required mission-required'>العناصر المنفذة</label>
+                    <div style={{ position: 'relative' }}>
+                        <div className="input-wrapper mission-input-wrapper">
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    handleSearch(e.target.value);
+                                    if (errors.referenceNumber) setErrors({ ...errors, referenceNumber: false });
+                                }}
+                                placeholder="ابحث عن اسم..."
+                                style={{ borderColor: errors.participants ? '#c41e3a' : '#ddd' }}
+                                data-field="participants"
+                            />
+                        </div>
+                        {showSuggestions && searchResults.length > 0 && (
+                            <div className="suggestions">
+                                {searchResults.map(user => (
+                                    <div
+                                        key={user._id}
+                                        className="suggestion-item"
+                                        onClick={() => addParticipant(user)}
+                                    >
+                                        {user.name}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {participants.length > 0 && (
+                        <div className="selected-participants mission-selected-participants">
+                            {participants.map(p => (
+                                <div key={p.userId} style={{ marginBottom: '10px', width: '100%' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span className="participant-tag mission-participant-tag">
+                                            {p.name}
+                                            <button onClick={() => removeParticipant(p.userId)} className="remove-tag mission-remove-tag">×</button>
+                                        </span>
+                                        {/* NEW: Toggle button for custom times */}
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleCustomTimes(p.userId)}
+                                            style={{
+                                                padding: '4px 8px',
+                                                fontSize: '12px',
+                                                backgroundColor: p.showCustomTimes ? '#28a745' : '#007bff',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            {p.showCustomTimes ? '✓ وقت خاص' : '⏱ تعديل الوقت'}
+                                        </button>
+                                    </div>
+
+                                    {/* Show custom time pickers if enabled */}
+                                    {p.showCustomTimes && (
+                                        <div style={{ marginTop: '8px', marginRight: '20px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+                                            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                                <div style={{ flex: '1', minWidth: '150px' }}>
+                                                    <TimePicker
+                                                        label="بداية"
+                                                        value={p.customStartTime || startTime}
+                                                        onChange={(time) => updateCustomStartTime(p.userId, time)}
+                                                    />
+                                                </div>
+                                                <div style={{ flex: '1', minWidth: '150px' }}>
+                                                    <TimePicker
+                                                        label="نهاية"
+                                                        value={p.customEndTime || endTime}
+                                                        onChange={(time) => updateCustomEndTime(p.userId, time)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="form-group mission-form-group">

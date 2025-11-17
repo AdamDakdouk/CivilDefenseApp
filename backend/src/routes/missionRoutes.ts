@@ -4,7 +4,7 @@ import Shift from '../models/Shift';
 import User from '../models/User';
 import Settings from '../models/Settings';
 import { authenticateToken } from '../middleware/auth';
-import moment from 'moment-timezone';
+import { calculateHours, daysBetween, timeToMinutes } from '../utils/timeUtils';
 
 const router = express.Router();
 
@@ -15,40 +15,45 @@ router.use(authenticateToken);
 router.get('/', async (req: Request, res: Response) => {
   try {
     const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    
+    // Create date strings for filtering
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
-// Line 21-30 - Update your GET route
-const missions = await Mission.find({
-  startTime: {
-    $gte: startOfMonth,
-    $lte: endOfMonth
-  }
-})
-  .populate('participants.user')
-  .populate('createdBy')
-  .sort({ startTime: 1 });
+    const missions = await Mission.find({
+      date: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    })
+      .populate('participants.user')
+      .populate('createdBy')
+      .sort({ date: 1, startTime: 1 });
 
-// Filter out participants with invalid user references
-const cleanedMissions = missions.map(mission => {
-  const validParticipants = mission.participants.filter(p => p.user !== null);
-  return {
-    ...mission.toObject(),
-    participants: validParticipants
-  };
-});
+    // Filter out participants with invalid user references
+    const cleanedMissions = missions.map(mission => {
+      const validParticipants = mission.participants.filter(p => p.user !== null);
+      return {
+        ...mission.toObject(),
+        participants: validParticipants
+      };
+    });
 
-res.json(cleanedMissions);
+    res.json(cleanedMissions);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching missions', error });
   }
 });
 
 // Helper function to check if mission overlaps with shift
-const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd: Date) => {
-  // Find all shifts for this user
+const checkShiftOverlap = async (userId: string, missionDate: string, missionStart: string, missionEnd: string) => {
+  // Find all shifts for this user on this date
   const shifts = await Shift.find({
-    'participants.user': userId
+    'participants.user': userId,
+    date: missionDate
   });
 
   // Check each shift's participants for overlap
@@ -58,18 +63,99 @@ const checkShiftOverlap = async (userId: string, missionStart: Date, missionEnd:
     );
 
     if (userParticipant) {
-      const shiftStart = new Date(userParticipant.checkIn);
-      const shiftEnd = new Date(userParticipant.checkOut);
+      const shiftStart = userParticipant.checkIn;
+      const shiftEnd = userParticipant.checkOut;
 
-      // Check if there's ANY overlap between mission and shift
-      const hasOverlap = missionStart < shiftEnd && missionEnd > shiftStart;
+      // Reconstruct full datetime for shift to handle midnight crossing
+      const toMinutes = (time: string) => {
+        const [h, m] = time.split(':').map(Number);
+        return h * 60 + m;
+      };
+      
+      const shiftStartMin = toMinutes(shiftStart);
+      const shiftEndMin = toMinutes(shiftEnd);
+      
+      let shiftCheckoutDate = missionDate;
+      if (shiftEndMin < shiftStartMin || (shiftEndMin === shiftStartMin && shiftEndMin !== 0)) {
+        const checkoutDateObj = new Date(missionDate);
+        checkoutDateObj.setDate(checkoutDateObj.getDate() + 1);
+        shiftCheckoutDate = checkoutDateObj.toISOString().split('T')[0];
+      }
+      
+      const shiftStartFull = `${missionDate}T${shiftStart}`;
+      const shiftEndFull = `${shiftCheckoutDate}T${shiftEnd}`;
+
+      // Check if there's ANY time overlap with full datetimes
+      const hasOverlap = checkTimeOverlapWithDates(
+        missionStart, missionEnd,
+        shiftStartFull, shiftEndFull
+      );
 
       if (hasOverlap) {
+        console.log(`✅ Mission deletion: Found shift overlap for user ${userId} on ${missionDate}`);
         return true;
       }
     }
   }
+
   return false;
+};
+
+// Helper to check if two time ranges overlap
+const checkTimeOverlap = (start1: string, end1: string, start2: string, end2: string): boolean => {
+  let s1 = timeToMinutes(start1);
+  let e1 = timeToMinutes(end1);
+  let s2 = timeToMinutes(start2);
+  let e2 = timeToMinutes(end2);
+
+  // Handle midnight crossing for first range
+  if (e1 < s1) e1 += 24 * 60;
+  
+  // Handle midnight crossing for second range
+  if (e2 < s2) e2 += 24 * 60;
+
+  // Check overlap
+  return s1 < e2 && e1 > s2;
+};
+
+// Helper to check if two datetime ranges overlap (handles dates + times)
+const checkTimeOverlapWithDates = (start1: string, end1: string, start2: string, end2: string): boolean => {
+  const extractDateTime = (t: string) => {
+    if (t.includes('T')) {
+      const [date, time] = t.split('T');
+      return { date, time };
+    }
+    return { date: null, time: t };
+  };
+
+  const dt1Start = extractDateTime(start1);
+  const dt1End = extractDateTime(end1);
+  const dt2Start = extractDateTime(start2);
+  const dt2End = extractDateTime(end2);
+
+  let s1Min = timeToMinutes(dt1Start.time);
+  let e1Min = timeToMinutes(dt1End.time);
+  let s2Min = timeToMinutes(dt2Start.time);
+  let e2Min = timeToMinutes(dt2End.time);
+
+  // For range 1: if end < start OR (end == start AND endDate > startDate), crosses midnight
+  const range1CrossesMidnight = 
+    e1Min < s1Min || 
+    (e1Min === s1Min && dt1End.date && dt1Start.date && dt1End.date > dt1Start.date);
+  if (range1CrossesMidnight) {
+    e1Min += 24 * 60;
+  }
+
+  // For range 2: if end < start OR (end == start AND endDate > startDate), crosses midnight
+  const range2CrossesMidnight = 
+    e2Min < s2Min || 
+    (e2Min === s2Min && dt2End.date && dt2Start.date && dt2End.date > dt2Start.date);
+  if (range2CrossesMidnight) {
+    e2Min += 24 * 60;
+  }
+
+  // Check overlap
+  return s1Min < e2Min && e1Min > s2Min;
 };
 
 // Create new mission
@@ -78,6 +164,7 @@ router.post('/', async (req: Request, res: Response) => {
     const {
       referenceNumber,
       vehicleNumbers,
+      date,
       startTime,
       endTime,
       location,
@@ -89,45 +176,24 @@ router.post('/', async (req: Request, res: Response) => {
       createdBy
     } = req.body;
 
-    // Convert input to Lebanon time and then to a Date object (UTC-aware)
-    const missionStart = moment.tz(startTime, 'Asia/Beirut').toDate();
-    let missionEnd = moment.tz(endTime, 'Asia/Beirut').toDate();
+    // Calculate mission hours using our simple utility
+    const missionHours = calculateHours(startTime, endTime);
 
-    if (missionEnd < missionStart) {
-      missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
-    }
-
-    const missionHours = Math.round(
-      (missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60)
-    );
-
-    // NEW: Process participants with optional custom times
-    const processedParticipants = participants.map((p: any) => {
-      const participantData: any = {
-        user: p.userId,
-      };
-      
-      // If custom times are provided, add them
-      if (p.customStartTime && p.customEndTime) {
-        participantData.customStartTime = moment.tz(p.customStartTime, 'Asia/Beirut').toDate();
-        let customEnd = moment.tz(p.customEndTime, 'Asia/Beirut').toDate();
-        
-        // Handle midnight crossing for custom times
-        if (customEnd < participantData.customStartTime) {
-          customEnd = new Date(customEnd.getTime() + 24 * 60 * 60 * 1000);
-        }
-        
-        participantData.customEndTime = customEnd;
-      }
-      
-      return participantData;
-    });
+    // Process participants - no timezone conversions needed!
+    const processedParticipants = participants.map((p: any) => ({
+      user: p.userId,
+      ...(p.customStartTime && p.customEndTime ? {
+        customStartTime: p.customStartTime,
+        customEndTime: p.customEndTime
+      } : {})
+    }));
 
     const mission = new Mission({
       referenceNumber,
       vehicleNumbers,
-      startTime: missionStart,
-      endTime: missionEnd,
+      date,
+      startTime,
+      endTime,
       location,
       missionType,
       missionDetails,
@@ -137,15 +203,14 @@ router.post('/', async (req: Request, res: Response) => {
       createdBy
     });
 
-    await mission.save();;
+    await mission.save();
 
     // Only update user stats if this is the ACTIVE month
     const settings = await Settings.findOne();
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
-    const missionMonth = missionStart.getUTCMonth() + 1;
-    const missionYear = missionStart.getUTCFullYear();
+    const [missionYear, missionMonth] = date.split('-').map(Number);
     const isCurrentMonth = (missionMonth === activeMonth && missionYear === activeYear);
 
     if (isCurrentMonth) {
@@ -153,29 +218,19 @@ router.post('/', async (req: Request, res: Response) => {
       for (const participant of participants) {
         const userId = participant.userId;
 
-        // NEW: Determine participant's start and end times (custom or mission)
-        let participantStart = missionStart;
-        let participantEnd = missionEnd;
+        // Determine participant's hours (custom or mission)
         let participantHours = missionHours;
+        let participantStart = startTime;
+        let participantEnd = endTime;
 
         if (participant.customStartTime && participant.customEndTime) {
-          participantStart = moment.tz(participant.customStartTime, 'Asia/Beirut').toDate();
-          participantEnd = moment.tz(participant.customEndTime, 'Asia/Beirut').toDate();
-          
-          // Handle midnight crossing for custom times
-          const startTimeOnly = participant.customStartTime.split('T')[1];
-          const endTimeOnly = participant.customEndTime.split('T')[1];
-          if (endTimeOnly < startTimeOnly) {
-            participantEnd = new Date(participantEnd.getTime() + 24 * 60 * 60 * 1000);
-          }
-          
-          participantHours = Math.round(
-            (participantEnd.getTime() - participantStart.getTime()) / (1000 * 60 * 60)
-          );
+          participantStart = participant.customStartTime;
+          participantEnd = participant.customEndTime;
+          participantHours = calculateHours(participantStart, participantEnd);
         }
 
-        // Check if user was on shift during their participation time (not mission time)
-        const hadShift = await checkShiftOverlap(userId, participantStart, participantEnd);
+        // Check if user was on shift during their participation time
+        const hadShift = await checkShiftOverlap(userId, date, participantStart, participantEnd);
 
         // Increment mission count always
         await User.findByIdAndUpdate(userId, {
@@ -183,7 +238,6 @@ router.post('/', async (req: Request, res: Response) => {
         });
 
         // Add hours only if NOT on shift (to avoid double counting)
-        // Use participant-specific hours
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
             $inc: { currentMonthHours: participantHours }
@@ -202,13 +256,14 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-// Update mission
+// Update existing mission
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const {
       referenceNumber,
       vehicleNumbers,
+      date,
       startTime,
       endTime,
       location,
@@ -219,62 +274,44 @@ router.put('/:id', async (req: Request, res: Response) => {
       participants
     } = req.body;
 
-    // 🧭 Fetch old mission
     const oldMission = await Mission.findById(id);
     if (!oldMission) {
       return res.status(404).json({ message: 'Mission not found' });
     }
 
-    // ✅ Parse old mission times safely
-    let oldStart = moment.tz(oldMission.startTime, 'Asia/Beirut').toDate();
-    let oldEnd = moment.tz(oldMission.endTime, 'Asia/Beirut').toDate();
-
-    // Handle midnight crossing
-    if (oldEnd < oldStart) {
-      oldEnd = new Date(oldEnd.getTime() + 24 * 60 * 60 * 1000);
-    }
-
-    const oldHours = Math.round(
-      (oldEnd.getTime() - oldStart.getTime()) / (1000 * 60 * 60)
-    );
-
-    // 🧾 Get active month/year
+    // Check if old mission was in ACTIVE month
     const settings = await Settings.findOne();
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
-    const oldMissionMonth = oldStart.getMonth() + 1;
-    const oldMissionYear = oldStart.getFullYear();
-    const oldWasCurrentMonth =
-      oldMissionMonth === activeMonth && oldMissionYear === activeYear;
+    const [oldYear, oldMonth] = oldMission.date.split('-').map(Number);
+    const oldWasCurrentMonth = (oldMonth === activeMonth && oldYear === activeYear);
 
-    // 🧮 Revert old mission stats (if current month)
+    // Calculate old and new mission hours
+    const oldHours = calculateHours(oldMission.startTime, oldMission.endTime);
+    const newHours = calculateHours(startTime, endTime);
+
+    // Step 1: Revert stats for old participants (if was current month)
     if (oldWasCurrentMonth) {
       for (const participant of oldMission.participants) {
         const userId = participant.user.toString();
 
-        // NEW: Use participant's custom times if available
-        let oldParticipantStart = oldStart;
-        let oldParticipantEnd = oldEnd;
+        // Calculate old participant hours
         let oldParticipantHours = oldHours;
+        let oldParticipantStart = oldMission.startTime;
+        let oldParticipantEnd = oldMission.endTime;
 
         if (participant.customStartTime && participant.customEndTime) {
-          oldParticipantStart = new Date(participant.customStartTime);
-          oldParticipantEnd = new Date(participant.customEndTime);
-          
-          // No need to handle midnight crossing here!
-          // The database already stores the correct end date (next day if needed)
-          
-          oldParticipantHours = Math.round(
-            (oldParticipantEnd.getTime() - oldParticipantStart.getTime()) / (1000 * 60 * 60)
-          );
+          oldParticipantStart = participant.customStartTime;
+          oldParticipantEnd = participant.customEndTime;
+          oldParticipantHours = calculateHours(oldParticipantStart, oldParticipantEnd);
         }
 
         await User.findByIdAndUpdate(userId, {
           $inc: { currentMonthMissions: -1 }
         });
 
-        const hadShift = await checkShiftOverlap(userId, oldParticipantStart, oldParticipantEnd);
+        const hadShift = await checkShiftOverlap(userId, oldMission.date, oldParticipantStart, oldParticipantEnd);
 
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
@@ -284,100 +321,53 @@ router.put('/:id', async (req: Request, res: Response) => {
       }
     }
 
-    // ✅ Parse NEW mission times in Lebanon timezone
-    const newStart = moment.tz(startTime, 'Asia/Beirut').toDate();
-    let newEnd = moment.tz(endTime, 'Asia/Beirut').toDate();
+    // Step 2: Update the mission
+    const processedParticipants = participants.map((p: any) => ({
+      user: p.userId,
+      ...(p.customStartTime && p.customEndTime ? {
+        customStartTime: p.customStartTime,
+        customEndTime: p.customEndTime
+      } : {})
+    }));
 
-    // Fix midnight crossing
-    if (newEnd <= newStart) {
-      newEnd = new Date(newEnd.getTime() + 24 * 60 * 60 * 1000);
-    }
-
-    console.log('Adjusted mission time:', newStart, 'to', newEnd);
-
-    const newHours = Math.round(
-      (newEnd.getTime() - newStart.getTime()) / (1000 * 60 * 60)
-    );
-
-    // NEW: Process participants with optional custom times
-    const processedParticipants = participants.map((p: any) => {
-      const participantData: any = {
-        user: p.userId
-      };
-      
-      // If custom times are provided, add them
-      if (p.customStartTime && p.customEndTime) {
-        participantData.customStartTime = moment.tz(p.customStartTime, 'Asia/Beirut').toDate();
-        let customEnd = moment.tz(p.customEndTime, 'Asia/Beirut').toDate();
-        
-        // Handle midnight crossing for custom times
-        if (customEnd < participantData.customStartTime) {
-          customEnd = new Date(customEnd.getTime() + 24 * 60 * 60 * 1000);
-        }
-        
-        participantData.customEndTime = customEnd;
-      }
-      
-      return participantData;
+    await Mission.findByIdAndUpdate(id, {
+      referenceNumber,
+      vehicleNumbers,
+      date,
+      startTime,
+      endTime,
+      location,
+      missionType,
+      missionDetails,
+      notes: notes || '',
+      team,
+      participants: processedParticipants
     });
 
-    // 🧱 Update mission document
-    const updatedMission = await Mission.findByIdAndUpdate(
-      id,
-      {
-        referenceNumber,
-        vehicleNumbers,
-        startTime: newStart,
-        endTime: newEnd,
-        location,
-        missionType,
-        missionDetails,
-        notes: notes || '',
-        team,
-        participants: processedParticipants
-      },
-      { new: true }
-    )
-      .populate('participants.user')
-      .populate('createdBy');
+    // Step 3: Add stats for new participants (if is current month)
+    const [newYear, newMonth] = date.split('-').map(Number);
+    const newIsCurrentMonth = (newMonth === activeMonth && newYear === activeYear);
 
-    // 🧾 Check if new mission is in the active month
-    const newMissionMonth = newStart.getMonth() + 1;
-    const newMissionYear = newStart.getFullYear();
-    const newIsCurrentMonth =
-      newMissionMonth === activeMonth && newMissionYear === activeYear;
-
-    // 🔁 Add stats for new participants
     if (newIsCurrentMonth) {
       for (const participant of participants) {
         const userId = participant.userId;
 
-        // NEW: Determine participant's start and end times (custom or mission)
-        let participantStart = newStart;
-        let participantEnd = newEnd;
+        // Calculate new participant hours
         let participantHours = newHours;
+        let participantStart = startTime;
+        let participantEnd = endTime;
 
         if (participant.customStartTime && participant.customEndTime) {
-          participantStart = moment.tz(participant.customStartTime, 'Asia/Beirut').toDate();
-          participantEnd = moment.tz(participant.customEndTime, 'Asia/Beirut').toDate();
-          
-          // Handle midnight crossing for custom times
-          const startTimeOnly = participant.customStartTime.split('T')[1];
-          const endTimeOnly = participant.customEndTime.split('T')[1];
-          if (endTimeOnly < startTimeOnly) {
-            participantEnd = new Date(participantEnd.getTime() + 24 * 60 * 60 * 1000);
-          }
-          
-          participantHours = Math.round(
-            (participantEnd.getTime() - participantStart.getTime()) / (1000 * 60 * 60)
-          );
+          participantStart = participant.customStartTime;
+          participantEnd = participant.customEndTime;
+          participantHours = calculateHours(participantStart, participantEnd);
         }
 
         await User.findByIdAndUpdate(userId, {
           $inc: { currentMonthMissions: 1 }
         });
 
-        const hadShift = await checkShiftOverlap(userId, participantStart, participantEnd);
+        const hadShift = await checkShiftOverlap(userId, date, participantStart, participantEnd);
 
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
@@ -387,9 +377,12 @@ router.put('/:id', async (req: Request, res: Response) => {
       }
     }
 
+    const updatedMission = await Mission.findById(id)
+      .populate('participants.user')
+      .populate('createdBy');
+
     res.json(updatedMission);
   } catch (error) {
-    console.error('Mission update error:', error);
     res.status(500).json({ message: 'Error updating mission', error });
   }
 });
@@ -404,23 +397,15 @@ router.delete('/:id', async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Mission not found' });
     }
 
-    const missionStart = new Date(mission.startTime);
-    let missionEnd = new Date(mission.endTime);
-
-    // Fix midnight crossing
-    if (missionEnd < missionStart) {
-      missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
-    }
-
-    const missionHours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
+    // Calculate mission hours
+    const missionHours = calculateHours(mission.startTime, mission.endTime);
 
     // Only update user stats if this is the ACTIVE month
     const settings = await Settings.findOne();
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
-    const missionMonth = missionStart.getUTCMonth() + 1;
-    const missionYear = missionStart.getUTCFullYear();
+    const [missionYear, missionMonth] = mission.date.split('-').map(Number);
     const isCurrentMonth = (missionMonth === activeMonth && missionYear === activeYear);
 
     // Revert mission stats from all participants (only if current month)
@@ -428,22 +413,15 @@ router.delete('/:id', async (req: Request, res: Response) => {
       for (const participant of mission.participants) {
         const userId = participant.user.toString();
 
-        // NEW: Use participant's custom times if available
-        let participantStart = missionStart;
-        let participantEnd = missionEnd;
+        // Calculate participant hours
         let participantHours = missionHours;
+        let participantStart = mission.startTime;
+        let participantEnd = mission.endTime;
 
         if (participant.customStartTime && participant.customEndTime) {
-          participantStart = new Date(participant.customStartTime);
-          participantEnd = new Date(participant.customEndTime);
-          
-          // No need to handle midnight crossing here!
-          // The database already stores the correct end date (next day if needed)
-          // This was set correctly during CREATE
-          
-          participantHours = Math.round(
-            (participantEnd.getTime() - participantStart.getTime()) / (1000 * 60 * 60)
-          );
+          participantStart = participant.customStartTime;
+          participantEnd = participant.customEndTime;
+          participantHours = calculateHours(participantStart, participantEnd);
         }
 
         // Decrement mission count
@@ -452,7 +430,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         });
 
         // Check if user was on shift during their participation time
-        const hadShift = await checkShiftOverlap(userId, participantStart, participantEnd);
+        const hadShift = await checkShiftOverlap(userId, mission.date, participantStart, participantEnd);
 
         // Remove hours only if they were NOT on shift
         if (!hadShift) {
@@ -480,18 +458,20 @@ router.get('/by-month', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Month and year are required' });
     }
 
-    const startDate = new Date(Number(year), Number(month) - 1, 1);
-    const endDate = new Date(Number(year), Number(month), 0, 23, 59, 59);
+    // Create date range for the month
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(Number(year), Number(month), 0).getDate();
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
     const missions = await Mission.find({
-      startTime: {
+      date: {
         $gte: startDate,
         $lte: endDate
       }
     })
       .populate('participants.user')
       .populate('createdBy')
-      .sort({ startTime: 1 });
+      .sort({ date: 1, startTime: 1 });
 
     res.json(missions);
   } catch (error) {
@@ -504,27 +484,33 @@ router.get('/available-months', async (req: Request, res: Response) => {
   try {
     const months = await Mission.aggregate([
       {
-        $group: {
-          _id: {
-            month: { $month: '$startTime' },
-            year: { $year: '$startTime' }
-          }
+        $addFields: {
+          yearMonth: { $substr: ['$date', 0, 7] } // Extract YYYY-MM
         }
       },
       {
-        $sort: { '_id.year': -1, '_id.month': -1 }
+        $group: {
+          _id: '$yearMonth'
+        }
+      },
+      {
+        $sort: { _id: -1 }
       }
     ]);
 
-    const formattedMonths = months.map(m => ({
-      month: m._id.month,
-      year: m._id.year,
-      label: `${m._id.month}/${m._id.year}`
-    }));
+    const formattedMonths = months.map(m => {
+      const [year, month] = m._id.split('-');
+      return {
+        month: parseInt(month),
+        year: parseInt(year),
+        label: `${month}/${year}`
+      };
+    });
 
     res.json(formattedMonths);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching available months', error });
   }
 });
+
 export default router;

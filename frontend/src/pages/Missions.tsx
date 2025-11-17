@@ -7,6 +7,7 @@ import { useMonth } from '../contexts/MonthContext';
 import './Missions.css';
 import './Missions.print.css';
 import CustomAlert from '../components/CustomAlert';
+import { getCurrentDate } from '../utils/timeUtils';
 
 const Missions: React.FC = () => {
     const [missions, setMissions] = useState<Mission[]>([]);
@@ -16,7 +17,7 @@ const Missions: React.FC = () => {
     const [showConfirmDelete, setShowConfirmDelete] = useState(false);
     const [missionToDelete, setMissionToDelete] = useState<string | null>(null);
     const [docNumber, setDocNumber] = useState('');
-    const [docDate, setDocDate] = useState(new Date().toISOString().split('T')[0]);
+    const [docDate, setDocDate] = useState(getCurrentDate());
     const { selectedMonth, setSelectedMonth, activeMonth, activeYear } = useMonth();
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
@@ -65,33 +66,26 @@ const Missions: React.FC = () => {
     };
 
     const handleEditMission = (mission: Mission) => {
-    // Format times without timezone conversion
-    const formatDateTime = (dateString: string) => {
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
+        // No formatting needed! Backend already sends data in Civil Defense Clock format
+        // date: "YYYY-MM-DD", startTime: "HH:mm", endTime: "HH:mm"
+        const formattedMission = {
+            ...mission,
+            // Times are already in HH:mm format, use them directly
+            startTime: mission.startTime,
+            endTime: mission.endTime,
+            participants: mission.participants.map(p => ({
+                user: {
+                    _id: p.user._id,
+                    name: p.user.name
+                },
+                // Custom times are already in HH:mm format
+                customStartTime: p.customStartTime,
+                customEndTime: p.customEndTime
+            }))
+        };
+        setEditingMission(formattedMission);
+        setShowModal(true);
     };
-
-    const formattedMission = {
-        ...mission,
-        startTime: formatDateTime(mission.startTime),
-        endTime: formatDateTime(mission.endTime),
-        participants: mission.participants.map(p => ({
-            user: {
-                _id: p.user._id,
-                name: p.user.name
-            },
-            customStartTime: p.customStartTime ? formatDateTime(p.customStartTime) : undefined,
-            customEndTime: p.customEndTime ? formatDateTime(p.customEndTime) : undefined
-        }))
-    };
-    setEditingMission(formattedMission);
-    setShowModal(true);
-};
 
     const handleUpdateMission = async (missionData: any) => {
         try {
@@ -247,7 +241,7 @@ const Missions: React.FC = () => {
                     <tbody>
                         {missions.map(mission => (
                             <tr key={mission._id}>
-                                <td>{new Date(mission.startTime).toLocaleDateString('ar-LB')}</td>
+                                <td>{mission.date ? new Date(mission.date).toLocaleDateString('ar-LB') : ''}</td>
                                 <td>{mission.referenceNumber}</td>
                                 <td>
                                     {(mission.missionType === 'fire' || mission.missionType === 'rescue' || mission.missionType === 'medic' || mission.missionType === 'misc')
@@ -259,8 +253,8 @@ const Missions: React.FC = () => {
                                 </td>
                                 <td>{mission.location}</td>
                                 <td>{mission.participants.map(p => p.user.name).join('، ')}</td>
-                                <td>{new Date(mission.startTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}</td>
-                                <td>{new Date(mission.endTime).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}</td>
+                                <td>{mission.startTime}</td>
+                                <td>{mission.endTime}</td>
                                 <td>{Array.isArray(mission.vehicleNumbers)
                                     ? mission.vehicleNumbers.join(', ')
                                     : mission.vehicleNumbers || ''}</td>

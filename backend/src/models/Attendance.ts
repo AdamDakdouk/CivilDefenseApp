@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IAttendance extends Document {
   userId: mongoose.Types.ObjectId;
-  date: Date;
+  date: String;
   code: 'ح' | 'مأ' | 'غ' | 'ع' | 'م' | 'ب';
   createdAt: Date;
 }
@@ -14,7 +14,7 @@ const AttendanceSchema = new Schema<IAttendance>({
     required: true
   },
   date: {
-    type: Date,
+    type: String,
     required: true
   },
   code: {

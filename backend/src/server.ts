@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -20,6 +20,11 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
+
+// Async error wrapper for route handlers
+const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
 
 // Middleware
 app.use(cors({
@@ -52,6 +57,39 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
+
+// Global error handler middleware
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('🔴 Unhandled Error:', err.message);
+  console.error('Stack:', err.stack);
+  
+  const statusCode = err.status || err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+  
+  // Make sure we only send response once
+  if (!res.headersSent) {
+    res.status(statusCode).json({
+      message: message,
+      error: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  }
+});
+
+// 404 handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
+  console.error('🔴 Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error: Error) => {
+  console.error('🔴 Uncaught Exception:', error);
+  // Don't exit - let the error handler middleware deal with it
+});
 
 // Connect to database and start server
 const startServer = async () => {

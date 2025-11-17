@@ -16,8 +16,10 @@ router.get('/month', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Month and year are required' });
     }
 
-    const startDate = new Date(Number(year), Number(month) - 1, 1);
-    const endDate = new Date(Number(year), Number(month), 0, 23, 59, 59);
+    // Create date range for the month using strings
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(Number(year), Number(month), 0).getDate();
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
     const attendance = await Attendance.find({
       date: {
@@ -33,37 +35,17 @@ router.get('/month', async (req: Request, res: Response) => {
 });
 
 // Update attendance code
-// router.put('/update', async (req: Request, res: Response) => {
-//   try {
-//     const { userId, date, code } = req.body;
-    
-//     const attendanceDate = new Date(date);
-//     attendanceDate.setHours(0, 0, 0, 0);
-    
-//     const attendance = await Attendance.findOneAndUpdate(
-//       { userId, date: attendanceDate },
-//       { code },
-//       { upsert: true, new: true }
-//     );
-    
-//     res.json(attendance);
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error updating attendance', error });
-//   }
-// });
-
 router.put('/update', async (req: Request, res: Response) => {
   try {
     const { userId, date, code } = req.body;
     
-    // Parse as UTC date
-    const attendanceDate = new Date(date);
-    const normalizedDate = new Date(Date.UTC(
-      attendanceDate.getUTCFullYear(),
-      attendanceDate.getUTCMonth(),
-      attendanceDate.getUTCDate(),
-      0, 0, 0, 0
-    ));
+    // Date should come as YYYY-MM-DD string from frontend
+    // If it comes as ISO string, extract the date part
+    let normalizedDate = date;
+    if (date.includes('T')) {
+      // Extract date part from ISO string
+      normalizedDate = date.split('T')[0];
+    }
     
     const attendance = await Attendance.findOneAndUpdate(
       { userId, date: normalizedDate },

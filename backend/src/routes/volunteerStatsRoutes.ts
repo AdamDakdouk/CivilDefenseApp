@@ -16,12 +16,14 @@ router.get('/mission-counts', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Month and year are required' });
     }
 
-    const startDate = new Date(Number(year), Number(month) - 1, 1);
-    const endDate = new Date(Number(year), Number(month), 0, 23, 59, 59);
+    // Create date range for the month using strings
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(Number(year), Number(month), 0).getDate();
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
     // Get all missions in the month
     const missions = await Mission.find({
-      startTime: {
+      date: {
         $gte: startDate,
         $lte: endDate
       }

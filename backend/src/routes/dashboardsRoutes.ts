@@ -4,6 +4,7 @@ import Shift from '../models/Shift';
 import User from '../models/User';
 import MonthlyReport from '../models/MonthlyReport';
 import { authenticateToken } from '../middleware/auth';
+import { calculateHours } from '../utils/timeUtils';
 
 const router = express.Router();
 
@@ -18,23 +19,20 @@ router.get('/stats', async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Month and year are required' });
         }
 
-        const startDate = new Date(Date.UTC(Number(year), Number(month) - 1, 1, 0, 0, 0, 0));
-        const endDate = new Date(Date.UTC(Number(year), Number(month), 0, 23, 59, 59, 999));
-
-        // Validate dates
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            return res.status(400).json({ message: 'Invalid date range' });
-        }
+        // Create date range for the month
+        const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+        const lastDay = new Date(Number(year), Number(month), 0).getDate();
+        const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
         // Get all missions for the month
         const missions = await Mission.find({
-            startTime: {
+            date: {
                 $gte: startDate,
                 $lte: endDate
             }
         }).populate('participants.user');
 
-        // Get all shifts for the month
+        // Get all shifts for the month (not used for now, but keep for future)
         const shifts = await Shift.find({
             date: {
                 $gte: startDate,
@@ -45,16 +43,10 @@ router.get('/stats', async (req: Request, res: Response) => {
         // Total missions
         const totalMissions = missions.length;
 
-        // Total hours from MISSIONS ONLY
+        // Total hours from MISSIONS ONLY (sum of mission hours, not participant hours)
         let totalHours = 0;
         missions.forEach(mission => {
-            const missionStart = new Date(mission.startTime);
-            let missionEnd = new Date(mission.endTime);
-            if (missionEnd < missionStart) {
-                missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
-            }
-            const hours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
-            // Don't multiply by participants - just add mission hours once
+            const hours = calculateHours(mission.startTime, mission.endTime);
             totalHours += hours;
         });
 
@@ -79,18 +71,10 @@ router.get('/stats', async (req: Request, res: Response) => {
         const dailyActivity = [];
 
         for (let day = 1; day <= daysInMonth; day++) {
-            const dayDate = new Date(Date.UTC(Number(year), Number(month) - 1, day, 0, 0, 0, 0));
-            const nextDay = new Date(Date.UTC(Number(year), Number(month) - 1, day + 1, 0, 0, 0, 0));
+            const dayString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-            const dayMissions = missions.filter(m => {
-                const mStart = new Date(m.startTime);
-                return mStart >= dayDate && mStart < nextDay;
-            }).length;
-
-            const dayShifts = shifts.filter(s => {
-                const sDate = new Date(s.date);
-                return sDate.getUTCDate() === day;
-            }).length;
+            const dayMissions = missions.filter(m => m.date === dayString).length;
+            const dayShifts = shifts.filter(s => s.date === dayString).length;
 
             dailyActivity.push({
                 day,
@@ -100,20 +84,15 @@ router.get('/stats', async (req: Request, res: Response) => {
         }
 
         // Top contributors - VOLUNTEERS ONLY
+        // FIXED: Now uses custom participant hours!
         const volunteerMap = new Map();
 
-        // From missions
         missions.forEach(mission => {
-            const missionStart = new Date(mission.startTime);
-            let missionEnd = new Date(mission.endTime);
-            if (missionEnd < missionStart) {
-                missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
-            }
-            const hours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
+            const missionHours = calculateHours(mission.startTime, mission.endTime);
 
             mission.participants.forEach((p: any) => {
                 // Only include volunteers
-                if (p.user.role === 'volunteer') {
+                if (p.user && p.user.role === 'volunteer') {
                     const userId = p.user._id.toString();
                     const userName = p.user.name;
 
@@ -125,8 +104,15 @@ router.get('/stats', async (req: Request, res: Response) => {
                         });
                     }
 
+                    // FIXED: Use participant's custom hours if available
+                    let participantHours = missionHours;
+                    
+                    if (p.customStartTime && p.customEndTime) {
+                        participantHours = calculateHours(p.customStartTime, p.customEndTime);
+                    }
+
                     const contributor = volunteerMap.get(userId);
-                    contributor.hours += hours;
+                    contributor.hours += participantHours;
                     contributor.missions += 1;
                 }
             });
@@ -135,7 +121,7 @@ router.get('/stats', async (req: Request, res: Response) => {
         const topContributors = Array.from(volunteerMap.values())
             .sort((a, b) => b.hours - a.hours);
 
-        // Team performance - missions hours only
+        // Team performance - missions hours only (NOT participant hours)
         const teamMap = new Map();
 
         missions.forEach(mission => {
@@ -145,12 +131,7 @@ router.get('/stats', async (req: Request, res: Response) => {
                 teamMap.set(team, { team, hours: 0, missions: 0 });
             }
 
-            const missionStart = new Date(mission.startTime);
-            let missionEnd = new Date(mission.endTime);
-            if (missionEnd < missionStart) {
-                missionEnd = new Date(missionEnd.getTime() + 24 * 60 * 60 * 1000);
-            }
-            const hours = Math.round((missionEnd.getTime() - missionStart.getTime()) / (1000 * 60 * 60));
+            const hours = calculateHours(mission.startTime, mission.endTime);
 
             // Add mission hours only once per mission (not multiplied by participants)
             teamMap.get(team).hours += hours;

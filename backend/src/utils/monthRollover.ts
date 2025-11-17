@@ -13,31 +13,19 @@ export const rolloverMonth = async (month: number, year: number) => {
         const users = await User.find();
         console.log(`📊 Found ${users.length} users`);
 
-        // Get missions for this month to calculate mission type counts
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 0, 23, 59, 59);
+        // Get missions for this month using string dates
+        const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+        const lastDay = new Date(year, month, 0).getDate();
+        const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
         const missions = await Mission.find({
-            startTime: {
+            date: {
                 $gte: startDate,
                 $lte: endDate
             }
         }).populate('participants.user');
 
         console.log(`📋 Found ${missions.length} missions for ${month}/${year}`);
-
-        // // Delete all attendance records for the closed month
-        // const attendanceStartDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
-        // const attendanceEndDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
-
-        // await Attendance.deleteMany({
-        //     date: {
-        //         $gte: attendanceStartDate,
-        //         $lte: attendanceEndDate
-        //     }
-        // });
-
-        // console.log(`✅ Cleared attendance records for ${month}/${year}`);
 
         // Count mission types per user
         const userMissionCounts: any = {};

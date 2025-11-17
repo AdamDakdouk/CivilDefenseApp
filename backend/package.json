@@ -8,7 +8,7 @@
     "postbuild": "echo Build complete",
     "start": "node dist/server.js",
     "create-admin": "ts-node src/scripts/createAdmin.ts",
-    "clean":"ts-node src/scripts/cleanDatabase.ts",
+    "clean": "ts-node src/scripts/cleanDatabase.ts",
     "seed": "ts-node src/scripts/seedUsers.ts",
     "update-admin-email": "ts-node src/scripts/updateAdminEmail.ts"
   },
@@ -23,7 +23,6 @@
     "express": "^5.1.0",
     "googleapis": "^166.0.0",
     "jsonwebtoken": "^9.0.2",
-    "moment-timezone": "^0.6.0",
     "mongoose": "^8.18.3",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.10",
