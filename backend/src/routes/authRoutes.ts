@@ -74,10 +74,13 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ message: 'البريد الإلكتروني غير صحيح' });
+    }
+
     const admin = await Admin.findOne({ email: email.toLowerCase() });
     if (!admin) {
-      // Don't reveal if email exists
-      return res.json({ message: 'If email exists, a reset code will be sent' });
+      return res.status(404).json({ message: 'البريد الإلكتروني غير مسجل في النظام' });
     }
 
     // Generate a 6-digit code

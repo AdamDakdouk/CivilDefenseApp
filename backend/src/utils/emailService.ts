@@ -1,19 +1,48 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
+import * as fs from 'fs';
+import * as path from 'path';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: 'smtp.eu.mailgun.org',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.MAILGUN_SMTP_USER || 'noreply@civildefense.online',
+    pass: process.env.MAILGUN_SMTP_PASS || ''
+  }
+});
 
 export const sendResetCode = async (email: string, code: string): Promise<boolean> => {
   try {
     console.log('📧 Attempting to send email to:', email);
-    console.log('🔑 Using Resend API key:', process.env.RESEND_API_KEY ? 'Present' : 'MISSING');
+    console.log('🔑 Using Mailgun SMTP:', process.env.MAILGUN_SMTP_USER ? 'Configured' : 'MISSING');
     
-    const result = await resend.emails.send({
+    // Get the logo image file
+    const logoPath = path.join(process.cwd(), 'src', 'logo.png');
+    let attachments = [];
+    
+    // Attach logo if it exists
+    if (fs.existsSync(logoPath)) {
+      attachments.push({
+        filename: 'logo.png',
+        path: logoPath,
+        cid: 'logo@civildefense' // CID for referencing in HTML
+      });
+      console.log('📎 Logo attached as CID');
+    } else {
+      console.warn('⚠️ Logo file not found at:', logoPath);
+    }
+    
+    const result = await transporter.sendMail({
       from: 'Civil Defense <noreply@civildefense.online>',
       to: email,
       subject: 'كود إعادة تعيين كلمة المرور - الدفاع المدني',
       html: `
         <div style="direction: rtl; font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
           <div style="background-color: white; padding: 30px; border-radius: 10px; max-width: 500px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="cid:logo@civildefense" alt="Civil Defense Logo" style="width: 90px; height: 90px; object-fit: contain; background: #ffffff;  padding: 12px; box-shadow: 0 10px 30px rgba(196, 30, 58, 0.25), 0 0 0 8px rgba(196, 30, 58, 0.05); display: inline-block;">
+            </div>
             <h2 style="color: #333; text-align: center;">الدفاع المدني اللبناني</h2>
             <p style="color: #666; font-size: 16px;">مرحبا،</p>
             <p style="color: #666; font-size: 16px;">لقد طلبت إعادة تعيين كلمة المرور. استخدم الكود أدناه:</p>
@@ -37,10 +66,12 @@ export const sendResetCode = async (email: string, code: string): Promise<boolea
             </p>
           </div>
         </div>
-      `
+      `,
+      attachments: attachments
     });
 
-    console.log('✅ Resend API response:', JSON.stringify(result, null, 2));
+    console.log('✅ Email sent successfully');
+    console.log('📨 Response ID:', result.response);
     console.log(`✅ Reset code sent to ${email}`);
     return true;
   } catch (error) {
