@@ -186,3 +186,204 @@
     display: none !important;
   }
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .attendance-container {
+    padding: 12px;
+  }
+
+  .main-title {
+    font-size: 14px;
+    margin-top: 20px;
+  }
+
+  .sub-title {
+    font-size: 11px;
+  }
+
+  .top-section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .org-info {
+    text-align: right;
+    justify-self: auto;
+    margin-top: 0;
+    font-size: 10px;
+  }
+
+  .org-name {
+    margin-right: 1rem;
+  }
+
+  .info-line {
+    margin-bottom: 1px;
+  }
+
+  .legend-container {
+    text-align: left;
+    justify-self: auto;
+    margin-bottom: 12px;
+  }
+
+  .legend-table {
+    font-size: 8px;
+    margin-bottom: 6px;
+  }
+
+  .legend-code {
+    padding: 2px 4px;
+    width: 18px;
+  }
+
+  .legend-text {
+    padding: 2px 6px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .main-table {
+    font-size: 7px;
+  }
+
+  .main-table th,
+  .main-table td {
+    padding: 3px 1px;
+  }
+
+  .main-table .day-cell {
+    width: 14px;
+    padding: 3px 1px;
+  }
+
+  .main-table .col-serial {
+    width: 25px;
+  }
+
+  .main-table .col-overtime {
+    width: 45px;
+    font-size: 6px;
+  }
+
+  .main-table .col-signature {
+    width: 50px;
+  }
+
+  .footer-section {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .notes-section {
+    width: 100%;
+    margin-right: 0;
+    margin-top: 20px;
+    font-size: 9px;
+  }
+
+  .notes-title {
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+
+  .notes-content {
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  .notes-content div {
+    font-size: 8px;
+  }
+
+  .signatures-section {
+    flex-direction: column;
+    gap: 30px;
+    margin-left: 0;
+    margin-top: 20px;
+    font-size: 9px;
+  }
+
+  .print-btn {
+    padding: 8px 12px;
+    font-size: 11px;
+    margin-left: 0;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .attendance-container {
+    padding: 8px;
+  }
+
+  .main-title {
+    font-size: 12px;
+    margin-top: 15px;
+  }
+
+  .sub-title {
+    font-size: 10px;
+  }
+
+  .org-info {
+    font-size: 9px;
+  }
+
+  .legend-table {
+    font-size: 7px;
+    margin-bottom: 8px;
+  }
+
+  .legend-code {
+    width: 16px;
+  }
+
+  .main-table {
+    font-size: 6px;
+  }
+
+  .main-table th,
+  .main-table td {
+    padding: 2px 1px;
+  }
+
+  .main-table .day-cell {
+    width: 12px;
+    padding: 2px 0.5px;
+  }
+
+  .main-table .col-serial {
+    width: 20px;
+  }
+
+  .main-table .col-overtime {
+    width: 35px;
+    font-size: 5px;
+  }
+
+  .main-table .col-signature {
+    width: 40px;
+  }
+
+  .notes-section {
+    font-size: 8px;
+  }
+
+  .notes-content div {
+    font-size: 7px;
+  }
+
+  .signatures-section {
+    font-size: 8px;
+  }
+
+  .print-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+}

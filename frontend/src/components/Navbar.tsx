@@ -135,7 +135,7 @@ const Navbar: React.FC = () => {
     <nav className={`navbar ${isVisible ? 'visible' : 'hidden'}`}>
       <div className="nav-container">
         <div className="nav-brand">
-          <img src="/logo.jpeg" alt="Lebanese Civil Defense" className="nav-logo" />
+          <img src="/logo.png" alt="Lebanese Civil Defense" className="nav-logo" />
           <h1 className="nav-title">الدفاع المدني - عمليات عرمون</h1>
         </div>
 

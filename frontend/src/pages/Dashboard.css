@@ -314,11 +314,275 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .dashboard-container {
+        padding: 15px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 24px;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .metric-card {
+        padding: 20px;
+    }
+
+    .metric-icon {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .metric-value {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .metric-label {
+        font-size: 14px;
+    }
+
     .charts-section {
         grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .chart-card {
+        padding: 20px;
+    }
+
+    .chart-card h3 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+
+    .type-item-horizontal {
+        gap: 10px;
+    }
+
+    .type-name-horizontal {
+        min-width: 80px;
+        font-size: 13px;
+    }
+
+    .type-progress-bar {
+        height: 35px;
+    }
+
+    .type-progress-fill {
+        min-width: 40px;
+    }
+
+    .type-count-inside {
+        font-size: 14px;
+    }
+
+    .contributors-list {
+        max-height: 300px;
+    }
+
+    .contributor-item {
+        gap: 12px;
+        padding: 10px;
+    }
+
+    .contributor-rank {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .contributor-name {
+        font-size: 14px;
+    }
+
+    .contributor-stats {
+        font-size: 12px;
     }
 
     .team-performance-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .team-card {
+        padding: 15px;
+    }
+
+    .team-name {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+
+    .daily-activity-chart {
+        height: 60px;
+        gap: 6px;
+    }
+
+    .day-bar {
+        height: 30px;
+    }
+
+    .bar-value {
+        font-size: 12px;
+    }
+
+    .day-label {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 10px;
+    }
+
+    .dashboard-header h2 {
+        font-size: 20px;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .metric-card {
+        padding: 15px;
+    }
+
+    .metric-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
+    }
+
+    .metric-value {
+        font-size: 24px;
+    }
+
+    .metric-label {
+        font-size: 12px;
+    }
+
+    .charts-section {
+        gap: 12px;
+    }
+
+    .chart-card {
+        padding: 15px;
+    }
+
+    .chart-card h3 {
+        font-size: 16px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+    }
+
+    .type-item-horizontal {
+        gap: 8px;
+    }
+
+    .type-name-horizontal {
+        min-width: 70px;
+        font-size: 12px;
+    }
+
+    .type-progress-bar {
+        height: 30px;
+    }
+
+    .type-count-inside {
+        font-size: 12px;
+    }
+
+    .contributors-list {
+        max-height: 250px;
+        gap: 10px;
+    }
+
+    .contributor-item {
+        gap: 10px;
+        padding: 8px;
+    }
+
+    .contributor-rank {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .contributor-name {
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+    .contributor-stats {
+        font-size: 11px;
+    }
+
+    .team-performance-grid {
+        gap: 12px;
+    }
+
+    .team-card {
+        padding: 12px;
+    }
+
+    .team-name {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .team-stats {
+        gap: 10px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+    }
+
+    .daily-activity-chart {
+        height: 50px;
+        gap: 4px;
+        padding: 8px 0;
+    }
+
+    .day-bar-container {
+        min-width: 20px;
+        gap: 6px;
+    }
+
+    .day-bar {
+        min-width: 20px;
+        height: 25px;
+    }
+
+    .bar-value {
+        font-size: 10px;
+    }
+
+    .day-label {
+        font-size: 10px;
+    }
+
+    .no-data {
+        font-size: 14px;
+        padding: 30px 15px;
     }
 }

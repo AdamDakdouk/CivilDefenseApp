@@ -58,7 +58,7 @@ const ForgotPassword: React.FC = () => {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <img src="/logo.jpeg" alt="الدفاع المدني اللبناني" />
+          <img src="/logo.png" alt="الدفاع المدني اللبناني" />
           <h1>الدفاع المدني اللبناني</h1>
           <h2>نسيت كلمة المرور</h2>
         </div>
