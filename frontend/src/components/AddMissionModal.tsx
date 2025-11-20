@@ -310,7 +310,10 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                 name="missionType"
                                 value="fire"
                                 checked={missionType === 'fire'}
-                                onChange={(e) => setMissionType(e.target.value as 'fire')}
+                                onChange={(e) => {
+                                    setMissionType(e.target.value as 'fire');
+                                    setMissionDetails(''); // Reset mission details when type changes
+                                }}
                             />
                             اطفاء
                         </label>
@@ -320,7 +323,10 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                 name="missionType"
                                 value="rescue"
                                 checked={missionType === 'rescue'}
-                                onChange={(e) => setMissionType(e.target.value as 'rescue')}
+                                onChange={(e) => {
+                                    setMissionType(e.target.value as 'rescue');
+                                    setMissionDetails(''); // Reset mission details when type changes
+                                }}
                             />
                             انقاذ
                         </label>
@@ -330,7 +336,10 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                 name="missionType"
                                 value="medic"
                                 checked={missionType === 'medic'}
-                                onChange={(e) => setMissionType(e.target.value as 'medic')}
+                                onChange={(e) => {
+                                    setMissionType(e.target.value as 'medic');
+                                    setMissionDetails(''); // Reset mission details when type changes
+                                }}
                             />
                             اسعاف
                         </label>
@@ -340,7 +349,10 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                 name="missionType"
                                 value="public-service"
                                 checked={missionType === 'public-service'}
-                                onChange={(e) => setMissionType(e.target.value as 'public-service')}
+                                onChange={(e) => {
+                                    setMissionType(e.target.value as 'public-service');
+                                    setMissionDetails(''); // Reset mission details when type changes
+                                }}
                             />
                             خدمة عامة
                         </label>
@@ -350,30 +362,90 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                 name="missionType"
                                 value="misc"
                                 checked={missionType === 'misc'}
-                                onChange={(e) => setMissionType(e.target.value as 'misc')}
+                                onChange={(e) => {
+                                    setMissionType(e.target.value as 'misc');
+                                    setMissionDetails(''); // Reset mission details when type changes
+                                }}
                             />
                             مختلف
                         </label>
                     </div>
-                    <select
-                        value={missionDetails}
-                        onChange={(e) => {
-                            setMissionDetails(e.target.value);
-                            if (errors.missionDetails) setErrors({ ...errors, missionDetails: false });
-                        }}
-                        style={{ marginTop: '10px', borderColor: errors.missionDetails ? '#c41e3a' : '#ddd' }}
-                        data-field="missionDetails"
-                    >
-                        <option value="">حدد تفاصيل المهمة</option>
-                        <option value="اطفاء حريق اعشاب">اطفاء حريق اعشاب</option>
-                        <option value="اطفاء حريق اعشاب واشجار">اطفاء حريق اعشاب واشجار</option>
-                        <option value="اطفاء حريق اعشاب ونفايات">اطفاء حريق اعشاب ونفايات</option>
-                        <option value="اطفاء حريق سيارة">اطفاء حريق سيارة</option>
-                        <option value="اطفاء حريق مستودع">اطفاء حريق مستودع</option>
-                        <option value="اطفاء حريق شقة">اطفاء حريق شقة</option>
-                        <option value="تزود الية الاطفاء بالمحروقات">تزود الية الاطفاء بالمحروقات</option>
-                        <option value="تزود الية الاطفاء بالمياه">تزود الية الاطفاء بالمياه</option>
-                    </select>
+
+                    {/* Conditional rendering based on mission type */}
+                    {missionType === 'fire' && (
+                        <div style={{ marginTop: '10px' }}>
+                            <input
+                                list="fire-details"
+                                value={missionDetails}
+                                onChange={(e) => {
+                                    setMissionDetails(e.target.value);
+                                    if (errors.missionDetails) setErrors({ ...errors, missionDetails: false });
+                                }}
+                                placeholder="حدد تفاصيل المهمة"
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '8px', 
+                                    borderRadius: '4px', 
+                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd' 
+                                }}
+                                data-field="missionDetails"
+                            />
+                            <datalist id="fire-details">
+                                <option value="اطفاء حريق اعشاب" />
+                                <option value="اطفاء حريق اعشاب واشجار" />
+                                <option value="اطفاء حريق اعشاب ونفايات" />
+                                <option value="اطفاء حريق سيارة" />
+                                <option value="اطفاء حريق مستودع" />
+                                <option value="اطفاء حريق شقة" />
+                            </datalist>
+                        </div>
+                    )}
+
+                    {(missionType === 'rescue' || missionType === 'medic' || missionType === 'public-service') && (
+                        <div style={{ marginTop: '10px' }}>
+                            <input
+                                type="text"
+                                value={missionDetails}
+                                onChange={(e) => {
+                                    setMissionDetails(e.target.value);
+                                    if (errors.missionDetails) setErrors({ ...errors, missionDetails: false });
+                                }}
+                                placeholder="ادخل تفاصيل المهمة"
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '8px', 
+                                    borderRadius: '4px', 
+                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd' 
+                                }}
+                                data-field="missionDetails"
+                            />
+                        </div>
+                    )}
+
+                    {missionType === 'misc' && (
+                        <div style={{ marginTop: '10px' }}>
+                            <input
+                                list="misc-details"
+                                value={missionDetails}
+                                onChange={(e) => {
+                                    setMissionDetails(e.target.value);
+                                    if (errors.missionDetails) setErrors({ ...errors, missionDetails: false });
+                                }}
+                                placeholder="حدد أو اكتب تفاصيل المهمة"
+                                style={{ 
+                                    width: '100%', 
+                                    padding: '8px', 
+                                    borderRadius: '4px', 
+                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd' 
+                                }}
+                                data-field="missionDetails"
+                            />
+                            <datalist id="misc-details">
+                                <option value="تزود الية الاطفاء بالمحروقات" />
+                                <option value="تزود الية الاطفاء بالمياه" />
+                            </datalist>
+                        </div>
+                    )}
 
                 </div>
 
@@ -387,7 +459,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                 setLocation(e.target.value);
                                 if (errors.location) setErrors({ ...errors, location: false });
                             }}
-                            placeholder="أدخل المكان"
+                            placeholder="حدد المكان"
                             style={{ borderColor: errors.location ? '#c41e3a' : '#ddd' }}
                             data-field="location"
                         />
@@ -556,7 +628,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                     {/* Show custom time pickers if enabled */}
                                     {p.showCustomTimes && (
                                         <div style={{ marginTop: '8px', marginRight: '20px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                                            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                            <div style={{ display: 'flex', gap: '100px', flexWrap: 'wrap' }}>
                                                 <div style={{ flex: '1', minWidth: '150px' }}>
                                                     <TimePicker
                                                         label="بداية"
@@ -564,7 +636,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                                         onChange={(time) => updateCustomStartTime(p.userId, time)}
                                                     />
                                                 </div>
-                                                <div style={{ flex: '1', minWidth: '150px' }}>
+                                                <div style={{ flex: '2', minWidth: '150px' }}>
                                                     <TimePicker
                                                         label="نهاية"
                                                         value={p.customEndTime || endTime}

@@ -541,6 +541,26 @@ router.delete('/:id', async (req: Request, res: Response) => {
         const userId = participant.user.toString();
         const shiftStart = participant.checkIn;
         const shiftEnd = participant.checkOut;
+        
+        // Reconstruct full datetime for overlap detection (like we do during creation)
+        // The shift might span to next day if end time < start time
+        const shiftStartFull = `${shift.date}T${shiftStart}`;
+        let shiftEndFull: string;
+        
+        // Determine if shift crosses midnight
+        const startMinutes = timeToMinutes(shiftStart);
+        const endMinutes = timeToMinutes(shiftEnd);
+        
+        if (endMinutes <= startMinutes) {
+          // Crosses midnight - end is next day
+          const [year, month, day] = shift.date.split('-').map(Number);
+          const nextDate = new Date(year, month - 1, day + 1);
+          const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+          shiftEndFull = `${nextDateStr}T${shiftEnd}`;
+        } else {
+          // Same day
+          shiftEndFull = `${shift.date}T${shiftEnd}`;
+        }
 
         // Remove shift hours
         await User.findByIdAndUpdate(userId, {
@@ -556,12 +576,32 @@ router.delete('/:id', async (req: Request, res: Response) => {
           date: shift.date
         });
 
+        console.log(`🗑️ DELETE: Checking ${overlappingMissions.length} missions for user ${userId} on date ${shift.date}`);
+        
+        // DEBUG: Check what missions exist for this user regardless of date
+        const allUserMissions = await Mission.find({
+          'participants.user': userId
+        });
+        console.log(`   DEBUG: User has ${allUserMissions.length} total missions in database`);
+        if (allUserMissions.length > 0) {
+          allUserMissions.forEach(m => {
+            console.log(`   DEBUG: Mission ${m._id} date="${m.date}" (type: ${typeof m.date})`);
+          });
+        }
+        console.log(`   DEBUG: Looking for date="${shift.date}" (type: ${typeof shift.date})`);
+
+
         // For each overlapping mission, check if it's still covered by another shift
         for (const mission of overlappingMissions) {
+          console.log(`   Mission ${mission._id}: ${mission.startTime} - ${mission.endTime}`);
+          
+          // Use full datetime strings for accurate overlap detection (especially for midnight-crossing shifts)
           const hasOverlap = checkTimeOverlap(
             mission.startTime, mission.endTime,
-            shiftStart, shiftEnd
+            shiftStartFull, shiftEndFull
           );
+
+          console.log(`   hasOverlap with deleted shift: ${hasOverlap}`);
 
           if (hasOverlap) {
             // Check if there are OTHER shifts covering this mission
@@ -571,6 +611,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
               date: shift.date
             });
 
+            console.log(`   Found ${otherShifts.length} other shifts on same date`);
+
             let coveredByOtherShift = false;
             for (const otherShift of otherShifts) {
               const otherParticipant = otherShift.participants.find(
@@ -578,10 +620,28 @@ router.delete('/:id', async (req: Request, res: Response) => {
               );
 
               if (otherParticipant) {
+                // Reconstruct full datetime for other shift too
+                const otherShiftStartFull = `${otherShift.date}T${otherParticipant.checkIn}`;
+                let otherShiftEndFull: string;
+                
+                const otherStartMinutes = timeToMinutes(otherParticipant.checkIn);
+                const otherEndMinutes = timeToMinutes(otherParticipant.checkOut);
+                
+                if (otherEndMinutes <= otherStartMinutes) {
+                  // Other shift crosses midnight
+                  const [year, month, day] = otherShift.date.split('-').map(Number);
+                  const nextDate = new Date(year, month - 1, day + 1);
+                  const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+                  otherShiftEndFull = `${nextDateStr}T${otherParticipant.checkOut}`;
+                } else {
+                  otherShiftEndFull = `${otherShift.date}T${otherParticipant.checkOut}`;
+                }
+                
                 const otherHasOverlap = checkTimeOverlap(
                   mission.startTime, mission.endTime,
-                  otherParticipant.checkIn, otherParticipant.checkOut
+                  otherShiftStartFull, otherShiftEndFull
                 );
+                console.log(`   Other shift overlap: ${otherHasOverlap}`);
                 if (otherHasOverlap) {
                   coveredByOtherShift = true;
                   break;
@@ -592,10 +652,15 @@ router.delete('/:id', async (req: Request, res: Response) => {
             // If mission is NOT covered by any other shift, add its hours back
             if (!coveredByOtherShift) {
               const missionHours = getParticipantMissionHours(mission, userId);
+              console.log(`   ✅ RESTORING ${missionHours} hours from mission`);
               await User.findByIdAndUpdate(userId, {
                 $inc: { currentMonthHours: missionHours }
               });
+            } else {
+              console.log(`   ⏭️ Mission still covered by another shift, not restoring hours`);
             }
+          } else {
+            console.log(`   ⚠️ Mission does NOT overlap with deleted shift - this shouldn't happen!`);
           }
         }
       }

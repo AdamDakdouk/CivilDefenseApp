@@ -1,11 +1,12 @@
 .time-picker {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .time-picker label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 600;
+  font-size: 14px;
 }
 
 .time-picker-inputs {
@@ -50,13 +51,14 @@
 }
 
 .datetime-picker {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .datetime-picker label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 600;
+  font-size: 14px;
 }
 
 .datetime-picker-row {
@@ -71,4 +73,139 @@
   font-size: 16px;
   width: auto;
   direction: ltr;
+}
+
+/* Custom Time Dropdown Styles */
+.custom-time-dropdown {
+  position: relative;
+}
+
+.time-display-button {
+  padding: 7px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 80px;
+  background-color: #fff;
+  text-align: center;
+  user-select: none;
+  transition: border-color 0.2s;
+  color: #333;
+  font-weight: 500;
+}
+
+.time-display-button:hover {
+  border-color: #999;
+}
+
+.time-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 8px;
+  direction: ltr;
+}
+
+/* Hour dropdown with 3-row grid */
+.hour-dropdown {
+  min-width: 320px;
+  max-width: 380px;
+}
+
+.hour-grid-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+  direction: ltr;
+}
+
+.hour-grid-row:last-child {
+  margin-bottom: 0;
+}
+
+.hour-button {
+  padding: 10px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 32px;
+  flex: 1;
+  color: #333 !important;
+  text-align: center;
+  line-height: 1.2;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hour-button:hover {
+  background-color: #f0f7ff;
+  border-color: #4a90e2;
+  color: #2c5aa0 !important;
+}
+
+.hour-button.selected {
+  background-color: #4a90e2;
+  color: white !important;
+  border-color: #4a90e2;
+  font-weight: bold;
+}
+
+/* Minute dropdown */
+.minute-dropdown {
+  min-width: 150px;
+  max-width: 180px;
+}
+
+.minute-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  direction: ltr;
+}
+
+.minute-button {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 50px;
+  color: #333 !important;
+  text-align: center;
+  line-height: 1.2;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.minute-button:hover {
+  background-color: #f0f7ff;
+  border-color: #4a90e2;
+  color: #2c5aa0 !important;
+}
+
+.minute-button.selected {
+  background-color: #4a90e2;
+  color: white !important;
+  border-color: #4a90e2;
+  font-weight: bold;
 }

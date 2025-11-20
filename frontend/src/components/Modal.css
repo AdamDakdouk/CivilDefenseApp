@@ -154,7 +154,7 @@ textarea:focus {
   font-weight: 600;
 }
 
-/* ==================== ADDSHIFT SPECIFIC STYLES (SCALED DOWN 20-25%) ==================== */
+/* ==================== ADDSHIFT SPECIFIC STYLES ==================== */
 
 .shift-modal.modal-content {
   padding: 30px;
@@ -223,6 +223,7 @@ textarea:focus {
   gap: 10px;
   flex: 1;
   min-width: 0;
+  font-size: 14.5px;
 }
 
 .shift-btn-remove {
@@ -247,7 +248,7 @@ textarea:focus {
   margin-top: 16px;
 }
 
-/* ==================== ADDMISSION SPECIFIC STYLES (SCALED DOWN 25-30%) ==================== */
+/* ==================== ADDMISSION SPECIFIC STYLES ==================== */
 
 .mission-modal.modal-content {
   padding: 20px;
@@ -447,7 +448,6 @@ textarea:focus {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-bottom: 10px;
   padding: 10px;
   background-color: white;
   border-radius: 4px;
@@ -455,7 +455,6 @@ textarea:focus {
 
 .participant-row span {
   min-width: 150px;
-  font-weight: 600;
 }
 
 .participant-row input {
@@ -465,20 +464,19 @@ textarea:focus {
 .participant-datetime-row {
   display: grid;
   grid-template-columns: auto 1fr 150px;
-  gap: 30px;
+  gap: 10px;
   align-items: start;
-  margin-bottom: 20px;
-  padding: 20px;
+  margin-bottom: 10px;
+  padding: 10px;
   background-color: #b1b1b170;
   border-radius: 6px;
 }
 
 .participant-name {
-  font-weight: 600;
   padding-top: 35px;
   min-width: 150px;
 }
 
 .datetime-inputs {
-  gap: 30px;
+  gap: 10px;
 }
