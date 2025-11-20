@@ -55,7 +55,6 @@ router.put('/update', async (req: Request, res: Response) => {
     
     res.json(attendance);
   } catch (error) {
-    console.error('Error updating attendance:', error);
     res.status(500).json({ message: 'Error updating attendance', error });
   }
 });

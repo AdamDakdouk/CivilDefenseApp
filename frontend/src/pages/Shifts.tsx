@@ -19,7 +19,8 @@ const Shifts: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
-  const [deletingShift, setDeletingShift] = useState(false); // ✅ Add this
+  const [deletingShift, setDeletingShift] = useState(false);
+  const [teamFilter, setTeamFilter] = useState<'all' | '1' | '2' | '3'>('all'); // ✅ Add this
 
   useEffect(() => {
     fetchShifts();
@@ -144,6 +145,11 @@ const Shifts: React.FC = () => {
     return month === activeMonth && year === activeYear;
   };
 
+  // Filter shifts based on selected team
+  const filteredShifts = teamFilter === 'all'
+    ? shifts
+    : shifts.filter(shift => shift.team === teamFilter);
+
   if (loading) {
     return <div className="container">جاري التحميل...</div>;
   }
@@ -153,6 +159,21 @@ const Shifts: React.FC = () => {
       <div className="page-header">
         <h2 className="page-title">المناوبات</h2>
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <select
+            value={teamFilter}
+            onChange={(e) => setTeamFilter(e.target.value as 'all' | '1' | '2' | '3')}
+            style={{
+              fontSize: '15px',
+              cursor: 'pointer',
+              backgroundColor: '#bfbebeff',
+              width: '85px',
+            }}
+          >
+            <option value="all">الكل</option>
+            <option value="1">الفريق 1</option>
+            <option value="2">الفريق 2</option>
+            <option value="3">الفريق 3</option>
+          </select>
           {isCurrentMonth() && (
             <button onClick={() => { setEditingShift(null); setShowModal(true); }}>
               إضافة مناوبة
@@ -161,10 +182,10 @@ const Shifts: React.FC = () => {
         </div>
       </div>
 
-      {shifts.length === 0 ? (
+      {filteredShifts.length === 0 ? (
         <p>لا توجد مناوبات مسجلة</p>
       ) : (
-        shifts.map(shift => (
+        filteredShifts.map(shift => (
           <div key={shift._id} className="shift-card">
             <div className="shift-header">
               <h3 className="shift-date">{formatDateArabic(shift.date)}</h3>
@@ -227,6 +248,7 @@ const Shifts: React.FC = () => {
           onSave={handleSaveMission}
           editMode={!!editingShift}
           initialData={editingShift}
+          existingShifts={shifts}
         />
       )}
 

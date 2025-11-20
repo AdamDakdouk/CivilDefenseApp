@@ -33,7 +33,6 @@ router.post('/rollover', async (req: Request, res: Response) => {
     });
     
   } catch (error) {
-    console.error('Month rollover error:', error);
     res.status(500).json({ message: 'Error during month rollover', error });
   }
 });

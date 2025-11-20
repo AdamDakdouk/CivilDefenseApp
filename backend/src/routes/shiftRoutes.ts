@@ -105,7 +105,6 @@ const checkTimeOverlap = (start1: string, end1: string, start2: string, end2: st
   // Two ranges [s1, e1] and [s2, e2] overlap if: s1 < e2 AND e1 > s2
   const overlaps = s1Min < e2Min && e1Min > s2Min;
   
-  console.log(`   Overlap debug: range1=[${s1Min}, ${e1Min}] (crosses midnight: ${range1CrossesMidnight}), range2=[${s2Min}, ${e2Min}] (crosses midnight: ${range2CrossesMidnight}), overlaps=${overlaps}`);
   
   return overlaps;
 };
@@ -114,9 +113,6 @@ const checkTimeOverlap = (start1: string, end1: string, start2: string, end2: st
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { date, team, participants, createdBy } = req.body;
-
-    console.log(`📌 Shift creation - date: ${date}`);
-    console.log(`📌 Raw participants:`, JSON.stringify(participants, null, 2));
 
     // Validate inputs
     if (!date || !team || !Array.isArray(participants) || participants.length === 0) {
@@ -146,8 +142,6 @@ router.post('/', async (req: Request, res: Response) => {
         throw new Error(`Failed to calculate hours for participant ${p.userId}: checkIn=${p.checkIn}, checkOut=${p.checkOut}`);
       }
       
-      console.log(`   Participant ${p.userId}: ${p.checkIn} -> ${p.checkOut} = ${hoursServed} hours`);
-
       return {
         user: p.userId,
         checkIn: startTime,
@@ -216,26 +210,14 @@ router.post('/', async (req: Request, res: Response) => {
           date: date
         });
 
-        console.log(`🔍 Checking for missions on DATE: "${date}" for user ${participant.user}`);
-        console.log(`   Query: { 'participants.user': ${participant.user}, date: "${date}" }`);
-        console.log(`   Found ${overlappingMissions.length} missions`);
-        
         // Also check what missions exist for this user regardless of date
         const allUserMissions = await Mission.find({
           'participants.user': participant.user
         });
-        console.log(`   Total missions for this user (all dates): ${allUserMissions.length}`);
-        if (allUserMissions.length > 0) {
-          allUserMissions.forEach(m => console.log(`     - Mission on ${m.date}`));
-        }
 
         // Calculate hours to remove from missions that now overlap
         let hoursToRemove = 0;
         for (const mission of overlappingMissions) {
-          console.log(`   Mission: ${mission.startTime} - ${mission.endTime}`);
-          console.log(`   Shift: ${shiftStart} - ${shiftEnd}`);
-          console.log(`   Using original full datetimes: ${originalTimes.checkIn} -> ${originalTimes.checkOut}`);
-          
           // Check if mission time overlaps with shift time
           // Use the ORIGINAL full datetime strings from frontend
           const hasOverlap = checkTimeOverlap(
@@ -243,18 +225,14 @@ router.post('/', async (req: Request, res: Response) => {
             originalTimes.checkIn, originalTimes.checkOut
           );
 
-          console.log(`   Overlap check result: ${hasOverlap}`);
-
           if (hasOverlap) {
             // Get this participant's actual hours in the mission
             const missionHours = getParticipantMissionHours(mission, participant.user.toString());
-            console.log(`⏱️ Shift overlap detected: Mission ${mission._id} (${mission.startTime}-${mission.endTime}) overlaps with shift (${shiftStart}-${shiftEnd}). Removing ${missionHours} mission hours.`);
             hoursToRemove += missionHours;
           }
         }
 
         // Add shift hours and remove overlapping mission hours
-        console.log(`📊 User ${participant.user}: Adding ${participant.hoursServed} shift hours - ${hoursToRemove} overlapping mission hours = ${participant.hoursServed - hoursToRemove} total`);
         await User.findByIdAndUpdate(participant.user, {
           $inc: {
             currentMonthHours: participant.hoursServed - hoursToRemove,
@@ -270,8 +248,6 @@ router.post('/', async (req: Request, res: Response) => {
 
     res.status(201).json(populatedShift);
   } catch (error: any) {
-    console.error('❌ Error creating shift:', error);
-    console.error('Error stack:', error.stack);
     const message = error.message || 'Unknown error occurred';
     res.status(500).json({ message: `Error creating shift: ${message}`, error: error.message });
   }
@@ -377,7 +353,6 @@ router.put('/:id', async (req: Request, res: Response) => {
 
             if (!coveredByOther) {
               const missionHours = getParticipantMissionHours(mission, userId);
-              console.log(`✅ Reverting mission hours for user ${userId}: ${missionHours} hours (no other shift covers this mission)`);
               await User.findByIdAndUpdate(userId, {
                 $inc: { currentMonthHours: missionHours }
               });
@@ -447,12 +422,10 @@ router.put('/:id', async (req: Request, res: Response) => {
 
           if (hasOverlap) {
             const missionHours = getParticipantMissionHours(mission, participant.user.toString());
-            console.log(`⏱️ Shift update overlap detected: Mission ${mission._id} (${mission.startTime}-${mission.endTime}) overlaps with new shift (${shiftStart}-${shiftEnd}). Removing ${missionHours} mission hours.`);
             hoursToRemove += missionHours;
           }
         }
 
-        console.log(`📊 User ${participant.user}: Adding ${participant.hoursServed} shift hours - ${hoursToRemove} overlapping mission hours = ${participant.hoursServed - hoursToRemove} total`);
         await User.findByIdAndUpdate(participant.user, {
           $inc: {
             currentMonthHours: participant.hoursServed - hoursToRemove,
@@ -512,7 +485,6 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     res.json(updatedShift);
   } catch (error) {
-    console.error('Shift update error:', error);
     res.status(500).json({ message: 'Error updating shift', error });
   }
 });
@@ -576,7 +548,6 @@ router.delete('/:id', async (req: Request, res: Response) => {
           date: shift.date
         });
 
-        console.log(`🗑️ DELETE: Checking ${overlappingMissions.length} missions for user ${userId} on date ${shift.date}`);
         
         // DEBUG: Check what missions exist for this user regardless of date
         const allUserMissions = await Mission.find({
@@ -706,7 +677,6 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     res.json({ message: 'Shift deleted successfully' });
   } catch (error) {
-    console.error('Shift delete error:', error);
     res.status(500).json({ message: 'Error deleting shift', error });
   }
 });

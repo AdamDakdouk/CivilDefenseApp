@@ -41,7 +41,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAdmin(response.data.admin);
         setToken(storedToken);
       } catch (error) {
-        console.error('Token verification failed:', error);
         sessionStorage.removeItem('token');
         setToken(null);
         setAdmin(null);

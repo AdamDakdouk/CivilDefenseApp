@@ -41,7 +41,6 @@ router.post('/login', async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({ message: 'Error logging in', error });
   }
 });
@@ -102,7 +101,6 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
       message: 'تم إرسال رمز التحقق إلى البريد الإلكتروني'
     });
   } catch (error) {
-    console.error('Forgot password error:', error);
     res.status(500).json({ message: 'خطأ في معالجة الطلب' });
   }
 });
@@ -136,7 +134,6 @@ router.post('/verify-reset-code', async (req: Request, res: Response) => {
       resetToken 
     });
   } catch (error) {
-    console.error('Verify reset code error:', error);
     res.status(500).json({ message: 'خطأ في التحقق من الرمز' });
   }
 });
@@ -176,7 +173,6 @@ router.post('/reset-password', async (req: Request, res: Response) => {
 
     res.json({ message: 'تم تغيير كلمة المرور بنجاح' });
   } catch (error) {
-    console.error('Reset password error:', error);
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(400).json({ message: 'انتهت صلاحية الرمز' });
     }

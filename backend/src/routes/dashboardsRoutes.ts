@@ -151,7 +151,6 @@ router.get('/stats', async (req: Request, res: Response) => {
         });
 
     } catch (error) {
-        console.error('Error fetching dashboard stats:', error);
         res.status(500).json({ message: 'Error fetching dashboard stats', error });
     }
 });

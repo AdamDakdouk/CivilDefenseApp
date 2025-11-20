@@ -38,7 +38,6 @@ export const MonthProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setActiveYear(data.activeYear);
       setSelectedMonthState(`${data.activeMonth}-${data.activeYear}`);
     } catch (error) {
-      console.error('Error fetching active month:', error);
       // Fallback to current date
       const now = new Date();
       setActiveMonth(now.getMonth() + 1);

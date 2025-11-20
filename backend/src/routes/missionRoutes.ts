@@ -92,7 +92,6 @@ const checkShiftOverlap = async (userId: string, missionDate: string, missionSta
       );
 
       if (hasOverlap) {
-        console.log(`✅ Mission deletion: Found shift overlap for user ${userId} on ${missionDate}`);
         return true;
       }
     }

@@ -81,7 +81,6 @@ router.get('/reports', async (req: Request, res: Response) => {
 
     res.json(reports);
   } catch (error) {
-    console.error('Error fetching monthly reports:', error);
     res.status(500).json({ message: 'Error fetching monthly reports', error });
   }
 });

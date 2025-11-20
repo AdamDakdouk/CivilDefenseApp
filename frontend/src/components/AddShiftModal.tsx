@@ -19,10 +19,11 @@ interface AddShiftModalProps {
     onSave: (shiftData: any) => void;
     editMode?: boolean;
     initialData?: any;
+    existingShifts?: any[]; // Array of existing shifts to check for duplicates
 }
 
 
-const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, editMode = false, initialData }) => {
+const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, editMode = false, initialData, existingShifts = [] }) => {
     const getToday = () => {
         const now = new Date();
         const year = now.getFullYear();
@@ -354,6 +355,17 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
             setAlertType('error')
             setShowAlert(true);
             return;
+        }
+
+        // Check for duplicate shift on the same date (only when adding, not editing)
+        if (!editMode) {
+            const duplicateShift = existingShifts.find(shift => shift.date === date);
+            if (duplicateShift) {
+                setAlertMessage('يوجد مناوبة في هذا التاريخ');
+                setAlertType('warning');
+                setShowAlert(true);
+                return;
+            }
         }
 
         setIsSubmitting(true);

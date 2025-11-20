@@ -40,7 +40,6 @@ const Missions: React.FC = () => {
             setMissions(data);
             setLoading(false);
         } catch (error) {
-            console.error('Error fetching missions:', error);
             setLoading(false);
         }
     };

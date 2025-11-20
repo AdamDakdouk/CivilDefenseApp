@@ -18,49 +18,12 @@
     /* Portrait orientation for list */
     @page {
         size: A4 landscape;
-        margin: 1cm;
     }
 
     body {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
-        margin: 0;
-        padding: 0;
     }
-
-    table {
-  width: 100%;
-  border-collapse: collapse;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  font-size: 11px;
-  border: 2px solid #000;
-}
-
-table th, table td {
-  border: 1px solid #000;
-  text-align: center;
-  padding: 10px 8px;
-}
-
-table th[colspan] {
-  text-align: center;
-}
-
-table thead tr:first-child th {
-  font-weight: 700;
-  border: 2px solid #000;
-}
-
-table thead tr:last-child th {
-  font-weight: 600;
-  border: 2px solid #000;
-}
-
-.report-header {
-  padding: 15px;
-  position: relative;
-}
-
 .header-right {
   position: absolute;
   top: 15px;
@@ -69,93 +32,5 @@ table thead tr:last-child th {
   line-height: 1.6;
   font-size: 11px;
   margin-right: 3.5rem;
-}
-
-.doc-info {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.header-center {
-  text-align: center;
-  padding: 30px 150px 15px 150px;
-}
-
-.main-title {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  line-height: 1.5;
-}
-
-.hierarchy {
-  font-size: 11px;
-  font-weight: normal;
-}
-
-.subtitle {
-  font-size: 13px;
-  margin-top: 8px;
-}
-
-.inline-input {
-  width: 100px;
-  padding: 2px 4px;
-  border: none;
-  background: transparent;
-  font-size: 11px;
-  direction: ltr;
-  text-align: center;
-  padding-left: 40px;
-}
-
-.inline-input:focus {
-  outline: none;
-}
-
-.hidden-date-input {
-  position: absolute;
-  top: 0;
-  right: 0;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-}
-
-.date-display {
-  padding: 2px 4px;
-  min-width: 85px;
-  display: inline-block;
-  text-align: center;
-  pointer-events: none;
-  font-size: 11px;
-}
-
-.date-input-arabic {
-  position: absolute;
-  opacity: 0;
-  width: 85px;
-  height: 22px;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.date-display-overlay {
-  display: inline-block;
-  padding: 2px 4px;
-  min-width: 85px;
-  text-align: center;
-  pointer-events: none;
-  font-size: 11px;
-}
-
-.missions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 }
