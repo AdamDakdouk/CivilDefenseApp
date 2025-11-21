@@ -1,5 +1,4 @@
 @media print {
-
     /* Hide everything except the content */
     .navbar,
     .missions-header button,
@@ -10,8 +9,9 @@
         display: none !important;
     }
 
-    table tr th:last-child,
-    table tr td:last-child {
+    /* Only hide the last column in the FIRST header row and all body rows */
+    table thead tr:first-child th:last-child,
+    table tbody tr td:last-child {
         display: none;
     }
 
@@ -24,13 +24,14 @@
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
-.header-right {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  text-align: right;
-  line-height: 1.6;
-  font-size: 11px;
-  margin-right: 3.5rem;
-}
+    
+    .header-right {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        text-align: right;
+        line-height: 1.6;
+        font-size: 11px;
+        margin-right: 3.5rem;
+    }
 }
