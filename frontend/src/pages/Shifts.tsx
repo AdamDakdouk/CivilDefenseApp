@@ -38,8 +38,8 @@ const Shifts: React.FC = () => {
       setShifts(data);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching shifts:', error);
       setLoading(false);
+      throw (error);
     }
   };
 
@@ -52,12 +52,6 @@ const Shifts: React.FC = () => {
         setShowModal(false);
         fetchShifts();
       } catch (error: any) {
-        console.error('Error creating shift:', error);
-        console.error('Full error object:', JSON.stringify(error, null, 2));
-        console.error('Error response data:', error.response?.data);
-        console.error('Error response status:', error.response?.status);
-        console.error('Error message:', error.message);
-        console.error('Shift data sent:', shiftData);
         const errorMsg = error.response?.data?.message || error.message || 'حدث خطأ أثناء إضافة المناوبة';
         setAlertMessage(errorMsg);
         setAlertType('warning');
@@ -101,7 +95,6 @@ const Shifts: React.FC = () => {
       setEditingShift(null);
       fetchShifts();
     } catch (error) {
-      console.error('Error updating shift:', error);
       setAlertMessage('حدث خطأ أثناء تحديث المناوبة');
       setAlertType('warning');
       setShowAlert(true);
@@ -120,7 +113,6 @@ const Shifts: React.FC = () => {
         setAlertType('success');
         setShowAlert(true);
       } catch (error) {
-        console.error('Error deleting shift:', error);
         setAlertMessage('حدث خطأ أثناء حذف المناوبة');
         setAlertType('warning');
         setShowAlert(true);
@@ -150,9 +142,16 @@ const Shifts: React.FC = () => {
     ? shifts
     : shifts.filter(shift => shift.team === teamFilter);
 
-  if (loading) {
-    return <div className="container">جاري التحميل...</div>;
-  }
+if (loading) {
+  return (
+    <div className="container">
+      <div className="loading-state">
+        <div className="loading-spinner"></div>
+        <p className="loading-text">جاري التحميل...</p>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="container">
@@ -183,7 +182,11 @@ const Shifts: React.FC = () => {
       </div>
 
       {filteredShifts.length === 0 ? (
-        <p>لا توجد مناوبات مسجلة</p>
+        <div className="empty-state">
+          <div className="empty-icon">📋</div>
+          <p className="empty-message">لا توجد مناوبات مسجلة</p>
+          <p className="empty-hint">قم بإضافة مناوبة جديدة للبدء</p>
+        </div>
       ) : (
         filteredShifts.map(shift => (
           <div key={shift._id} className="shift-card">

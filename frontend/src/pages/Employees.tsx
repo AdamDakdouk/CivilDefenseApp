@@ -33,7 +33,7 @@ const Employees: React.FC = () => {
       fetchEmployees();
       setEditingCell(null);
     } catch (error) {
-      console.error('Error updating attendance:', error);
+      throw (error);
     }
   };
 
@@ -95,7 +95,6 @@ const Employees: React.FC = () => {
 
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching employees:', error);
       setLoading(false);
     }
   };
@@ -146,12 +145,29 @@ const Employees: React.FC = () => {
     return new Date(year, month, 0).getDate();
   };
 
+  const getFullName = (name: string, middleName?: string) => {
+    if (!middleName) return name;
+
+    const nameParts = name.split(' ');
+    const firstName = nameParts[0]; // "Naji"
+    const lastName = nameParts.slice(1).join(' '); // "Abou Ghannam" (everything after first name)
+
+    return `${firstName} ${middleName} ${lastName}`;
+  };
+
   const handlePrint = () => {
     window.print();
   };
 
   if (loading) {
-    return <div className="container">جاري التحميل...</div>;
+    return (
+      <div className="container">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">جاري التحميل...</p>
+        </div>
+      </div>
+    );
   }
 
   const totalDayCols = 31;
@@ -163,8 +179,8 @@ const Employees: React.FC = () => {
     <div className="attendance-container">
       {/* Header Section */}
       <button onClick={handlePrint} className="print-btn">
-          طباعة الجدول
-        </button>
+        طباعة الجدول
+      </button>
       <div className="header-section">
         <div className="top-section">
           {/* Right Side - Organization Info */}
@@ -244,7 +260,7 @@ const Employees: React.FC = () => {
               <tr key={emp._id}>
                 <td className="center-text"></td>
                 <td className="center-text">{emp.autoNumber || ''}</td>
-                <td>{emp.name} {emp.middleName}</td>
+                <td>{getFullName(emp.name, emp.middleName)}</td>
                 <td>{emp.motherName || ''}</td>
                 <td>{getPosition(emp.role)}</td>
                 {days.map((day, i) => {

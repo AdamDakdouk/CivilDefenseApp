@@ -13,18 +13,15 @@
  */
 export function timeToMinutes(time: string): number {
   if (!time || typeof time !== 'string') {
-    console.warn(`timeToMinutes: Invalid time format: ${time}`);
     return 0;
   }
   const parts = time.split(':');
   if (parts.length < 2) {
-    console.warn(`timeToMinutes: Invalid time format (missing colon): ${time}`);
     return 0;
   }
   const hours = Number(parts[0]);
   const minutes = Number(parts[1]);
   if (isNaN(hours) || isNaN(minutes)) {
-    console.warn(`timeToMinutes: Invalid time numbers - hours: ${hours}, minutes: ${minutes}`);
     return 0;
   }
   return hours * 60 + minutes;

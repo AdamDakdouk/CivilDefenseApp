@@ -47,6 +47,7 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     const [alertMessage, setAlertMessage] = useState('');
     const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [lastMonthEndTeam, setLastMonthEndTeam] = useState<'1' | '2' | '3'>('3'); // Default to '3'
 
     const sortParticipants = (participantsList: Participant[]) => {
         return participantsList.sort((a, b) => {
@@ -98,13 +99,34 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
         const newDate = new Date(newDatetime.split('T')[0]);
         const shiftDateObj = new Date(shiftDate);
         
-        // Check if month and year are the same
-        return newDate.getMonth() === shiftDateObj.getMonth() && 
-               newDate.getFullYear() === shiftDateObj.getFullYear();
+        // Check if shift is on the last day of the month
+        const lastDayOfMonth = new Date(shiftDateObj.getFullYear(), shiftDateObj.getMonth() + 1, 0).getDate();
+        const isLastDayOfMonth = shiftDateObj.getDate() === lastDayOfMonth;
+        
+        if (isLastDayOfMonth) {
+            // Allow same month OR next month only
+            const shiftMonth = shiftDateObj.getMonth();
+            const shiftYear = shiftDateObj.getFullYear();
+            const newMonth = newDate.getMonth();
+            const newYear = newDate.getFullYear();
+            
+            const isSameMonth = (newMonth === shiftMonth && newYear === shiftYear);
+            const isNextMonth = (
+                (newMonth === shiftMonth + 1 && newYear === shiftYear) || // Next month same year
+                (newMonth === 0 && shiftMonth === 11 && newYear === shiftYear + 1) // Dec -> Jan
+            );
+            
+            return isSameMonth || isNextMonth;
+        } else {
+            // Not last day - must be same month/year
+            return newDate.getMonth() === shiftDateObj.getMonth() && 
+                   newDate.getFullYear() === shiftDateObj.getFullYear();
+        }
     };
 
     useEffect(() => {
         fetchAllUsers();
+        fetchSettings();
     }, []);
 
     useEffect(() => {
@@ -179,6 +201,16 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
         prevDateRef.current = date;
     }, [date, allUsers, participants]);
 
+    // Auto-calculate team based on date and last month's end team
+    useEffect(() => {
+        if (date && lastMonthEndTeam) {
+            const dayOfMonth = new Date(date).getDate();
+            const monthStartTeam = ((parseInt(lastMonthEndTeam) % 3) + 1); // Team that starts this month
+            const calculatedTeam = (((monthStartTeam + dayOfMonth - 2) % 3) + 1).toString() as '1' | '2' | '3';
+            setTeam(calculatedTeam);
+        }
+    }, [date, lastMonthEndTeam]);
+
     useEffect(() => {
         if (team && !editMode) {
             const teamUsers = allUsers.filter(u =>
@@ -222,6 +254,22 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     const fetchAllUsers = async () => {
         const users = await getUsers();
         setAllUsers(users);
+    };
+
+    const fetchSettings = async () => {
+        try {
+            const response = await fetch('/api/settings/active-month', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await response.json();
+            if (data.lastMonthEndTeam) {
+                setLastMonthEndTeam(data.lastMonthEndTeam);
+            }
+        } catch (error) {
+            throw(error)
+        }
     };
 
     const autoFillEmployees = (selectedTeam: '1' | '2' | '3') => {
@@ -328,9 +376,18 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     };
 
     const updateParticipant = (userId: string, field: 'checkIn' | 'checkOut', value: string) => {
-        // Validate that month/year didn't change
+        // Validate that month/year didn't change inappropriately
         if (!validateDateTimeChange(value, date)) {
-            setAlertMessage('لا يمكن تغيير الشهر أو السنة، يمكنك تغيير اليوم فقط');
+            // Check if shift is on last day to provide appropriate error message
+            const shiftDateObj = new Date(date);
+            const lastDayOfMonth = new Date(shiftDateObj.getFullYear(), shiftDateObj.getMonth() + 1, 0).getDate();
+            const isLastDayOfMonth = shiftDateObj.getDate() === lastDayOfMonth;
+            
+            if (isLastDayOfMonth) {
+                setAlertMessage('يمكنك تغيير الشهر فقط إلى الشهر الحالي أو الشهر التالي');
+            } else {
+                setAlertMessage('لا يمكن تغيير الشهر أو السنة، يمكنك تغيير اليوم فقط');
+            }
             setAlertType('warning');
             setShowAlert(true);
             return;

@@ -107,7 +107,6 @@ const startServer = async () => {
 
 // Schedule monthly reset check - runs daily at 00:01 AM
 cron.schedule('1 0 * * *', async () => {
-  console.log('🔍 Checking if monthly reset is needed...');
   try {
     await checkAndPerformReset();
   } catch (error) {
@@ -115,5 +114,4 @@ cron.schedule('1 0 * * *', async () => {
   }
 });
 
-console.log('⏰ Monthly reset scheduler initialized');
 startServer();

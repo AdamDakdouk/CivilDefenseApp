@@ -553,26 +553,17 @@ router.delete('/:id', async (req: Request, res: Response) => {
         const allUserMissions = await Mission.find({
           'participants.user': userId
         });
-        console.log(`   DEBUG: User has ${allUserMissions.length} total missions in database`);
-        if (allUserMissions.length > 0) {
-          allUserMissions.forEach(m => {
-            console.log(`   DEBUG: Mission ${m._id} date="${m.date}" (type: ${typeof m.date})`);
-          });
-        }
-        console.log(`   DEBUG: Looking for date="${shift.date}" (type: ${typeof shift.date})`);
+
 
 
         // For each overlapping mission, check if it's still covered by another shift
         for (const mission of overlappingMissions) {
-          console.log(`   Mission ${mission._id}: ${mission.startTime} - ${mission.endTime}`);
           
           // Use full datetime strings for accurate overlap detection (especially for midnight-crossing shifts)
           const hasOverlap = checkTimeOverlap(
             mission.startTime, mission.endTime,
             shiftStartFull, shiftEndFull
           );
-
-          console.log(`   hasOverlap with deleted shift: ${hasOverlap}`);
 
           if (hasOverlap) {
             // Check if there are OTHER shifts covering this mission
@@ -582,7 +573,6 @@ router.delete('/:id', async (req: Request, res: Response) => {
               date: shift.date
             });
 
-            console.log(`   Found ${otherShifts.length} other shifts on same date`);
 
             let coveredByOtherShift = false;
             for (const otherShift of otherShifts) {
@@ -612,7 +602,6 @@ router.delete('/:id', async (req: Request, res: Response) => {
                   mission.startTime, mission.endTime,
                   otherShiftStartFull, otherShiftEndFull
                 );
-                console.log(`   Other shift overlap: ${otherHasOverlap}`);
                 if (otherHasOverlap) {
                   coveredByOtherShift = true;
                   break;
@@ -623,16 +612,12 @@ router.delete('/:id', async (req: Request, res: Response) => {
             // If mission is NOT covered by any other shift, add its hours back
             if (!coveredByOtherShift) {
               const missionHours = getParticipantMissionHours(mission, userId);
-              console.log(`   ✅ RESTORING ${missionHours} hours from mission`);
               await User.findByIdAndUpdate(userId, {
                 $inc: { currentMonthHours: missionHours }
               });
-            } else {
-              console.log(`   ⏭️ Mission still covered by another shift, not restoring hours`);
-            }
-          } else {
-            console.log(`   ⚠️ Mission does NOT overlap with deleted shift - this shouldn't happen!`);
-          }
+            } 
+          } 
+
         }
       }
     }

@@ -17,105 +17,94 @@ const Volunteers: React.FC = () => {
   }, [selectedMonth]);
 
   const fetchVolunteers = async () => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const [month, year] = selectedMonth.split('-').map(Number);
+      const [month, year] = selectedMonth.split('-').map(Number);
 
-    console.log('Fetching volunteers for:', month, year);
-    console.log('Active month:', activeMonth, activeYear);
-    console.log('Is active month?', month === activeMonth && year === activeYear);
+      if (month === activeMonth && year === activeYear) {
+        const users = await getCurrentMonthData();
+        const vols = users
+          .filter(u => u.role === 'volunteer')
+          .sort((a, b) => {
+            // First, separate those with card numbers from those without
+            const hasCardA = a.cardNumber && a.cardNumber.trim() !== '';
+            const hasCardB = b.cardNumber && b.cardNumber.trim() !== '';
 
-    if (month === activeMonth && year === activeYear) {
-      console.log('Fetching current month data...');
-      const users = await getCurrentMonthData();
-      const vols = users
-        .filter(u => u.role === 'volunteer')
-        .sort((a, b) => {
-          // First, separate those with card numbers from those without
-          const hasCardA = a.cardNumber && a.cardNumber.trim() !== '';
-          const hasCardB = b.cardNumber && b.cardNumber.trim() !== '';
-          
-          // If one has card number and the other doesn't, those with card numbers come first
-          if (hasCardA && !hasCardB) return -1;
-          if (!hasCardA && hasCardB) return 1;
-          
-          // If both have or both don't have card numbers, sort by team
-          const teamOrder: { [key: string]: number } = { '1': 1, '2': 2, '3': 3 };
-          
-          // If one has no team and the other does, no team goes last
-          if (!a.team && b.team) return 1;
-          if (a.team && !b.team) return -1;
-          
-          // If both have no team, keep original order
-          if (!a.team && !b.team) return 0;
-          
-          // Compare by team order
-          const orderA = teamOrder[a.team] || 999;
-          const orderB = teamOrder[b.team] || 999;
-          
-          return orderA - orderB;
-        });
-      console.log('Current month volunteers:', vols);
-      setVolunteers(vols);
-    } else {
-      console.log('Fetching archived data...');
-      const reports = await getMonthlyReports(month, year);
-      console.log('Monthly reports:', reports);
+            // If one has card number and the other doesn't, those with card numbers come first
+            if (hasCardA && !hasCardB) return -1;
+            if (!hasCardA && hasCardB) return 1;
 
-      const vols = reports
-        .filter((report: any) => report.userId.role === 'volunteer')
-        .map((report: any) => ({
-          _id: report.userId._id,
-          name: report.userId.name,
-          cardNumber: report.userId.cardNumber,
-          role: report.userId.role,
-          team: report.userId.team,
-          currentMonthHours: report.totalHours,
-          currentMonthMissions: report.totalMissions,
-          currentMonthDays: report.totalDays || 0
-        }))
-        .sort((a, b) => {
-          // First, separate those with card numbers from those without
-          const hasCardA = a.cardNumber && a.cardNumber.trim() !== '';
-          const hasCardB = b.cardNumber && b.cardNumber.trim() !== '';
-          
-          // If one has card number and the other doesn't, those with card numbers come first
-          if (hasCardA && !hasCardB) return -1;
-          if (!hasCardA && hasCardB) return 1;
-          
-          // If both have or both don't have card numbers, sort by team
-          const teamOrder: { [key: string]: number } = { '1': 1, '2': 2, '3': 3 };
-          
-          // If one has no team and the other does, no team goes last
-          if (!a.team && b.team) return 1;
-          if (a.team && !b.team) return -1;
-          
-          // If both have no team, keep original order
-          if (!a.team && !b.team) return 0;
-          
-          // Compare by team order
-          const orderA = teamOrder[a.team] || 999;
-          const orderB = teamOrder[b.team] || 999;
-          
-          return orderA - orderB;
-        });
+            // If both have or both don't have card numbers, sort by team
+            const teamOrder: { [key: string]: number } = { '1': 1, '2': 2, '3': 3 };
 
-      console.log('Archived volunteers:', vols);
-      setVolunteers(vols);
+            // If one has no team and the other does, no team goes last
+            if (!a.team && b.team) return 1;
+            if (a.team && !b.team) return -1;
+
+            // If both have no team, keep original order
+            if (!a.team && !b.team) return 0;
+
+            // Compare by team order
+            const orderA = teamOrder[a.team] || 999;
+            const orderB = teamOrder[b.team] || 999;
+
+            return orderA - orderB;
+          });
+        setVolunteers(vols);
+      } else {
+        const reports = await getMonthlyReports(month, year);
+
+        const vols = reports
+          .filter((report: any) => report.userId.role === 'volunteer')
+          .map((report: any) => ({
+            _id: report.userId._id,
+            name: report.userId.name,
+            cardNumber: report.userId.cardNumber,
+            role: report.userId.role,
+            team: report.userId.team,
+            currentMonthHours: report.totalHours,
+            currentMonthMissions: report.totalMissions,
+            currentMonthDays: report.totalDays || 0
+          }))
+          .sort((a, b) => {
+            // First, separate those with card numbers from those without
+            const hasCardA = a.cardNumber && a.cardNumber.trim() !== '';
+            const hasCardB = b.cardNumber && b.cardNumber.trim() !== '';
+
+            // If one has card number and the other doesn't, those with card numbers come first
+            if (hasCardA && !hasCardB) return -1;
+            if (!hasCardA && hasCardB) return 1;
+
+            // If both have or both don't have card numbers, sort by team
+            const teamOrder: { [key: string]: number } = { '1': 1, '2': 2, '3': 3 };
+
+            // If one has no team and the other does, no team goes last
+            if (!a.team && b.team) return 1;
+            if (a.team && !b.team) return -1;
+
+            // If both have no team, keep original order
+            if (!a.team && !b.team) return 0;
+
+            // Compare by team order
+            const orderA = teamOrder[a.team] || 999;
+            const orderB = teamOrder[b.team] || 999;
+
+            return orderA - orderB;
+          });
+
+        setVolunteers(vols);
+      }
+
+      // Fetch mission counts
+      const counts = await getVolunteerMissionCounts(month, year);
+      setMissionCounts(counts);
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
     }
-
-    // Fetch mission counts
-    const counts = await getVolunteerMissionCounts(month, year);
-    console.log('Mission counts:', counts);
-    setMissionCounts(counts);
-
-    setLoading(false);
-  } catch (error) {
-    console.error('Error fetching volunteers:', error);
-    setLoading(false);
-  }
-};
+  };
 
   const getMonthName = () => {
     const [month, year] = selectedMonth.split('-').map(Number);
@@ -133,7 +122,14 @@ const Volunteers: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="container">جاري التحميل...</div>;
+    return (
+      <div className="container">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">جاري التحميل...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

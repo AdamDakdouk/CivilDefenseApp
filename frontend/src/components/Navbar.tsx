@@ -18,6 +18,7 @@ const Navbar: React.FC = () => {
   const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmData, setConfirmData] = useState({ month: 0, year: 0, monthName: '' });
+  const [isClosingMonth, setIsClosingMonth] = useState(false); // Loading state for month close
 
   useEffect(() => {
     fetchAvailableMonths();
@@ -65,7 +66,6 @@ const Navbar: React.FC = () => {
         setSelectedMonth(`${activeMonth}-${activeYear}`);
       }
     } catch (error) {
-      console.error('Error fetching available months:', error);
       // Fallback: add current month
       const now = new Date();
       setAvailableMonths([{
@@ -107,24 +107,33 @@ const Navbar: React.FC = () => {
   };
 
   const handleConfirmClose = async () => {
+    if (isClosingMonth) return; // Prevent double-click
+    
+    setIsClosingMonth(true);
     setShowConfirm(false);
 
     const { month, year } = confirmData;
 
     try {
+      // Show processing message immediately
+      setAlertMessage('جاري إغلاق الشهر... الرجاء الانتظار');
+      setAlertType('info');
+      setShowAlert(true);
+
       // Wait for rollover to complete
       await rolloverMonth(month, year);
 
+      // Update to success message
       setAlertMessage('تم إغلاق الشهر بنجاح! جاري التحديث...');
       setAlertType('success');
       setShowAlert(true);
 
-      // Reload page after showing success message
+      // Reload page after a short delay to show success message
       setTimeout(() => {
         window.location.reload();
       }, 1500);
     } catch (error) {
-      console.error('Error closing month:', error);
+      setIsClosingMonth(false); // Re-enable on error
       setAlertMessage('حدث خطأ أثناء إغلاق الشهر');
       setAlertType('error');
       setShowAlert(true);
@@ -162,8 +171,9 @@ const Navbar: React.FC = () => {
           <button
             onClick={closeCurrentMonth}
             className="close-month-btn"
+            disabled={isClosingMonth}
           >
-            إغلاق الشهر
+            {isClosingMonth ? 'جاري الإغلاق...' : 'إغلاق الشهر'}
           </button>
         </div>
       </div>
@@ -174,13 +184,18 @@ const Navbar: React.FC = () => {
           message={`سيتم:\n• حفظ جميع البيانات في الأرشيف\n• إعادة تعيين العدادات إلى الصفر\n• الانتقال إلى الشهر الجديد`}
           onConfirm={handleConfirmClose}
           onCancel={() => setShowConfirm(false)}
+          loading={isClosingMonth}
         />
       )}
 
       {showAlert && (
         <CustomAlert
           message={alertMessage}
-          onClose={() => setShowAlert(false)}
+          onClose={() => {
+            if (!isClosingMonth) { // Only allow closing if not in the middle of closing month
+              setShowAlert(false);
+            }
+          }}
           type={alertType}
         />
       )}

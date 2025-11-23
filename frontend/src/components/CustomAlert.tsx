@@ -12,7 +12,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ message, onClose, type }) => 
     success: { icon: '✓', showButton: false, autoDismiss: true },
     error: { icon: '⚠️', showButton: true, autoDismiss: false },
     warning: { icon: '⚠', showButton: true, autoDismiss: false },
-    info: { icon: 'ℹ', showButton: true, autoDismiss: false },
+    info: { icon: 'spinner', showButton: false, autoDismiss: false }, // Use spinner for loading
   };
 
   const config = alertConfig[type];
@@ -35,7 +35,11 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ message, onClose, type }) => 
     <div className={overlayClass} onClick={onClose}>
       <div className="custom-alert-box" onClick={(e) => e.stopPropagation()}>
         <div className={`alert-icon ${type}`}>
-          {config.icon}
+          {config.icon === 'spinner' ? (
+            <div className="spinner-icon"></div>
+          ) : (
+            config.icon
+          )}
         </div>
         <div className="alert-message">{message}</div>
         {config.showButton && (

@@ -18,6 +18,8 @@
     /* Portrait orientation for list */
     @page {
         size: A4 landscape;
+        margin: 0;
+        padding: 0;
     }
 
     body {

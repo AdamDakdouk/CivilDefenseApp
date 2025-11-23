@@ -31,13 +31,10 @@ const Dashboard: React.FC = () => {
     const fetchDashboardStats = async (month: number, year: number) => {
         try {
             setLoading(true);
-            console.log('Fetching dashboard stats for:', month, year);
             const response = await api.get(`/dashboard/stats?month=${month}&year=${year}`);
-            console.log('Dashboard data:', response.data);
             setStats(response.data);
             setLoading(false);
         } catch (error) {
-            console.error('Error fetching dashboard stats:', error);
             setLoading(false);
         }
     };
@@ -62,9 +59,16 @@ const Dashboard: React.FC = () => {
         return <div className="loading">جاري التحميل...</div>;
     }
 
-    if (loading) {
-        return <div className="loading">جاري تحميل لوحة المعلومات...</div>;
-    }
+if (loading) {
+  return (
+    <div className="container">
+      <div className="loading-state">
+        <div className="loading-spinner"></div>
+        <p className="loading-text">جاري التحميل...</p>
+      </div>
+    </div>
+  );
+}
 
     if (!stats) {
         return <div className="error">خطأ في تحميل البيانات</div>;

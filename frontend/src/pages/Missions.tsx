@@ -146,77 +146,90 @@ const Missions: React.FC = () => {
     };
 
     if (loading) {
-        return <div className="container">جاري التحميل...</div>;
+        return (
+            <div className="container">
+                <div className="loading-state">
+                    <div className="loading-spinner"></div>
+                    <p className="loading-text">جاري التحميل...</p>
+                </div>
+            </div>
+        );
     }
 
-    return (
-        <div className="container">
-            <div className="page-header">
-                <h2 className="page-title">المهمات</h2>
-                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                    <button onClick={handlePrint} className="export-btn">
-                        طباعة / تصدير PDF
+return (
+    <div className="container">
+        <div className="page-header">
+            <h2 className="page-title">المهمات</h2>
+            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                <button onClick={handlePrint} className="export-btn">
+                    طباعة / تصدير PDF
+                </button>
+                {isCurrentMonth() && (
+                    <button onClick={() => { setEditingMission(null); setShowModal(true); }}>
+                        إضافة مهمة
                     </button>
-                    {isCurrentMonth() && (
-                        <button onClick={() => { setEditingMission(null); setShowModal(true); }}>
-                            إضافة مهمة
-                        </button>
-                    )}
-
-                </div>
+                )}
             </div>
-            {/* Report Header */}
-            <div className="report-header">
-                <div className="header-right">
-                    <div>الجمهورية اللبنانية ٢ </div>
-                    <div>وزارة الداخلية والبلديات</div>
-                    <div>المديرية العامة للدفاع المدني</div>
-                    <div><strong>مركز عرمون</strong></div>
-                    <div className="doc-info">
-                        <span>برقية رقم: </span>
-                        <input
-                            type="text"
-                            value={docNumber}
-                            onChange={(e) => setDocNumber(e.target.value)}
-                            placeholder="..."
-                            className="inline-input"
-                        />
+        </div>
+
+        {missions.length === 0 ? (
+            <div className="empty-state">
+                <div className="empty-icon">🚒</div>
+                <p className="empty-message">لا توجد مهمات مسجلة</p>
+                <p className="empty-hint">قم بإضافة مهمة جديدة للبدء</p>
+            </div>
+        ) : (
+            <>
+                {/* Report Header */}
+                <div className="report-header">
+                    <div className="header-right">
+                        <div>الجمهورية اللبنانية</div>
+                        <div>وزارة الداخلية والبلديات</div>
+                        <div>المديرية العامة للدفاع المدني</div>
+                        <div><strong>مركز عرمون</strong></div>
+                        <div className="doc-info">
+                            <span>برقية رقم: </span>
+                            <input
+                                type="text"
+                                value={docNumber}
+                                onChange={(e) => setDocNumber(e.target.value)}
+                                placeholder="..."
+                                className="inline-input"
+                            />
+                        </div>
+                        <div className="doc-info">
+                            <span>التاريخ: </span>
+                            <input
+                                type="date"
+                                value={docDate}
+                                onChange={(e) => setDocDate(e.target.value)}
+                                className="date-input-arabic"
+                                onFocus={(e) => {
+                                    try {
+                                        e.target.showPicker();
+                                    } catch (err) {
+                                        // Browser blocked showPicker (needs user gesture)
+                                        // Ignore the error, user can click manually
+                                    }
+                                }}
+                            />
+                            <span className="date-display-overlay">
+                                {toArabicNumerals(docDate.split('-').join('/'))}
+                            </span>
+                        </div>
                     </div>
-                    <div className="doc-info">
-                        <span>التاريخ: </span>
-                        <input
-                            type="date"
-                            value={docDate}
-                            onChange={(e) => setDocDate(e.target.value)}
-                            className="date-input-arabic"
-                            onFocus={(e) => {
-                                try {
-                                    e.target.showPicker();
-                                } catch (err) {
-                                    // Browser blocked showPicker (needs user gesture)
-                                    // Ignore the error, user can click manually
-                                }
-                            }}
-                        />
-                        <span className="date-display-overlay">
-                            {toArabicNumerals(docDate.split('-').join('/'))}
-                        </span>
+
+                    <div className="header-center">
+                        <h1 className="main-title">
+                            سعادة المدير العام الدفاع المدني بالتكليف<br />
+                            العميد الركن عماد خريش <span className="hierarchy">بالتراتبيه</span>
+                        </h1>
+                        <p className="subtitle">
+                            ارفع لسعادتكم جدول بالمهمات والخدمات المنفذة في المركز خلال شهر {getMonthName()}
+                        </p>
                     </div>
                 </div>
 
-                <div className="header-center">
-                    <h1 className="main-title">
-                        سعادة المدير العام الدفاع المدني بالتكليف<br />
-                        العميد الركن عماد خريش <span className="hierarchy">بالتراتبيه</span>
-                    </h1>
-                    <p className="subtitle">
-                        ارفع لسعادتكم جدول بالمهمات والخدمات المنفذة في المركز خلال شهر {getMonthName()}
-                    </p>
-                </div>
-            </div>
-            {missions.length === 0 ? (
-                <p>لا توجد مهمات مسجلة</p>
-            ) : (
                 <table className='mission-table'>
                     <thead>
                         <tr>
@@ -274,41 +287,42 @@ const Missions: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
-            )}
+            </>
+        )}
 
-            {showModal && (
-                <AddMissionModal
-                    isOpen={showModal}
-                    onClose={() => { setShowModal(false); setEditingMission(null); }}
-                    onSave={handleSaveMission}
-                    editMode={!!editingMission}
-                    initialData={editingMission}
-                />
-            )}
+        {showModal && (
+            <AddMissionModal
+                isOpen={showModal}
+                onClose={() => { setShowModal(false); setEditingMission(null); }}
+                onSave={handleSaveMission}
+                editMode={!!editingMission}
+                initialData={editingMission}
+            />
+        )}
 
-            {showConfirmDelete && (
-                <ConfirmModal
-                    message="هل أنت متأكد من حذف هذه المهمة؟"
-                    onConfirm={handleDeleteMission}
-                    onCancel={() => {
-                        if (!deletingMission) { // ✅ Only allow cancel if not deleting
-                            setShowConfirmDelete(false);
-                            setMissionToDelete(null);
-                        }
-                    }}
-                    loading={deletingMission} // ✅ Pass loading state to modal
-                />
-            )}
+        {showConfirmDelete && (
+            <ConfirmModal
+                message="هل أنت متأكد من حذف هذه المهمة؟"
+                onConfirm={handleDeleteMission}
+                onCancel={() => {
+                    if (!deletingMission) {
+                        setShowConfirmDelete(false);
+                        setMissionToDelete(null);
+                    }
+                }}
+                loading={deletingMission}
+            />
+        )}
 
-            {showAlert && (
-                <CustomAlert
-                    message={alertMessage}
-                    onClose={() => setShowAlert(false)}
-                    type={alertType} // ✅ Use alertType from state
-                />
-            )}
-        </div>
-    );
+        {showAlert && (
+            <CustomAlert
+                message={alertMessage}
+                onClose={() => setShowAlert(false)}
+                type={alertType}
+            />
+        )}
+    </div>
+);
 };
 
 export default Missions;

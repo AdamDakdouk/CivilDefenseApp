@@ -7,11 +7,9 @@ import Settings from '../models/Settings';
 
 export const rolloverMonth = async (month: number, year: number) => {
     try {
-        console.log(`\n🔄 Starting month rollover for ${month}/${year}...`);
 
         // Get all users
         const users = await User.find();
-        console.log(`📊 Found ${users.length} users`);
 
         // Get missions for this month using string dates
         const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
@@ -25,7 +23,6 @@ export const rolloverMonth = async (month: number, year: number) => {
             }
         }).populate('participants.user');
 
-        console.log(`📋 Found ${missions.length} missions for ${month}/${year}`);
 
         // Count mission types per user
         const userMissionCounts: any = {};
@@ -33,7 +30,6 @@ export const rolloverMonth = async (month: number, year: number) => {
             try {
                 for (const participant of mission.participants) {
                     if (!participant.user) {
-                        console.warn(`⚠️  Mission ${mission._id} has participant without user data`);
                         continue;
                     }
 
@@ -68,10 +64,8 @@ export const rolloverMonth = async (month: number, year: number) => {
                     }
                 }
             } catch (err) {
-                console.error(`⚠️  Error processing mission ${mission._id}:`, err);
             }
         }
-        console.log(`📊 Counted mission types for ${Object.keys(userMissionCounts).length} users`);
 
         // Create monthly reports for all users
         let reportsCreated = 0;
@@ -104,7 +98,6 @@ export const rolloverMonth = async (month: number, year: number) => {
                 reportsCreated++;
             }
         }
-        console.log(`📝 Created ${reportsCreated} monthly reports`);
 
         // Reset current month fields for all users
         const resetResult = await User.updateMany(
@@ -117,19 +110,32 @@ export const rolloverMonth = async (month: number, year: number) => {
                 }
             }
         );
-        console.log(`🔄 Reset stats for ${resetResult.modifiedCount} users`);
 
         // Update active month to next month
         const nextMonth = month === 12 ? 1 : month + 1;
         const nextYear = month === 12 ? year + 1 : year;
 
-        console.log(`🔄 Updating settings from ${month}/${year} to ${nextMonth}/${nextYear}...`);
+
+        // Find the last shift of the closing month to determine rotation
+        const Shift = mongoose.model('Shift');
+        const lastShift = await Shift.findOne({
+            date: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        }).sort({ date: -1 }).limit(1);
+
+        let lastMonthEndTeam: '1' | '2' | '3' = '3'; // Default to '3' so next month starts with '1'
+        if (lastShift && lastShift.team) {
+            lastMonthEndTeam = lastShift.team;
+        } 
 
         const settings = await Settings.findOneAndUpdate(
             {},
             {
                 activeMonth: nextMonth,
-                activeYear: nextYear
+                activeYear: nextYear,
+                lastMonthEndTeam: lastMonthEndTeam
             },
             {
                 upsert: true,
@@ -138,10 +144,8 @@ export const rolloverMonth = async (month: number, year: number) => {
             }
         );
 
-        console.log(`✅ Settings updated successfully:`, settings);
         return { success: true, usersProcessed: users.length };
     } catch (error) {
-        console.error('\n❌ Month rollover ERROR:', error);
         throw error;
     }
 };

@@ -17,13 +17,15 @@ router.get('/active-month', async (req: Request, res: Response) => {
       const now = new Date();
       settings = await Settings.create({
         activeMonth: now.getMonth() + 1,
-        activeYear: now.getFullYear()
+        activeYear: now.getFullYear(),
+        lastMonthEndTeam: '3' // Default
       });
     }
     
     res.json({
       activeMonth: settings.activeMonth,
-      activeYear: settings.activeYear
+      activeYear: settings.activeYear,
+      lastMonthEndTeam: settings.lastMonthEndTeam || '3' // Default to '3' if not set
     });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching active month', error });

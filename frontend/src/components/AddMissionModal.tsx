@@ -48,13 +48,16 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
+    const [lastMonthEndTeam, setLastMonthEndTeam] = useState<'1' | '2' | '3'>('3'); // Default to '3'
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const suffix = '\\د م ع ر';
 
     useEffect(() => {
         fetchAllUsers();
+        fetchSettings();
     }, []);
 
     useEffect(() => {
@@ -86,9 +89,35 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         }
     }, [editMode, initialData]);
 
+    // Auto-calculate team based on date and last month's end team
+    useEffect(() => {
+        if (missionDate && lastMonthEndTeam) {
+            const dayOfMonth = new Date(missionDate).getDate();
+            const monthStartTeam = ((parseInt(lastMonthEndTeam) % 3) + 1); // Team that starts this month
+            const calculatedTeam = (((monthStartTeam + dayOfMonth - 2) % 3) + 1).toString() as '1' | '2' | '3';
+            setTeam(calculatedTeam);
+        }
+    }, [missionDate, lastMonthEndTeam]);
+
     const fetchAllUsers = async () => {
         const users = await getUsers();
         setAllUsers(users);
+    };
+
+    const fetchSettings = async () => {
+        try {
+            const response = await fetch('/api/settings/active-month', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const data = await response.json();
+            if (data.lastMonthEndTeam) {
+                setLastMonthEndTeam(data.lastMonthEndTeam);
+            }
+        } catch (error) {
+            throw(error);
+        }
     };
 
     const autoFillTeamEmployees = (selectedTeam: '1' | '2' | '3') => {
@@ -209,19 +238,10 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         setErrors({});
         setIsSubmitting(true);
 
-        // DEBUG: Check participants state before submission
-        console.log('🔍 Participants state before submit:', participants);
-        console.log('🔍 Mapped participants for API:', participants.map(p => ({
-            userId: p.userId,
-            showCustomTimes: p.showCustomTimes,
-            customStartTime: p.customStartTime,
-            customEndTime: p.customEndTime
-        })));
-
         try {
             const payload = {
                 ...(editMode && initialData?._id ? { id: initialData._id } : {}),
-                referenceNumber,
+                referenceNumber: referenceNumber + suffix,
                 vehicleNumbers: vehicleNumbers.join(', '),
                 date: missionDate,     // YYYY-MM-DD format
                 startTime,             // HH:mm format
@@ -242,8 +262,6 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                 })),
                 createdBy: '674c8f9e8e7b4c001234abcd'
             };
-
-            console.log('🔍 Final payload being sent:', JSON.stringify(payload, null, 2));
 
             await onSave(payload);
         } finally {
@@ -397,6 +415,9 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                 <option value="اطفاء حريق سيارة" />
                                 <option value="اطفاء حريق مستودع" />
                                 <option value="اطفاء حريق شقة" />
+                                <option value="اطفاء حريق معمل" />
+                                <option value="اطفاء حريق غرفة كهرباء" />
+                                <option value="اطفاء حريق مولد كهرباء" />
                             </datalist>
                         </div>
                     )}

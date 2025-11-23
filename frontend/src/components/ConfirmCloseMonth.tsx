@@ -6,21 +6,22 @@ interface ConfirmCloseMonth {
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
+  loading?: boolean;
 }
 
-const ConfirmCloseMonth: React.FC<ConfirmCloseMonth> = ({ title, message, onConfirm, onCancel }) => {
+const ConfirmCloseMonth: React.FC<ConfirmCloseMonth> = ({ title, message, onConfirm, onCancel, loading = false }) => {
   return (
-    <div className="custom-confirm-overlay" onClick={onCancel}>
+    <div className="custom-confirm-overlay" onClick={loading ? undefined : onCancel}>
       <div className="custom-confirm-box" onClick={(e) => e.stopPropagation()}>
         <div className="confirm-icon">⚠️</div>
         <h3 className="confirm-title">{title}</h3>
         <div className="confirm-message">{message}</div>
         <div className="confirm-buttons">
-          <button className="confirm-btn cancel-btn" onClick={onCancel}>
+          <button className="confirm-btn cancel-btn" onClick={onCancel} disabled={loading}>
             إلغاء
           </button>
-          <button className="confirm-btn confirm-yes-btn" onClick={onConfirm}>
-            نعم، متأكد
+          <button className="confirm-btn confirm-yes-btn" onClick={onConfirm} disabled={loading}>
+            {loading ? 'جاري المعالجة...' : 'نعم، متأكد'}
           </button>
         </div>
       </div>
