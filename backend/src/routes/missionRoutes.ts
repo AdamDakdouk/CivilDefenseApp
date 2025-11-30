@@ -7,6 +7,7 @@ import { authenticateToken } from '../middleware/auth';
 import { calculateHours, daysBetween, timeToMinutes } from '../utils/timeUtils';
 
 const router = express.Router();
+const suffix = '\\د م ع ر';
 
 // Apply authentication to all routes
 router.use(authenticateToken);
@@ -188,7 +189,7 @@ router.post('/', async (req: Request, res: Response) => {
     }));
 
     const mission = new Mission({
-      referenceNumber,
+      referenceNumber: referenceNumber + suffix,
       vehicleNumbers,
       date,
       startTime,

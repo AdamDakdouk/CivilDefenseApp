@@ -11,6 +11,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 10px;
 }
 
 .modal-content {
@@ -46,6 +47,7 @@ input, select {
   font-size: 16px;
   width: 100%;
   direction: rtl;
+  box-sizing: border-box;
 }
 
 input:focus, select:focus {
@@ -62,6 +64,7 @@ textarea {
   direction: rtl;
   font-family: inherit;
   resize: vertical;
+  box-sizing: border-box;
 }
 
 textarea:focus {
@@ -98,6 +101,7 @@ textarea:focus {
   gap: 10px;
   margin-top: 20px;
   justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .modal-actions button:disabled {
@@ -200,13 +204,14 @@ textarea:focus {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
-  margin-bottom: 4px;
-  padding: 4;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
   background-color: #b1b1b170;
   border-radius: 5px;
   position: relative;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .shift-participant-name {
@@ -226,6 +231,11 @@ textarea:focus {
   font-size: 14.5px;
 }
 
+.shift-datetime-inputs input {
+  box-sizing: border-box;
+  width: 100%;
+}
+
 .shift-btn-remove {
   align-self: center;
   margin: 0;
@@ -242,6 +252,36 @@ textarea:focus {
 .shift-modal .suggestion-item {
   padding: 8px;
   font-size: 14px;
+}
+
+.shift-modal .modal-actions {
+  margin-top: 16px;
+}
+
+/* Custom Time Pickers Styles */
+.custom-times-container {
+  margin-top: 8px;
+  margin-right: 20px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.custom-times-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.custom-time-item {
+  flex: 1;
+  min-width: 150px;
+  position: relative;
+}
+
+/* Fix dropdown positioning in RTL modals */
+.custom-time-item .custom-time-dropdown {
+  direction: ltr;
 }
 
 .shift-modal .modal-actions {
@@ -479,4 +519,406 @@ textarea:focus {
 
 .datetime-inputs {
   gap: 10px;
+}
+
+/* ==================== MOBILE RESPONSIVE STYLES ==================== */
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 8px;
+  }
+
+  .modal-content {
+    padding: 20px;
+    width: 95%;
+    max-height: 85vh;
+  }
+
+  .modal-content h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  input, select, textarea {
+    padding: 10px;
+    font-size: 15px;
+  }
+
+  .modal-actions {
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .confirm-modal {
+    padding: 24px;
+    width: 95%;
+  }
+
+  .confirm-modal h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  /* Shift Modal Mobile */
+  .shift-modal.modal-content {
+    padding: 20px;
+    max-width: 95%;
+  }
+
+  .shift-modal h2 {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .shift-form-group {
+    margin-bottom: 14px;
+  }
+
+  .shift-participants-list {
+    padding: 12px;
+    margin-top: 14px;
+  }
+
+  .shift-participants-list h3 {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  .shift-modal .modal-actions {
+    margin-top: 14px;
+    gap: 8px;
+  }
+
+  .shift-modal .modal-actions button {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  /* Mission Modal Mobile */
+  .mission-modal.modal-content {
+    padding: 18px;
+    max-width: 95%;
+  }
+
+  .mission-modal h2 {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .mission-form-group {
+    margin-bottom: 12px;
+  }
+
+  .radio-group {
+    gap: 12px;
+  }
+
+  .mission-radio-group {
+    gap: 10px;
+  }
+
+  .participant-tag {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .mission-participant-tag {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .mission-modal .modal-actions {
+    margin-top: 12px;
+  }
+
+  .mission-modal .modal-actions button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 5px;
+  }
+
+  .modal-content {
+    padding: 16px;
+    width: 98%;
+    max-height: 90vh;
+    border-radius: 6px;
+  }
+
+  .modal-content h2 {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  input, select, textarea {
+    padding: 9px;
+    font-size: 14px;
+  }
+
+  .modal-actions {
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 14px;
+    justify-content: flex-start;
+  }
+
+  .modal-actions button {
+    width: auto;
+    min-width: 40%;
+    flex: 0 1 auto;
+  }
+
+  .confirm-modal {
+    padding: 20px;
+  }
+
+  .confirm-modal h3 {
+    font-size: 17px;
+    margin-bottom: 18px;
+  }
+
+  /* Shift Modal Small Mobile */
+  .shift-modal.modal-content {
+    padding: 16px;
+  }
+
+  .shift-modal h2 {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .shift-form-group {
+    margin-bottom: 12px;
+  }
+
+  .shift-form-group label {
+    font-size: 13px;
+  }
+
+  .shift-modal input,
+  .shift-modal select {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .shift-participants-list {
+    padding: 10px;
+    margin-top: 12px;
+  }
+
+  .shift-participants-list h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .shift-participant-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .shift-participant-name {
+    font-size: 14px;
+    font-weight: 700;
+    min-width: auto;
+    max-width: none;
+    text-align: center;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+
+  .shift-datetime-inputs {
+    font-size: 14px;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .shift-datetime-inputs input {
+    width: 100%;
+  }
+
+  .shift-btn-remove {
+    padding: 10px;
+    font-size: 13px;
+    margin-top: 5px;
+    width: 100%;
+  }
+
+  .shift-modal .modal-actions {
+    flex-direction: row;
+  }
+
+  .shift-modal .modal-actions button {
+    width: auto;
+    min-width: 40%;
+    flex: 0 1 auto;
+  }
+
+  /* Custom times mobile styles */
+  .custom-times-container {
+    margin-right: 0;
+    padding: 8px;
+  }
+
+  .custom-times-row {
+    gap: 12px;
+  }
+
+  .custom-time-item {
+    min-width: 140px;
+  }
+
+  /* Mission Modal Small Mobile */
+  .mission-modal.modal-content {
+    padding: 14px;
+  }
+
+  .mission-modal h2 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .mission-form-group {
+    margin-bottom: 10px;
+  }
+
+  .mission-form-group label {
+    font-size: 13px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .mission-form-row {
+    gap: 0;
+  }
+
+  .mission-modal input,
+  .mission-modal select,
+  .mission-modal textarea {
+    padding: 7px;
+    font-size: 13px;
+  }
+
+  .radio-label {
+    font-size: 13px;
+  }
+
+  .mission-radio-label {
+    font-size: 13px;
+  }
+
+  .participant-tag {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .mission-participant-tag {
+    padding: 4px 7px;
+    font-size: 11px;
+  }
+
+  .remove-tag {
+    font-size: 18px;
+  }
+
+  .mission-remove-tag {
+    font-size: 16px;
+  }
+
+  .mission-modal .modal-actions {
+    flex-direction: row;
+  }
+
+  .mission-modal .modal-actions button {
+    width: auto;
+    min-width: 40%;
+    flex: 0 1 auto;
+  }
+
+  .suggestions {
+    max-height: 150px;
+  }
+
+  .suggestion-item {
+    padding: 8px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .modal-content {
+    padding: 12px;
+  }
+
+  .modal-content h2 {
+    font-size: 16px;
+  }
+
+  input, select, textarea {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .shift-modal.modal-content {
+    padding: 12px;
+  }
+
+  .shift-modal h2 {
+    font-size: 16px;
+  }
+
+  .shift-participant-name {
+    font-size: 12px;
+  }
+
+  .mission-modal.modal-content {
+    padding: 12px;
+  }
+
+  .mission-modal h2 {
+    font-size: 15px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .modal-actions button {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+
+  .shift-btn-remove {
+    min-height: 44px;
+  }
+
+  .remove-tag {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

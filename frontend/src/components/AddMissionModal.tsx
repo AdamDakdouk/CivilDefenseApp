@@ -53,7 +53,6 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
     const [alertMessage, setAlertMessage] = useState('');
     const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const suffix = '\\د م ع ر';
 
     useEffect(() => {
         fetchAllUsers();
@@ -116,7 +115,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                 setLastMonthEndTeam(data.lastMonthEndTeam);
             }
         } catch (error) {
-            throw(error);
+            throw (error);
         }
     };
 
@@ -241,7 +240,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         try {
             const payload = {
                 ...(editMode && initialData?._id ? { id: initialData._id } : {}),
-                referenceNumber: referenceNumber + suffix,
+                referenceNumber: referenceNumber,
                 vehicleNumbers: vehicleNumbers.join(', '),
                 date: missionDate,     // YYYY-MM-DD format
                 startTime,             // HH:mm format
@@ -400,11 +399,11 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                     if (errors.missionDetails) setErrors({ ...errors, missionDetails: false });
                                 }}
                                 placeholder="حدد تفاصيل المهمة"
-                                style={{ 
-                                    width: '100%', 
-                                    padding: '8px', 
-                                    borderRadius: '4px', 
-                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd' 
+                                style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    borderRadius: '4px',
+                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd'
                                 }}
                                 data-field="missionDetails"
                             />
@@ -432,11 +431,11 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                     if (errors.missionDetails) setErrors({ ...errors, missionDetails: false });
                                 }}
                                 placeholder="ادخل تفاصيل المهمة"
-                                style={{ 
-                                    width: '100%', 
-                                    padding: '8px', 
-                                    borderRadius: '4px', 
-                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd' 
+                                style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    borderRadius: '4px',
+                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd'
                                 }}
                                 data-field="missionDetails"
                             />
@@ -453,11 +452,11 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                     if (errors.missionDetails) setErrors({ ...errors, missionDetails: false });
                                 }}
                                 placeholder="حدد أو اكتب تفاصيل المهمة"
-                                style={{ 
-                                    width: '100%', 
-                                    padding: '8px', 
-                                    borderRadius: '4px', 
-                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd' 
+                                style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    borderRadius: '4px',
+                                    border: errors.missionDetails ? '1px solid #c41e3a' : '1px solid #ddd'
                                 }}
                                 data-field="missionDetails"
                             />
@@ -648,16 +647,16 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
 
                                     {/* Show custom time pickers if enabled */}
                                     {p.showCustomTimes && (
-                                        <div style={{ marginTop: '8px', marginRight: '20px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                                            <div style={{ display: 'flex', gap: '100px', flexWrap: 'wrap' }}>
-                                                <div style={{ flex: '1', minWidth: '150px' }}>
+                                        <div className="custom-times-container">
+                                            <div className="custom-times-row">
+                                                <div className="custom-time-item">
                                                     <TimePicker
                                                         label="بداية"
                                                         value={p.customStartTime || startTime}
                                                         onChange={(time) => updateCustomStartTime(p.userId, time)}
                                                     />
                                                 </div>
-                                                <div style={{ flex: '2', minWidth: '150px' }}>
+                                                <div className="custom-time-item">
                                                     <TimePicker
                                                         label="نهاية"
                                                         value={p.customEndTime || endTime}

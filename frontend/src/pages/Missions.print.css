@@ -9,11 +9,11 @@
         display: none !important;
     }
 
-    /* Only hide the last column in the FIRST header row and all body rows */
-    table thead tr:first-child th:last-child,
-    table tbody tr td:last-child {
-        display: none;
-    }
+.mission-table thead tr:first-child th:last-child,
+.mission-table tbody tr td:last-child {
+    display: none;
+}
+
 
     /* Portrait orientation for list */
     @page {

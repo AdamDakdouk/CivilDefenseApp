@@ -23,6 +23,7 @@
   cursor: pointer;
   width: 80px;
   background-color: #fff;
+  box-sizing: border-box;
 }
 
 .time-picker-inputs select:hover {
@@ -37,6 +38,7 @@
   width: 80px;
   text-align: center;
   background-color: #f0f7ff;
+  box-sizing: border-box;
 }
 
 .time-input:focus {
@@ -64,6 +66,7 @@
 .datetime-picker-row {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .date-input {
@@ -73,11 +76,13 @@
   font-size: 16px;
   width: auto;
   direction: ltr;
+  box-sizing: border-box;
 }
 
 /* Custom Time Dropdown Styles */
 .custom-time-dropdown {
   position: relative;
+  direction: ltr;
 }
 
 .time-display-button {
@@ -94,6 +99,7 @@
   transition: border-color 0.2s;
   color: #333;
   font-weight: 500;
+  box-sizing: border-box;
 }
 
 .time-display-button:hover {
@@ -114,10 +120,19 @@
   direction: ltr;
 }
 
+/* Prevent dropdown from going off-screen */
+@media (max-width: 600px) {
+  .time-dropdown-menu {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
 /* Hour dropdown with 3-row grid */
 .hour-dropdown {
-  min-width: 320px;
-  max-width: 380px;
+  min-width: 300px;
+  max-width: 360px;
 }
 
 .hour-grid-row {
@@ -167,8 +182,8 @@
 
 /* Minute dropdown */
 .minute-dropdown {
-  min-width: 150px;
-  max-width: 180px;
+  min-width: 130px;
+  max-width: 160px;
 }
 
 .minute-grid {
@@ -208,4 +223,336 @@
   color: white !important;
   border-color: #4a90e2;
   font-weight: bold;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .time-picker {
+    margin-bottom: 12px;
+  }
+
+  .time-picker-inputs {
+    gap: 6px;
+  }
+
+  .time-picker-inputs select {
+    padding: 9px;
+    font-size: 15px;
+    width: 75px;
+  }
+
+  .time-input {
+    padding: 9px;
+    font-size: 15px;
+    width: 75px;
+  }
+
+  .time-separator {
+    font-size: 18px;
+  }
+
+  .datetime-picker {
+    margin-bottom: 12px;
+  }
+
+  .datetime-picker-row {
+    gap: 6px;
+  }
+
+  .date-input {
+    padding: 9px;
+    font-size: 15px;
+  }
+
+  .time-display-button {
+    padding: 7px;
+    font-size: 14px;
+    width: 75px;
+  }
+
+  /* Hour dropdown - 8 columns on tablet */
+  .hour-dropdown {
+    min-width: 280px;
+    max-width: 340px;
+  }
+
+  .hour-grid-row {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 3px;
+    margin-bottom: 3px;
+  }
+
+  .hour-button {
+    padding: 9px 6px;
+    font-size: 14px;
+    min-width: 28px;
+  }
+
+  /* Minute dropdown */
+  .minute-dropdown {
+    min-width: 140px;
+    max-width: 160px;
+  }
+
+  .minute-grid {
+    gap: 3px;
+  }
+
+  .minute-button {
+    padding: 9px 10px;
+    font-size: 14px;
+    min-width: 45px;
+  }
+}
+
+@media (max-width: 480px) {
+  .time-picker {
+    margin-bottom: 10px;
+  }
+
+  .time-picker label {
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+
+  .time-picker-inputs {
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .time-picker-inputs select {
+    padding: 8px;
+    font-size: 14px;
+    width: 70px;
+  }
+
+  .time-input {
+    padding: 8px;
+    font-size: 14px;
+    width: 70px;
+  }
+
+  .time-separator {
+    font-size: 16px;
+  }
+
+  .datetime-picker {
+    margin-bottom: 10px;
+  }
+
+  .datetime-picker label {
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+
+  .datetime-picker-row {
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .date-input {
+    padding: 8px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .time-display-button {
+    padding: 6px;
+    font-size: 13px;
+    width: 70px;
+  }
+
+  /* Hour dropdown - 6 columns for mobile to fit screen */
+  .hour-dropdown {
+    min-width: 240px;
+    max-width: min(90vw, 280px);
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .hour-grid-row {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+
+  .hour-button {
+    padding: 9px 5px;
+    font-size: 13px;
+    min-width: 32px;
+  }
+
+  /* Minute dropdown - same as desktop */
+  .minute-dropdown {
+    min-width: 130px;
+    max-width: 160px;
+  }
+
+  .minute-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+  }
+
+  /* Minute dropdown - 2 columns for mobile */
+  .minute-dropdown {
+    min-width: 100px;
+    max-width: min(90vw, 140px);
+  }
+
+  .minute-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+
+  .minute-button {
+    padding: 9px 8px;
+    font-size: 13px;
+    min-width: 42px;
+  }
+
+  .time-dropdown-menu {
+    padding: 6px;
+    margin-top: 3px;
+  }
+}
+
+@media (max-width: 360px) {
+  .time-picker-inputs select,
+  .time-input {
+    padding: 7px;
+    font-size: 13px;
+    width: 65px;
+  }
+
+  .time-separator {
+    font-size: 15px;
+  }
+
+  .time-display-button {
+    padding: 6px;
+    font-size: 12px;
+    width: 65px;
+  }
+
+  .date-input {
+    padding: 7px;
+    font-size: 13px;
+  }
+
+  /* Hour dropdown - smaller for tiny screens */
+  .hour-dropdown {
+    min-width: 200px;
+    max-width: 240px;
+  }
+
+  .hour-button {
+    padding: 8px 5px;
+    font-size: 12px;
+    min-width: 42px;
+  }
+
+  .minute-dropdown {
+    min-width: 110px;
+    max-width: 130px;
+  }
+
+  .minute-button {
+    padding: 8px 6px;
+    font-size: 12px;
+    min-width: 50px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .time-picker-inputs select,
+  .time-input,
+  .time-display-button {
+    min-height: 44px;
+    padding: 12px;
+  }
+
+  .hour-button,
+  .minute-button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 8px;
+  }
+
+  .date-input {
+    min-height: 44px;
+    padding: 12px;
+  }
+}
+
+/* Prevent dropdown from going off-screen on mobile */
+@media (max-width: 480px) {
+  .time-dropdown-menu {
+    position: fixed;
+    top: auto;
+    right: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 20px;
+    margin-top: 0;
+  }
+
+  .hour-dropdown,
+  .minute-dropdown {
+    width: 90vw;
+    max-width: 300px;
+  }
+
+  /* ========================= */
+/* FIX TIME DROPDOWN ISSUES */
+/* ========================= */
+
+/* Always anchor to parent */
+.custom-time-dropdown {
+  position: relative;
+  overflow: visible;
+}
+
+/* Dropdown positioning */
+.time-dropdown-menu {
+  position: absolute !important;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 40px);
+  box-sizing: border-box;
+}
+
+/* Prevent modal overflow */
+.modal-content .time-dropdown-menu {
+  max-width: calc(100% - 20px);
+}
+
+/* Desktop clamp inside modal */
+@media (min-width: 481px) {
+  .time-dropdown-menu {
+    left: 0;
+    right: 0;
+    transform: none;
+    margin-inline: auto;
+  }
+}
+
+/* Mobile fix – NO fixed positioning */
+@media (max-width: 480px) {
+  .time-dropdown-menu {
+    left: 50%;
+    bottom: auto;
+  }
+.hour-grid-row {
+  grid-template-columns: repeat(4,  1fr);
+}
+
+ .hour-dropdown {
+  left: -17%;
+  min-width: 190px;
+ }
+}
+
+
 }
