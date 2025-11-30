@@ -1,34 +1,34 @@
 @media print {
     /* Hide everything except the content */
-    .navbar,
-    .missions-header button,
-    .edit-btn,
-    .delete-btn,
-    .page-header,
-    button {
+    .missions-page-print .navbar,
+    .missions-page-print .missions-header button,
+    .missions-page-print .edit-btn,
+    .missions-page-print .delete-btn,
+    .missions-page-print .page-header,
+    .missions-page-print button {
         display: none !important;
     }
 
-    .mission-table thead tr:first-child th:last-child,
-    .mission-table tbody tr td:last-child {
+    .missions-page-print .mission-table thead tr:first-child th:last-child,
+    .missions-page-print .mission-table tbody tr td:last-child {
         display: none;
     }
 
     /* Portrait orientation for list */
     @page {
         size: A4 landscape;
-        margin: 30mm 0mm 20mm 0mm; /* top right bottom left */
+        margin: 30mm 0mm 20mm 0mm;
         padding: 0;
     }
 
-    body {
+    .missions-page-print body {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
         margin: 20mm 0mm 20mm 0mm;
-        padding: 30mm 0mm 20mm 0mm; /* Match @page margins */
+        padding: 30mm 0mm 20mm 0mm;
     }
     
-    .header-right {
+    .missions-page-print .header-right {
         position: absolute;
         top: 15px;
         right: 15px;
@@ -38,17 +38,15 @@
         margin-right: 3.5rem;
     }
     
-    .mission-table {
-        margin-bottom: 20mm; /* Space at the very end */
+    .missions-page-print .mission-table {
+        margin-bottom: 20mm;
     }
     
-    /* Repeat table header on each page */
-    .mission-table thead {
+    .missions-page-print .mission-table thead {
         display: table-header-group;
     }
     
-    /* Force spacing on continuation pages */
-    .mission-table tbody tr {
+    .missions-page-print .mission-table tbody tr {
         page-break-inside: avoid;
     }
 }
