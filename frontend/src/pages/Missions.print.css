@@ -9,22 +9,23 @@
         display: none !important;
     }
 
-.mission-table thead tr:first-child th:last-child,
-.mission-table tbody tr td:last-child {
-    display: none;
-}
-
+    .mission-table thead tr:first-child th:last-child,
+    .mission-table tbody tr td:last-child {
+        display: none;
+    }
 
     /* Portrait orientation for list */
     @page {
         size: A4 landscape;
-        margin: 0;
+        margin: 30mm 0mm 20mm 0mm; /* top right bottom left */
         padding: 0;
     }
 
     body {
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
+        margin: 20mm 0mm 20mm 0mm;
+        padding: 30mm 0mm 20mm 0mm; /* Match @page margins */
     }
     
     .header-right {
@@ -35,5 +36,19 @@
         line-height: 1.6;
         font-size: 11px;
         margin-right: 3.5rem;
+    }
+    
+    .mission-table {
+        margin-bottom: 20mm; /* Space at the very end */
+    }
+    
+    /* Repeat table header on each page */
+    .mission-table thead {
+        display: table-header-group;
+    }
+    
+    /* Force spacing on continuation pages */
+    .mission-table tbody tr {
+        page-break-inside: avoid;
     }
 }
