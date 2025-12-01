@@ -7,23 +7,51 @@
     display: none !important;
   }
 
-  /* Force landscape orientation */
+  /* Force landscape orientation with side margins to prevent clipping */
   @page {
     size: A4 landscape;
-    margin: 0.3cm;
+    margin: 0 5mm 0 5mm;
   }
 
-  body {
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-    margin: 0;
-    margin-top: 1rem;
-    padding: 0;
+  /* Scoped to report-container only - won't affect other pages */
+  .report-container {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    margin: 0 !important;
+    margin-top: 15mm !important;
+    padding: 0 5mm !important;
   }
 
-  .report-container tbody tr:nth-child(3) td,
-  .report-container tbody tr:nth-child(5) td,
-  .report-container tbody tr:nth-child(10) td {
+  /* Force table borders with collapse */
+  .report-container table {
+    border: 1px solid #000 !important;
+    border-collapse: collapse !important;
+  }
+
+  /* Force all cell borders */
+  .report-container th,
+  .report-container td {
+    border: 0.5px solid #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ensure outer borders are thicker and visible */
+  .report-container th:first-child,
+  .report-container td:first-child {
+    border-left: 1px solid #000 !important;
+  }
+
+  .report-container th:last-child,
+  .report-container td:last-child {
+    border-right: 1px solid #000 !important;
+  }
+
+  .report-container thead tr:first-child th {
+    border-top: 1px solid #000 !important;
+  }
+
+  .report-container tbody tr:last-child td {
     border-bottom: 1px solid #000 !important;
   }
 }

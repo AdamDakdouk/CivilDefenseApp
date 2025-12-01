@@ -1,5 +1,4 @@
 @media print {
-
   /* Hide everything except the content */
   .navbar,
   .add-employee-btn,
@@ -9,31 +8,34 @@
     display: none !important;
   }
 
-  /* Force landscape orientation */
+  /* Force landscape orientation - keep at None in print settings */
   @page {
     size: A4 landscape;
-    margin: 0.3cm;
+    margin: 10mm 0mm 10mm 0mm;
   }
 
-  body {
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-    margin: 0;
-    margin-top: 7rem;
-    padding: 0;
+  /* Scoped to attendance-container only - won't affect other pages */
+  .attendance-container {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    margin: 0 !important;
+    margin-top: 40mm !important;
+    padding: 0 !important;
   }
 
-   .legend-container {
+  .legend-container {
     display: block !important;
     page-break-inside: avoid;
   }
 
   .legend-table {
     table-layout: auto !important;
+    border: 1px solid black !important;
   }
 
   .legend-table td {
     display: table-cell !important;
+    border: 0.5px solid black !important;
   }
 
   .legend-code,
@@ -41,4 +43,14 @@
     display: table-cell !important;
     visibility: visible !important;
   }
+
+    .main-table {
+    border: 1px solid black !important;
+  }
+
+  .main-table th,
+  .main-table td {
+    border: 1px solid black !important;
+  }
+
 }

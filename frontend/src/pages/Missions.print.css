@@ -1,5 +1,12 @@
 @media print {
-    /* Hide everything except the content */
+    /* Override all table borders */
+    .missions-page-print table,
+    .missions-page-print .mission-table {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    /* Hide non-printable elements */
     .missions-page-print .navbar,
     .missions-page-print .missions-header button,
     .missions-page-print .edit-btn,
@@ -9,44 +16,211 @@
         display: none !important;
     }
 
+    /* Hide action column in print */
     .missions-page-print .mission-table thead tr:first-child th:last-child,
     .missions-page-print .mission-table tbody tr td:last-child {
-        display: none;
+        display: none !important;
     }
 
-    /* Portrait orientation for list */
+    /* Page setup - landscape with minimal margins */
     @page {
         size: A4 landscape;
-        margin: 30mm 0mm 20mm 0mm;
-        padding: 0;
+        margin: 0mm 0mm 0mm 0mm;
     }
 
-    .missions-page-print body {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-        margin: 20mm 0mm 20mm 0mm;
-        padding: 30mm 0mm 20mm 0mm;
+    /* Body settings */
+    html, body {
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+    }
+
+    /* Container reset for print */
+    .missions-page-print .container {
+        margin: 0 !important;
+        padding: 0 10mm !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    /* Report header adjustments */
+    .missions-page-print .report-header {
+        padding: 5mm 0 5mm 0;
+        position: relative;
+        page-break-inside: avoid;
     }
     
     .missions-page-print .header-right {
         position: absolute;
-        top: 15px;
-        right: 15px;
+        top: 0;
+        right: 0;
         text-align: right;
         line-height: 1.6;
         font-size: 11px;
-        margin-right: 3.5rem;
+        margin: 0;
+    }
+
+    .missions-page-print .header-center {
+        text-align: center;
+        padding: 5mm 100px 5mm 100px;
+        margin: 0;
+    }
+
+    .missions-page-print .main-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+
+    .missions-page-print .hierarchy {
+        font-size: 11px;
+        font-weight: normal;
+    }
+
+    .missions-page-print .subtitle {
+        font-size: 13px;
+        margin-top: 8px;
+        margin-bottom: 5mm;
     }
     
+    /* Table settings - critical for header alignment */
     .missions-page-print .mission-table {
-        margin-bottom: 20mm;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        table-layout: fixed !important;
+        border-collapse: collapse !important;
+        page-break-inside: auto;
+        border: none !important;
+        box-shadow: none !important;
     }
     
+    /* Ensure thead repeats on each page */
     .missions-page-print .mission-table thead {
-        display: table-header-group;
+        display: table-header-group !important;
+    }
+
+    .missions-page-print .mission-table tbody {
+        display: table-row-group !important;
     }
     
+    /* Prevent row breaks and phantom rows */
     .missions-page-print .mission-table tbody tr {
-        page-break-inside: avoid;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        height: auto !important;
+    }
+    
+    /* Prevent phantom rows at page breaks */
+    .missions-page-print .mission-table tbody tr:last-child {
+        page-break-after: avoid !important;
+    }
+
+    /* Explicit column widths for perfect alignment */
+    .missions-page-print .mission-table thead tr:first-child th:nth-child(1),
+    .missions-page-print .mission-table tbody tr td:nth-child(1) {
+        width: 9% !important; /* التاريخ */
+    }
+
+    .missions-page-print .mission-table thead tr:first-child th:nth-child(2),
+    .missions-page-print .mission-table tbody tr td:nth-child(2) {
+        width: 8% !important; /* رقم البرقية */
+    }
+
+    /* نوع المهمة columns - these span 2 cols in header but show as 2 separate cols in second row */
+    .missions-page-print .mission-table thead tr:last-child th:nth-child(1),
+    .missions-page-print .mission-table tbody tr td:nth-child(3) {
+        width: 11% !important; /* اسعاف - اطفاء */
+    }
+
+    .missions-page-print .mission-table thead tr:last-child th:nth-child(2),
+    .missions-page-print .mission-table tbody tr td:nth-child(4) {
+        width: 11% !important; /* خدمة عامة */
+    }
+
+    .missions-page-print .mission-table thead tr:first-child th:nth-child(4),
+    .missions-page-print .mission-table tbody tr td:nth-child(5) {
+        width: 12% !important; /* المكان */
+    }
+
+    .missions-page-print .mission-table thead tr:first-child th:nth-child(5),
+    .missions-page-print .mission-table tbody tr td:nth-child(6) {
+        width: 16% !important; /* العناصر المنفذة */
+    }
+
+    /* الساعة columns - span 2 in header */
+    .missions-page-print .mission-table thead tr:last-child th:nth-child(3),
+    .missions-page-print .mission-table tbody tr td:nth-child(7) {
+        width: 7% !important; /* الذهاب */
+    }
+
+    .missions-page-print .mission-table thead tr:last-child th:nth-child(4),
+    .missions-page-print .mission-table tbody tr td:nth-child(8) {
+        width: 7% !important; /* الإياب */
+    }
+
+    .missions-page-print .mission-table thead tr:first-child th:nth-child(8),
+    .missions-page-print .mission-table tbody tr td:nth-child(9) {
+        width: 10% !important; /* نوع الآلية */
+    }
+
+    .missions-page-print .mission-table thead tr:first-child th:nth-child(9),
+    .missions-page-print .mission-table tbody tr td:nth-child(10) {
+        width: 9% !important; /* ملاحظات */
+    }
+
+    /* Table cells - ensure consistent styling */
+    .missions-page-print .mission-table th,
+    .missions-page-print .mission-table td {
+        padding: 4px 2px !important;
+        font-size: 10px !important;
+        border: 1px solid #000 !important;
+        text-align: center !important;
+        overflow: hidden !important;
+        word-wrap: break-word !important;
+        vertical-align: middle !important;
+    }
+
+    /* First header row styling */
+    .missions-page-print .mission-table thead tr:first-child th {
+        font-weight: 700 !important;
+        border: 1px solid #000 !important;
+        background-color: #f0f0f0 !important;
+        padding: 6px 2px !important;
+    }
+
+    /* Second header row styling */
+    .missions-page-print .mission-table thead tr:last-child th {
+        font-weight: 600 !important;
+        border: 1px solid #000 !important;
+        background-color: #f8f8f8 !important;
+        padding: 6px 2px !important;
+    }
+
+    /* Hide inputs in print - show only values */
+    .missions-page-print .inline-input,
+    .missions-page-print .date-input-arabic {
+        border: none !important;
+        background: transparent !important;
+        font-size: 11px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .missions-page-print .date-display-overlay {
+        font-size: 11px !important;
+    }
+
+    /* Ensure content doesn't overflow page */
+    .missions-page-print * {
+        box-sizing: border-box !important;
+    }
+
+    /* Prevent orphaned content */
+    .missions-page-print .report-header + table {
+        margin-top: 5mm;
     }
 }
