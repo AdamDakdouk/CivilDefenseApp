@@ -269,7 +269,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay">
             <div className="modal-content modal-large mission-modal" onClick={(e) => e.stopPropagation()}>
                 <h2>{editMode ? 'تعديل المهمة' : 'إضافة مهمة جديدة'}</h2>
 
@@ -471,7 +471,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
 
                 <div className="form-group mission-form-group">
                     <label className='required mission-required'>المكان</label>
-                    <div className="input-wrapper mission-input-wrapper">
+                    <div className="input-wrapper mission-input-wrapper" data-field='location' >
                         <input
                             type="text"
                             value={location}
@@ -481,7 +481,6 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                             }}
                             placeholder="حدد المكان"
                             style={{ borderColor: errors.location ? '#c41e3a' : '#ddd' }}
-                            data-field="location"
                         />
                         {errors.location && <span className="error-icon mission-error-icon">⚠</span>}
                     </div>
@@ -489,7 +488,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
 
                 <div className="form-group mission-form-group">
                     <label className='required mission-required'>نوع الآلية</label>
-                    <div className="radio-group mission-radio-group">
+                    <div className="radio-group mission-radio-group" data-field="vehicleNumber">
                         <label className="radio-label mission-radio-label">
                             <input
                                 type="checkbox"

@@ -444,7 +444,7 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay">
             <div className="modal-content shift-modal" onClick={(e) => e.stopPropagation()}>
                 <h2>{editMode ? 'تعديل المناوبة' : 'إضافة مناوبة جديدة'}</h2>
 
