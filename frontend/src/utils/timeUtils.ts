@@ -215,3 +215,30 @@ export function daysBetween(date1: string, date2: string): number {
   const diffTime = dateObj2.getTime() - dateObj1.getTime();
   return Math.round(diffTime / (1000 * 60 * 60 * 24));
 }
+
+/**
+ * Calculate which team should work on a given date
+ * Reference: Jan 1, 2026 = Team 2, Jan 2 = Team 3, Jan 3 = Team 1, etc.
+ * Pattern cycles every 3 days
+ * @param dateString - Date in YYYY-MM-DD format
+ * @returns Team number ('1', '2', or '3')
+ */
+export function getTeamForDate(dateString: string): '1' | '2' | '3' {
+  // Parse the date string manually to avoid timezone issues
+  const [year, month, day] = dateString.split('-').map(Number);
+  
+  // Use UTC dates to avoid timezone shifts
+  const referenceDate = new Date(Date.UTC(2025, 11, 31)); // Dec 31, 2025 = Team 1
+  const targetDate = new Date(Date.UTC(year, month - 1, day));
+  
+  // Calculate days difference
+  const daysDiff = Math.round((targetDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24));
+  
+  // Teams cycle: Team1 (daysDiff=0), Team2 (daysDiff=1), Team3 (daysDiff=2), Team1 (daysDiff=3), etc.
+  // So: (daysDiff + 1) % 3 gives us 1, 2, 0, 1, 2, 0...
+  // But we want teams indexed as 0='1', 1='2', 2='3'
+  // So: daysDiff % 3 gives us 0, 1, 2, 0, 1, 2...
+  const teamIndex = daysDiff % 3;
+  const teams: ('1' | '2' | '3')[] = ['1', '2', '3'];
+  return teams[teamIndex];
+}

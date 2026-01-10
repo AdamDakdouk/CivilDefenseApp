@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import Settings from '../models/Settings';
 import { authenticateToken } from '../middleware/auth';
+import { getTeamForDate, getCurrentDate } from '../utils/timeUtils';
 
 const router = express.Router();
 
@@ -15,17 +16,26 @@ router.get('/active-month', async (req: Request, res: Response) => {
     // If no settings exist, create with current month
     if (!settings) {
       const now = new Date();
+      const today = getCurrentDate();
+      const todayTeam = getTeamForDate(today);
+      
+      // Calculate yesterday's team to get lastMonthEndTeam
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+      const lastMonthEndTeam = getTeamForDate(yesterdayStr);
+      
       settings = await Settings.create({
         activeMonth: now.getMonth() + 1,
         activeYear: now.getFullYear(),
-        lastMonthEndTeam: '3' // Default
+        lastMonthEndTeam
       });
     }
     
     res.json({
       activeMonth: settings.activeMonth,
       activeYear: settings.activeYear,
-      lastMonthEndTeam: settings.lastMonthEndTeam || '3' // Default to '3' if not set
+      lastMonthEndTeam: settings.lastMonthEndTeam || '3'
     });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching active month', error });

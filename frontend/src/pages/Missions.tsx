@@ -264,7 +264,14 @@ return (
                                     {mission.missionType === 'public-service' ? mission.missionDetails : ''}
                                 </td>
                                 <td>{mission.location}</td>
-                                <td>{mission.participants.map(p => p.user.name).join('، ')}</td>
+                                <td>{mission.participants
+                                    .sort((a, b) => {
+                                        if (a.user.role === 'head') return -1;
+                                        if (b.user.role === 'head') return 1;
+                                        return 0;
+                                    })
+                                    .map(p => p.user.name)
+                                    .join('، ')}</td>
                                 <td>{mission.startTime}</td>
                                 <td>{mission.endTime}</td>
                                 <td>{Array.isArray(mission.vehicleNumbers)

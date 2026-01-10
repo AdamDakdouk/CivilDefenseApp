@@ -3,14 +3,15 @@ import { User } from '../types';
 import { searchUsers, getUsers } from '../services/api';
 import DateTimePicker from './DateTimePicker';
 import { useMonth } from '../contexts/MonthContext';
+import { getTeamForDate } from '../utils/timeUtils';
 import './Modal.css';
 import CustomAlert from './CustomAlert';
 
 interface Participant {
     userId: string;
     name: string;
-    checkIn: string;   // YYYY-MM-DDTHH:mm format
-    checkOut: string;  // YYYY-MM-DDTHH:mm format
+    checkIn: string;   // HH:mm format
+    checkOut: string;  // HH:mm format
 }
 
 interface AddShiftModalProps {
@@ -74,24 +75,9 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
         });
     };
 
-    // Helper: Update participant dates when shift date changes
+    // Helper: Times remain unchanged when shift date changes
     const updateParticipantDates = (newShiftDate: string, currentParticipants: Participant[]) => {
-        return currentParticipants.map(p => {
-            // Extract time from existing check-in/check-out
-            const checkInTime = p.checkIn.split('T')[1] || '08:00';
-            const checkOutTime = p.checkOut.split('T')[1] || '08:00';
-            
-            // Calculate next day for checkout
-            const nextDay = new Date(newShiftDate);
-            nextDay.setDate(nextDay.getDate() + 1);
-            const nextDayStr = `${nextDay.getFullYear()}-${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
-            
-            return {
-                ...p,
-                checkIn: `${newShiftDate}T${checkInTime}`,
-                checkOut: `${nextDayStr}T${checkOutTime}`
-            };
-        });
+        return currentParticipants;
     };
 
     // Helper: Validate datetime change (allow day change, block month/year change)
@@ -181,8 +167,8 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                 u.role === 'head' || u.role === 'administrative staff'
             );
 
-            const adminCheckIn = `${date}T08:00`;
-            const adminCheckOut = `${date}T15:00`;
+            const adminCheckIn = `08:00`;
+            const adminCheckOut = `15:00`;
 
             const newParticipants = headAndAdmin
                 .filter(person => !participants.some(p => p.userId === person._id))
@@ -201,15 +187,13 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
         prevDateRef.current = date;
     }, [date, allUsers, participants]);
 
-    // Auto-calculate team based on date and last month's end team
+    // Auto-calculate team based on date using the global team pattern
     useEffect(() => {
-        if (date && lastMonthEndTeam) {
-            const dayOfMonth = new Date(date).getDate();
-            const monthStartTeam = ((parseInt(lastMonthEndTeam) % 3) + 1); // Team that starts this month
-            const calculatedTeam = (((monthStartTeam + dayOfMonth - 2) % 3) + 1).toString() as '1' | '2' | '3';
+        if (date) {
+            const calculatedTeam = getTeamForDate(date);
             setTeam(calculatedTeam);
         }
-    }, [date, lastMonthEndTeam]);
+    }, [date]);
 
     useEffect(() => {
         if (team && !editMode) {
@@ -235,8 +219,8 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                     return existing;
                 } else {
                     const isAdmin = user.role === 'head' || user.role === 'administrative staff';
-                    const defaultCheckIn = date ? `${date}T08:00` : '';
-                    const defaultCheckOut = date ? (isAdmin ? `${date}T15:00` : `${nextDayStr}T08:00`) : '';
+                    const defaultCheckIn = '08:00';
+                    const defaultCheckOut = isAdmin ? '15:00' : '08:00';
 
                     return {
                         userId: user._id,
@@ -376,25 +360,11 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     };
 
     const updateParticipant = (userId: string, field: 'checkIn' | 'checkOut', value: string) => {
-        // Validate that month/year didn't change inappropriately
-        if (!validateDateTimeChange(value, date)) {
-            // Check if shift is on last day to provide appropriate error message
-            const shiftDateObj = new Date(date);
-            const lastDayOfMonth = new Date(shiftDateObj.getFullYear(), shiftDateObj.getMonth() + 1, 0).getDate();
-            const isLastDayOfMonth = shiftDateObj.getDate() === lastDayOfMonth;
-            
-            if (isLastDayOfMonth) {
-                setAlertMessage('يمكنك تغيير الشهر فقط إلى الشهر الحالي أو الشهر التالي');
-            } else {
-                setAlertMessage('لا يمكن تغيير الشهر أو السنة، يمكنك تغيير اليوم فقط');
-            }
-            setAlertType('warning');
-            setShowAlert(true);
-            return;
-        }
+        // Extract time only (HH:mm format)
+        const timeOnly = value.includes('T') ? value.split('T')[1] : value;
         
         setParticipants(participants.map(p =>
-            p.userId === userId ? { ...p, [field]: value } : p
+            p.userId === userId ? { ...p, [field]: timeOnly } : p
         ));
     };
 
@@ -433,8 +403,8 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                 team,
                 participants: participants.map(p => ({
                     userId: p.userId,
-                    checkIn: p.checkIn,
-                    checkOut: p.checkOut
+                    checkIn: p.checkIn.includes('T') ? p.checkIn.split('T')[1] : p.checkIn,
+                    checkOut: p.checkOut.includes('T') ? p.checkOut.split('T')[1] : p.checkOut
                 })),
                 createdBy: '674c8f9e8e7b4c001234abcd'
             });

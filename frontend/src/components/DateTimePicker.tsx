@@ -2,13 +2,26 @@ import React, { useState, useRef, useEffect } from 'react';
 import './TimePicker.css';
 
 interface DateTimePickerProps {
-  value: string; // Format: "YYYY-MM-DDTHH:MM"
-  onChange: (datetime: string) => void;
+  value: string; // Format: "HH:MM" (time-only) or "YYYY-MM-DDTHH:MM"
+  onChange: (time: string) => void;
   label: string;
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({ value, onChange, label }) => {
-  const [datePart, timePart] = value ? value.split('T') : ['', '08:00'];
+  // Handle both time-only (HH:mm) and datetime (YYYY-MM-DDTHH:mm) formats
+  let datePart = '';
+  let timePart = '08:00';
+  
+  if (value) {
+    if (value.includes('T')) {
+      // Datetime format
+      [datePart, timePart] = value.split('T');
+    } else if (value.includes(':')) {
+      // Time-only format
+      timePart = value;
+    }
+  }
+  
   const [hour, minute] = timePart ? timePart.split(':') : ['08', '00'];
 
   const [showHourDropdown, setShowHourDropdown] = useState(false);
@@ -33,11 +46,12 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({ value, onChange, label 
   }, []);
 
   const handleDateChange = (newDate: string) => {
-    onChange(`${newDate}T${timePart || '08:00'}`);
+    onChange(datePart ? `${newDate}T${timePart || '08:00'}` : timePart || '08:00');
   };
 
   const handleTimeChange = (newHour: string, newMinute: string) => {
-    onChange(`${datePart}T${newHour}:${newMinute}`);
+    const newTime = `${newHour}:${newMinute}`;
+    onChange(datePart ? `${datePart}T${newTime}` : newTime);
   };
 
   const handleHourChange = (newHour: string) => {
@@ -65,12 +79,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({ value, onChange, label 
     <div className="datetime-picker">
       <label>{label}</label>
       <div className="datetime-picker-row">
-        <input 
-          type="date" 
-          value={datePart} 
-          onChange={(e) => handleDateChange(e.target.value)}
-          className="date-input"
-        />
+       
         <div className="time-picker-inputs">
           <div className="custom-time-dropdown" ref={hourDropdownRef}>
             <div 

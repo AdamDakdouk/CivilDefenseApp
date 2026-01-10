@@ -61,28 +61,17 @@ const Shifts: React.FC = () => {
   };
 
   const handleEditShift = (shift: Shift) => {
-    // No formatting needed! Backend already sends data in Civil Defense Clock format
-    // date: "YYYY-MM-DD", checkIn: "HH:mm", checkOut: "HH:mm"
+    // Backend sends data in format: date: "YYYY-MM-DD", checkIn: "HH:mm", checkOut: "HH:mm"
+    // Pass only times to modal - shift.date is shared by all participants
     const formattedShift = {
       ...shift,
       date: shift.date,
-      participants: shift.participants.map(p => {
-        const checkIn = `${shift.date}T${p.checkIn}`;
-
-        // detect next-day checkout
-        const checkOutDate = new Date(shift.date);
-        if (p.checkOut <= p.checkIn) {
-          checkOutDate.setDate(checkOutDate.getDate() + 1);
-        }
-        const checkOutDateStr = checkOutDate.toISOString().split('T')[0];
-
-        return {
-          userId: p.user._id,
-          name: p.user.name,
-          checkIn,
-          checkOut: `${checkOutDateStr}T${p.checkOut}`
-        };
-      })
+      participants: shift.participants.map(p => ({
+        userId: p.user._id,
+        name: p.user.name,
+        checkIn: p.checkIn,
+        checkOut: p.checkOut
+      }))
     };
     setEditingShift(formattedShift);
     setShowModal(true);

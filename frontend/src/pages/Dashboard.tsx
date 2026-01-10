@@ -155,7 +155,9 @@ if (loading) {
             <div className="chart-card full-width">
                 <h3>أداء الفرق</h3>
                 <div className="team-performance-grid">
-                    {stats.teamPerformance.map((team) => (
+                    {[...stats.teamPerformance]
+                        .sort((a, b) => parseInt(a.team) - parseInt(b.team))
+                        .map((team) => (
                         <div key={team.team} className="team-card">
                             <div className="team-name">الفريق {team.team}</div>
                             <div className="team-stats">

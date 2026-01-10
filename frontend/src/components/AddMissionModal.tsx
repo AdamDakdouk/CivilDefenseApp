@@ -5,7 +5,7 @@ import TimePicker from './TimePicker';
 import './Modal.css';
 import { useMonth } from '../contexts/MonthContext';
 import CustomAlert from './CustomAlert';
-import { getCurrentDate } from '../utils/timeUtils';
+import { getCurrentDate, getTeamForDate } from '../utils/timeUtils';
 
 interface Participant {
     userId: string;
@@ -88,15 +88,13 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
         }
     }, [editMode, initialData]);
 
-    // Auto-calculate team based on date and last month's end team
+    // Auto-calculate team based on date using the global team pattern
     useEffect(() => {
-        if (missionDate && lastMonthEndTeam) {
-            const dayOfMonth = new Date(missionDate).getDate();
-            const monthStartTeam = ((parseInt(lastMonthEndTeam) % 3) + 1); // Team that starts this month
-            const calculatedTeam = (((monthStartTeam + dayOfMonth - 2) % 3) + 1).toString() as '1' | '2' | '3';
+        if (missionDate) {
+            const calculatedTeam = getTeamForDate(missionDate);
             setTeam(calculatedTeam);
         }
-    }, [missionDate, lastMonthEndTeam]);
+    }, [missionDate]);
 
     const fetchAllUsers = async () => {
         const users = await getUsers();
