@@ -11,7 +11,7 @@ export interface IShift extends Document {
     hoursServed: number;     // Calculated hours
   }[];
   createdBy: mongoose.Types.ObjectId | null;
-  createdAt: Date;           // Keep for audit purposes only
+  createdAt: Date;           
 }
 
 const ShiftSchema = new Schema<IShift>({

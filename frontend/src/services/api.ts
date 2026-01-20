@@ -7,9 +7,6 @@ const isLocalhost = window.location.hostname === 'localhost' ||
 
 const API_URL = isLocalhost ? 'http://localhost:5000/api' : '/api';
 
-console.log('🌍 Running on:', window.location.hostname);
-console.log('🔗 API URL:', API_URL);
-
 const api = axios.create({
   baseURL: API_URL,
   headers: {

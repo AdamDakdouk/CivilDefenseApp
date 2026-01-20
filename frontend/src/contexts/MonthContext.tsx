@@ -65,7 +65,6 @@ export const MonthProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const data = await fetchActiveMonth();
     
     // ✅ Explicitly update context state to ensure propagation
-    console.log('[MonthContext] refreshActiveMonth - Setting state:', data);
     setActiveMonth(data.activeMonth);
     setActiveYear(data.activeYear);
     setSelectedMonthState(`${data.activeMonth}-${data.activeYear}`);

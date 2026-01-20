@@ -36,8 +36,6 @@ const fetchAvailableMonths = async (forceMonth?: number, forceYear?: number) => 
       getAvailableMissionMonths()
     ]);
 
-    console.log('[Navbar] Fetched months - archived:', archived, 'shifts:', shifts, 'missions:', missions);
-
     const allMonths = [...archived];
 
     // Add months from shifts
@@ -51,13 +49,10 @@ const fetchAvailableMonths = async (forceMonth?: number, forceYear?: number) => 
     const monthToUse = forceMonth ?? activeMonth;
     const yearToUse = forceYear ?? activeYear;
 
-    console.log('[Navbar] Using month:', monthToUse, 'year:', yearToUse);
-
     // ✅ Always add active month if not in list
     if (monthToUse && yearToUse) {
       const hasActiveMonth = allMonths.some((m: any) => m.month === monthToUse && m.year === yearToUse);
       if (!hasActiveMonth) {
-        console.log('[Navbar] Adding active month to list:', monthToUse, yearToUse);
         allMonths.unshift({
           month: monthToUse,
           year: yearToUse,
@@ -72,12 +67,10 @@ const fetchAvailableMonths = async (forceMonth?: number, forceYear?: number) => 
       return b.month - a.month;
     });
 
-    console.log('[Navbar] Final available months:', allMonths);
     setAvailableMonths(allMonths);
 
     // Only reset selectedMonth if it's empty
     if (!selectedMonth && monthToUse && yearToUse) {
-      console.log('[Navbar] selectedMonth is empty, setting to activeMonth:', monthToUse, yearToUse);
       setSelectedMonth(`${monthToUse}-${yearToUse}`);
     }
     
@@ -142,27 +135,19 @@ const handleConfirmClose = async () => {
     setAlertType('info');
     setShowAlert(true);
 
-    console.log('Starting month rollover for:', month, year);
-
     const response = await rolloverMonth(month, year);
-    console.log('Rollover response:', response);
 
     const newMonth = response.newActiveMonth;
     const newYear = response.newActiveYear;
     
-    console.log('New month from rollover response:', newMonth, newYear);
-
     // ✅ Update selected month FIRST
     setSelectedMonth(`${newMonth}-${newYear}`);
-    console.log('Updated selected month to:', newMonth, newYear);
 
     // Refresh context
-    console.log('Calling refreshActiveMonth to sync context...');
     await refreshActiveMonth();
 
     // ✅ Pass the NEW month values directly to fetchAvailableMonths
     setTimeout(async () => {
-      console.log('Fetching available months with new month:', newMonth, newYear);
       await fetchAvailableMonths(newMonth, newYear);
     }, 500);
 

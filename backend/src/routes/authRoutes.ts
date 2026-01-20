@@ -78,7 +78,6 @@ router.post('/login', async (req: Request, res: Response) => {
     // ✅ Ensure settings exist for this admin (for legacy accounts)
     const existingSettings = await Settings.findOne({ adminId: admin._id });
     if (!existingSettings) {
-      console.log('[Auth] Creating settings for legacy admin:', admin._id);
       await Settings.create({
         adminId: admin._id,
         activeMonth: 1,

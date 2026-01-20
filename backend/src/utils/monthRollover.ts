@@ -151,23 +151,6 @@ export const rolloverMonth = async (month: number, year: number, adminId: string
             }
         );
 
-        // ✅ Add verification logging
-        console.log('✅ Settings updated:', {
-            adminId: adminObjectId.toString(),
-            activeMonth: settings?.activeMonth,
-            activeYear: settings?.activeYear,
-            lastMonthEndTeam: settings?.lastMonthEndTeam
-        });
-
-        // ✅ Verify it was actually saved
-        const verify = await Settings.findOne({ adminId: adminObjectId });
-        console.log('✅ Verification read from DB:', {
-            adminId: verify?.adminId?.toString(),
-            activeMonth: verify?.activeMonth,
-            activeYear: verify?.activeYear,
-            lastMonthEndTeam: verify?.lastMonthEndTeam
-        });
-
         return { success: true, usersProcessed: users.length };
     } catch (error) {
         throw error;

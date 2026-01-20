@@ -16,13 +16,10 @@ router.get('/active-month', async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ message: 'Unauthorized' });
     }
     
-    console.log(`[Settings] Fetching active month for admin: ${req.admin.stationName} (${req.admin.adminId})`);
-    
     // ✅ DON'T convert to ObjectId - query with string directly
     let settings = await Settings.findOne({ adminId: req.admin.adminId });
     
     if (!settings) {
-      console.log(`[Settings] No settings found for admin: ${req.admin.adminId}, returning defaults`);
       return res.json({
         activeMonth: 1,
         activeYear: new Date().getFullYear(),
@@ -30,11 +27,6 @@ router.get('/active-month', async (req: AuthRequest, res: Response) => {
       });
     }
 
-    console.log(`[Settings] Fetched active month for ${req.admin.stationName}:`, {
-      activeMonth: settings.activeMonth,
-      activeYear: settings.activeYear,
-      lastMonthEndTeam: settings.lastMonthEndTeam
-    });
     
     res.json({
       activeMonth: settings.activeMonth,
@@ -42,7 +34,6 @@ router.get('/active-month', async (req: AuthRequest, res: Response) => {
       lastMonthEndTeam: settings.lastMonthEndTeam || '3'
     });
   } catch (error) {
-    console.error('[Settings] Error fetching active month:', error);
     res.status(500).json({ message: 'Error fetching active month' });
   }
 });
@@ -56,12 +47,10 @@ router.get('/active-month', async (req: AuthRequest, res: Response) => {
     
     // ✅ Convert to ObjectId for query
     const adminObjectId = new mongoose.Types.ObjectId(req.admin.adminId);
-    console.log(`[Settings] Fetching active month for admin: ${req.admin.stationName} (${req.admin.adminId})`);
     
     let settings = await Settings.findOne({ adminId: adminObjectId });
     
     if (!settings) {
-      console.log(`[Settings] No settings found for admin: ${req.admin.adminId}, returning defaults`);
       return res.json({
         activeMonth: 1,
         activeYear: new Date().getFullYear(),
@@ -69,12 +58,6 @@ router.get('/active-month', async (req: AuthRequest, res: Response) => {
       });
     }
 
-    console.log(`[Settings] Fetched active month for ${req.admin.stationName}:`, {
-      activeMonth: settings.activeMonth,
-      activeYear: settings.activeYear,
-      lastMonthEndTeam: settings.lastMonthEndTeam
-    });
-    
     res.json({
       activeMonth: settings.activeMonth,
       activeYear: settings.activeYear,

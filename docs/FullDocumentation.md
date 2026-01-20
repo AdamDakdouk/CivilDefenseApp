@@ -839,7 +839,6 @@ Traditional date/time handling in JavaScript uses the `Date` object, which autom
 // Server in UTC timezone
 const shiftDate = new Date('2024-10-15T20:00:00.000Z'); // 8 PM UTC
 // Client in Lebanon (UTC+3)
-console.log(shiftDate.toLocaleDateString()); // Shows "10/16/2024" instead of "10/15/2024"
 ```
 
 **Scenario 2: Hour Calculation Errors**

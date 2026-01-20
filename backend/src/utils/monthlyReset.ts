@@ -7,7 +7,6 @@ export const performMonthlyReset = async (): Promise<void> => {
     const lastMonth = now.getMonth() === 0 ? 12 : now.getMonth(); // 1-12
     const lastYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
 
-    console.log(`🔄 Starting monthly reset for ${lastMonth}/${lastYear}`);
 
     // Get all users
     const users = await User.find();
@@ -31,7 +30,6 @@ export const performMonthlyReset = async (): Promise<void> => {
       await user.save();
     }
 
-    console.log(`✅ Monthly reset completed. Archived stats for ${users.length} users`);
   } catch (error) {
     console.error('❌ Error performing monthly reset:', error);
     throw error;
