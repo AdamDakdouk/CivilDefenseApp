@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ISettings extends Document {
+  adminId: mongoose.Types.ObjectId;
   activeMonth: number;
   activeYear: number;
   lastMonthEndTeam: '1' | '2' | '3';
@@ -9,6 +10,12 @@ export interface ISettings extends Document {
 }
 
 const SettingsSchema = new Schema<ISettings>({
+  adminId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Admin',
+    required: true,
+    unique: true
+  },
   activeMonth: {
     type: Number,
     required: true,

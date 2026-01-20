@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IMission extends Document {
+  adminId: mongoose.Types.ObjectId;
   referenceNumber: string;
   vehicleNumbers: string;
   date: string;              // YYYY-MM-DD format (e.g., "2025-11-14")
@@ -21,6 +22,11 @@ export interface IMission extends Document {
 }
 
 const MissionSchema = new Schema<IMission>({
+  adminId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Admin',
+    required: true
+  },
   referenceNumber: {
     type: String,
     required: true,

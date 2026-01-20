@@ -4,6 +4,7 @@ export interface IAdmin extends Document {
   email: string;
   password: string;
   name: string;
+  stationName: string;
   resetCode?: string;
   resetCodeExpiry?: Date;
 }
@@ -23,6 +24,11 @@ const AdminSchema: Schema = new Schema({
   name: {
     type: String,
     required: true
+  },
+  stationName: {
+    type: String,
+    required: true,
+    trim: true
   },
   resetCode: {
     type: String,

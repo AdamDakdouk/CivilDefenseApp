@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import Attendance from '../models/Attendance';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -8,8 +8,11 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Get attendance records for a specific month
-router.get('/month', async (req: Request, res: Response) => {
+router.get('/month', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { month, year } = req.query;
     
     if (!month || !year) {
@@ -22,6 +25,7 @@ router.get('/month', async (req: Request, res: Response) => {
     const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
     const attendance = await Attendance.find({
+      adminId: req.admin.adminId,
       date: {
         $gte: startDate,
         $lte: endDate
@@ -35,8 +39,11 @@ router.get('/month', async (req: Request, res: Response) => {
 });
 
 // Update attendance code
-router.put('/update', async (req: Request, res: Response) => {
+router.put('/update', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { userId, date, code } = req.body;
     
     // Date should come as YYYY-MM-DD string from frontend
@@ -48,7 +55,7 @@ router.put('/update', async (req: Request, res: Response) => {
     }
     
     const attendance = await Attendance.findOneAndUpdate(
-      { userId, date: normalizedDate },
+      { adminId: req.admin.adminId, userId, date: normalizedDate },
       { code },
       { upsert: true, new: true }
     ).populate('userId');

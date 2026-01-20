@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import Mission from '../models/Mission';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -8,8 +8,11 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Get mission type counts for volunteers in a specific month
-router.get('/mission-counts', async (req: Request, res: Response) => {
+router.get('/mission-counts', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { month, year } = req.query;
     
     if (!month || !year) {
@@ -21,8 +24,9 @@ router.get('/mission-counts', async (req: Request, res: Response) => {
     const lastDay = new Date(Number(year), Number(month), 0).getDate();
     const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
-    // Get all missions in the month
+    // Get all missions in the month FOR THIS ADMIN
     const missions = await Mission.find({
+      adminId: req.admin.adminId,
       date: {
         $gte: startDate,
         $lte: endDate

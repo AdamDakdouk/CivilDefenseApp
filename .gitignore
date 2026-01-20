@@ -16,6 +16,9 @@ frontend/.env
 backend/dist/
 frontend/build/
 
+# Backend scripts
+backend/scripts/
+
 # Logs
 *.log
 npm-debug.log*

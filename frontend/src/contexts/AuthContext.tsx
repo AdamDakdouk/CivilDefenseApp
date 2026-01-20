@@ -6,6 +6,7 @@ interface Admin {
   id: string;
   email: string;
   name: string;
+  stationName: string;
 }
 
 interface AuthContextType {
@@ -58,6 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await api.post('/auth/login', { email, password });
       
       sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('adminId', response.data.adminId);
+      sessionStorage.setItem('stationName', response.data.stationName);
       setToken(response.data.token);
       setAdmin(response.data.admin);
       navigate('/dashboard');
@@ -69,6 +72,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('adminId');
+    sessionStorage.removeItem('stationName');
     setToken(null);
     setAdmin(null);
     navigate('/login');

@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import User from '../models/User';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -8,9 +8,12 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Get all users
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
-    const users = await User.find().sort({ name: 1 });
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const users = await User.find({ adminId: req.admin.adminId }).sort({ name: 1 });
     res.json(users);
   } catch (error: any) {
     res.status(500).json({ 
@@ -21,8 +24,11 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Search users by name (for autocomplete)
-router.get('/search', async (req: Request, res: Response) => {
+router.get('/search', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const query = req.query.q as string;
     if (!query) {
       return res.json([]);
@@ -34,6 +40,7 @@ router.get('/search', async (req: Request, res: Response) => {
     
     // Search for names that contain the query string
     const users = await User.find({
+      adminId: req.admin.adminId,
       name: { $regex: escapedQuery, $options: 'i' }
     }).limit(20).sort({ name: 1 });
     
@@ -46,4 +53,4 @@ router.get('/search', async (req: Request, res: Response) => {
   }
 });
 
-export default router;  
+export default router;

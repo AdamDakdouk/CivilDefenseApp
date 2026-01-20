@@ -8,7 +8,7 @@ interface MonthContextType {
   selectedMonth: string;
   setSelectedMonth: (month: string) => void;
   isCurrentMonth: () => boolean;
-  refreshActiveMonth: () => Promise<void>;
+  refreshActiveMonth: () => Promise<{ activeMonth: number; activeYear: number }>;
 }
 
 const MonthContext = createContext<MonthContextType | undefined>(undefined);
@@ -29,7 +29,7 @@ export const MonthProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const fetchActiveMonth = async () => {
 
     if (!isAuthenticated || !token) {
-      return;
+      return { activeMonth: 0, activeYear: 0 };
     }
 
     try {
@@ -37,14 +37,18 @@ export const MonthProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setActiveMonth(data.activeMonth);
       setActiveYear(data.activeYear);
       setSelectedMonthState(`${data.activeMonth}-${data.activeYear}`);
+      return { activeMonth: data.activeMonth, activeYear: data.activeYear };
     } catch (error) {
       // Fallback to current date
       const now = new Date();
-      setActiveMonth(now.getMonth() + 1);
-      setActiveYear(now.getFullYear());
+      const month = now.getMonth() + 1;
+      const year = now.getFullYear();
+      setActiveMonth(month);
+      setActiveYear(year);
       if (!selectedMonth) {
-        setSelectedMonthState(`${now.getMonth() + 1}-${now.getFullYear()}`);
+        setSelectedMonthState(`${month}-${year}`);
       }
+      return { activeMonth: month, activeYear: year };
     }
   };
 
@@ -58,7 +62,15 @@ export const MonthProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const refreshActiveMonth = async () => {
-    await fetchActiveMonth();
+    const data = await fetchActiveMonth();
+    
+    // ✅ Explicitly update context state to ensure propagation
+    console.log('[MonthContext] refreshActiveMonth - Setting state:', data);
+    setActiveMonth(data.activeMonth);
+    setActiveYear(data.activeYear);
+    setSelectedMonthState(`${data.activeMonth}-${data.activeYear}`);
+    
+    return data;
   };
 
   return (

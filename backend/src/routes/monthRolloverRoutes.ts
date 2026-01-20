@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { rolloverMonth } from '../utils/monthRollover';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -8,8 +8,11 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Manually trigger month rollover
-router.post('/rollover', async (req: Request, res: Response) => {
+router.post('/rollover', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { month, year } = req.body;
     
     if (!month || !year) {
@@ -20,7 +23,7 @@ router.post('/rollover', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid month' });
     }
     
-    await rolloverMonth(month, year);
+    await rolloverMonth(month, year, req.admin.adminId);
     
     // Calculate new month and year
     const newMonth = month === 12 ? 1 : month + 1;

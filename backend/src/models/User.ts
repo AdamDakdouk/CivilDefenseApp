@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IUser extends Document {
+  adminId: mongoose.Types.ObjectId;
   name: string;
   middleName: string;
   cardNumber: string;
@@ -15,6 +16,11 @@ export interface IUser extends Document {
 }
 
 const UserSchema = new Schema<IUser>({
+  adminId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Admin',
+    required: true
+  },
   name: {
     type: String,
     required: true,

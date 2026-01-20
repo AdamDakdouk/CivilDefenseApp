@@ -3,10 +3,56 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Admin from '../models/Admin';
+import Settings from '../models/Settings';
 import { sendResetCode } from '../utils/emailService';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
+
+// Register new admin
+router.post('/register', async (req: Request, res: Response) => {
+  try {
+    const { email, password, name, stationName } = req.body;
+
+    if (!email || !password || !name || !stationName) {
+      return res.status(400).json({ message: 'جميع الحقول مطلوبة' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'يجب أن تكون كلمة المرور 6 أحرف على الأقل' });
+    }
+
+    // Check if admin already exists
+    const existingAdmin = await Admin.findOne({ email: email.toLowerCase() });
+    if (existingAdmin) {
+      return res.status(400).json({ message: 'البريد الإلكتروني مسجل بالفعل' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create admin
+    const admin = await Admin.create({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      name,
+      stationName
+    });
+
+    // ✅ Create initial settings for this admin
+    await Settings.create({
+      adminId: admin._id,
+      activeMonth: 1,
+      activeYear: new Date().getFullYear(),
+      lastMonthEndTeam: '1'
+    });
+
+    res.status(201).json({ message: 'تم إنشاء الحساب بنجاح' });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'خطأ في إنشاء الحساب' });
+  }
+});
 
 // Login
 router.post('/login', async (req: Request, res: Response) => {
@@ -29,15 +75,35 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Generate token
-    const token = jwt.sign({ adminId: admin._id }, JWT_SECRET, { expiresIn: '7d' });
+    // ✅ Ensure settings exist for this admin (for legacy accounts)
+    const existingSettings = await Settings.findOne({ adminId: admin._id });
+    if (!existingSettings) {
+      console.log('[Auth] Creating settings for legacy admin:', admin._id);
+      await Settings.create({
+        adminId: admin._id,
+        activeMonth: 1,
+        activeYear: new Date().getFullYear(),
+        lastMonthEndTeam: '1'
+      });
+    }
+
+    // Generate token with stationName
+    const token = jwt.sign({
+      adminId: admin._id,
+      email: admin.email,
+      name: admin.name,
+      stationName: admin.stationName
+    }, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({
       token,
+      adminId: admin._id,
+      stationName: admin.stationName,
       admin: {
         id: admin._id,
         email: admin.email,
-        name: admin.name
+        name: admin.name,
+        stationName: admin.stationName
       }
     });
   } catch (error) {
@@ -55,14 +121,26 @@ router.get('/verify', async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { adminId: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      adminId: string;
+      email: string;
+      name: string;
+      stationName: string;
+    };
     const admin = await Admin.findById(decoded.adminId).select('-password');
 
     if (!admin) {
       return res.status(401).json({ message: 'Admin not found' });
     }
 
-    res.json({ admin });
+    res.json({
+      admin: {
+        id: admin._id,
+        email: admin.email,
+        name: admin.name,
+        stationName: admin.stationName
+      }
+    });
   } catch (error) {
     res.status(403).json({ message: 'Invalid token' });
   }

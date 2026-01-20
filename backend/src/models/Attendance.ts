@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IAttendance extends Document {
+  adminId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   date: String;
   code: 'ح' | 'مأ' | 'غ' | 'ع' | 'م' | 'ب';
@@ -8,6 +9,11 @@ export interface IAttendance extends Document {
 }
 
 const AttendanceSchema = new Schema<IAttendance>({
+  adminId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Admin',
+    required: true
+  },
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',

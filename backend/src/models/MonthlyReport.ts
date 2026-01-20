@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IMonthlyReport extends Document {
+  adminId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   month: number;
   year: number;
@@ -18,6 +19,11 @@ export interface IMonthlyReport extends Document {
 }
 
 const MonthlyReportSchema = new Schema<IMonthlyReport>({
+  adminId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Admin',
+    required: true
+  },
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',

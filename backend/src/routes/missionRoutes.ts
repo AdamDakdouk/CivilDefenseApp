@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Mission from '../models/Mission';
 import Shift from '../models/Shift';
 import User from '../models/User';
 import Settings from '../models/Settings';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { calculateHours, daysBetween, timeToMinutes } from '../utils/timeUtils';
 
 const router = express.Router();
@@ -13,18 +14,22 @@ const suffix = '\\د م ع ر';
 router.use(authenticateToken);
 
 // Get current month missions
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
-    
+
     // Create date strings for filtering
     const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
     const lastDay = new Date(year, month, 0).getDate();
     const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
     const missions = await Mission.find({
+      adminId: req.admin.adminId,
       date: {
         $gte: startDate,
         $lte: endDate
@@ -50,9 +55,10 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Helper function to check if mission overlaps with shift
-const checkShiftOverlap = async (userId: string, missionDate: string, missionStart: string, missionEnd: string) => {
+const checkShiftOverlap = async (userId: string, missionDate: string, missionStart: string, missionEnd: string, adminId: string) => {
   // Find all shifts for this user on this date
   const shifts = await Shift.find({
+    adminId,
     'participants.user': userId,
     date: missionDate
   });
@@ -72,17 +78,17 @@ const checkShiftOverlap = async (userId: string, missionDate: string, missionSta
         const [h, m] = time.split(':').map(Number);
         return h * 60 + m;
       };
-      
+
       const shiftStartMin = toMinutes(shiftStart);
       const shiftEndMin = toMinutes(shiftEnd);
-      
+
       let shiftCheckoutDate = missionDate;
       if (shiftEndMin < shiftStartMin || (shiftEndMin === shiftStartMin && shiftEndMin !== 0)) {
         const checkoutDateObj = new Date(missionDate);
         checkoutDateObj.setDate(checkoutDateObj.getDate() + 1);
         shiftCheckoutDate = checkoutDateObj.toISOString().split('T')[0];
       }
-      
+
       const shiftStartFull = `${missionDate}T${shiftStart}`;
       const shiftEndFull = `${shiftCheckoutDate}T${shiftEnd}`;
 
@@ -110,7 +116,7 @@ const checkTimeOverlap = (start1: string, end1: string, start2: string, end2: st
 
   // Handle midnight crossing for first range
   if (e1 < s1) e1 += 24 * 60;
-  
+
   // Handle midnight crossing for second range
   if (e2 < s2) e2 += 24 * 60;
 
@@ -139,16 +145,16 @@ const checkTimeOverlapWithDates = (start1: string, end1: string, start2: string,
   let e2Min = timeToMinutes(dt2End.time);
 
   // For range 1: if end < start OR (end == start AND endDate > startDate), crosses midnight
-  const range1CrossesMidnight = 
-    e1Min < s1Min || 
+  const range1CrossesMidnight =
+    e1Min < s1Min ||
     (e1Min === s1Min && dt1End.date && dt1Start.date && dt1End.date > dt1Start.date);
   if (range1CrossesMidnight) {
     e1Min += 24 * 60;
   }
 
   // For range 2: if end < start OR (end == start AND endDate > startDate), crosses midnight
-  const range2CrossesMidnight = 
-    e2Min < s2Min || 
+  const range2CrossesMidnight =
+    e2Min < s2Min ||
     (e2Min === s2Min && dt2End.date && dt2Start.date && dt2End.date > dt2Start.date);
   if (range2CrossesMidnight) {
     e2Min += 24 * 60;
@@ -159,8 +165,11 @@ const checkTimeOverlapWithDates = (start1: string, end1: string, start2: string,
 };
 
 // Create new mission
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const {
       referenceNumber,
       vehicleNumbers,
@@ -189,6 +198,7 @@ router.post('/', async (req: Request, res: Response) => {
     }));
 
     const mission = new Mission({
+      adminId: req.admin.adminId,
       referenceNumber: referenceNumber + suffix,
       vehicleNumbers,
       date,
@@ -206,7 +216,7 @@ router.post('/', async (req: Request, res: Response) => {
     await mission.save();
 
     // Only update user stats if this is the ACTIVE month
-    const settings = await Settings.findOne();
+    const settings = await Settings.findOne({ adminId: req.admin.adminId });
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
@@ -230,7 +240,7 @@ router.post('/', async (req: Request, res: Response) => {
         }
 
         // Check if user was on shift during their participation time
-        const hadShift = await checkShiftOverlap(userId, date, participantStart, participantEnd);
+        const hadShift = await checkShiftOverlap(userId, date, participantStart, participantEnd, req.admin.adminId);
 
         // Increment mission count always
         await User.findByIdAndUpdate(userId, {
@@ -257,8 +267,11 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 // Update existing mission
-router.put('/:id', async (req: Request, res: Response) => {
+router.put('/:id', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { id } = req.params;
     const {
       referenceNumber,
@@ -274,13 +287,13 @@ router.put('/:id', async (req: Request, res: Response) => {
       participants
     } = req.body;
 
-    const oldMission = await Mission.findById(id);
+    const oldMission = await Mission.findOne({ _id: id, adminId: req.admin.adminId });
     if (!oldMission) {
       return res.status(404).json({ message: 'Mission not found' });
     }
 
     // Check if old mission was in ACTIVE month
-    const settings = await Settings.findOne();
+    const settings = await Settings.findOne({ adminId: req.admin.adminId });
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
@@ -311,7 +324,7 @@ router.put('/:id', async (req: Request, res: Response) => {
           $inc: { currentMonthMissions: -1 }
         });
 
-        const hadShift = await checkShiftOverlap(userId, oldMission.date, oldParticipantStart, oldParticipantEnd);
+        const hadShift = await checkShiftOverlap(userId, oldMission.date, oldParticipantStart, oldParticipantEnd, req.admin.adminId);
 
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
@@ -367,7 +380,7 @@ router.put('/:id', async (req: Request, res: Response) => {
           $inc: { currentMonthMissions: 1 }
         });
 
-        const hadShift = await checkShiftOverlap(userId, date, participantStart, participantEnd);
+        const hadShift = await checkShiftOverlap(userId, date, participantStart, participantEnd, req.admin.adminId);
 
         if (!hadShift) {
           await User.findByIdAndUpdate(userId, {
@@ -388,11 +401,14 @@ router.put('/:id', async (req: Request, res: Response) => {
 });
 
 // Delete mission
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { id } = req.params;
 
-    const mission = await Mission.findById(id);
+    const mission = await Mission.findOne({ _id: id, adminId: req.admin.adminId });
     if (!mission) {
       return res.status(404).json({ message: 'Mission not found' });
     }
@@ -401,7 +417,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const missionHours = calculateHours(mission.startTime, mission.endTime);
 
     // Only update user stats if this is the ACTIVE month
-    const settings = await Settings.findOne();
+    const settings = await Settings.findOne({ adminId: req.admin.adminId });
     const activeMonth = settings?.activeMonth || new Date().getMonth() + 1;
     const activeYear = settings?.activeYear || new Date().getFullYear();
 
@@ -430,7 +446,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         });
 
         // Check if user was on shift during their participation time
-        const hadShift = await checkShiftOverlap(userId, mission.date, participantStart, participantEnd);
+        const hadShift = await checkShiftOverlap(userId, mission.date, participantStart, participantEnd, req.admin.adminId);
 
         // Remove hours only if they were NOT on shift
         if (!hadShift) {
@@ -450,8 +466,11 @@ router.delete('/:id', async (req: Request, res: Response) => {
 });
 
 // Get missions for specific month/year
-router.get('/by-month', async (req: Request, res: Response) => {
+router.get('/by-month', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
     const { month, year } = req.query;
 
     if (!month || !year) {
@@ -464,6 +483,7 @@ router.get('/by-month', async (req: Request, res: Response) => {
     const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
     const missions = await Mission.find({
+      adminId: req.admin.adminId,
       date: {
         $gte: startDate,
         $lte: endDate
@@ -480,12 +500,20 @@ router.get('/by-month', async (req: Request, res: Response) => {
 });
 
 // Get available months that have missions
-router.get('/available-months', async (req: Request, res: Response) => {
+router.get('/available-months', async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    // ✅ Convert to ObjectId for aggregate query
+    const adminObjectId = new mongoose.Types.ObjectId(req.admin.adminId);
+    
     const months = await Mission.aggregate([
+      { $match: { adminId: adminObjectId } }, // ✅ Use ObjectId
       {
         $addFields: {
-          yearMonth: { $substr: ['$date', 0, 7] } // Extract YYYY-MM
+          yearMonth: { $substr: ['$date', 0, 7] }
         }
       },
       {
@@ -509,6 +537,7 @@ router.get('/available-months', async (req: Request, res: Response) => {
 
     res.json(formattedMonths);
   } catch (error) {
+    console.error('[Missions] Error fetching available months:', error);
     res.status(500).json({ message: 'Error fetching available months', error });
   }
 });

@@ -9,9 +9,7 @@
     "start": "node dist/server.js",
     "create-admin": "ts-node src/scripts/createAdmin.ts",
     "clean": "ts-node -e \"import { clearDatabase } from './src/utils/clearDatabase'; clearDatabase();\"",
-    "clean:full": "ts-node -e \"import { clearDatabaseComplete } from './src/utils/clearDatabase'; clearDatabaseComplete();\"",
-    "seed": "ts-node src/scripts/seedUsers.ts",
-    "update-admin-email": "ts-node src/scripts/updateAdminEmail.ts"
+    "clean:full": "ts-node -e \"import { clearDatabaseComplete } from './src/utils/clearDatabase'; clearDatabaseComplete();\""
   },
   "keywords": [],
   "author": "",

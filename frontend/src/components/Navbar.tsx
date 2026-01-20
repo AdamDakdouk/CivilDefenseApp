@@ -19,62 +19,84 @@ const Navbar: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmData, setConfirmData] = useState({ month: 0, year: 0, monthName: '' });
   const [isClosingMonth, setIsClosingMonth] = useState(false); // Loading state for month close
+  const [isRollingOver, setIsRollingOver] = useState(false); // ✅ Flag to prevent reset during rollover
 
-  useEffect(() => {
+useEffect(() => {
+  if (activeMonth && activeYear) {
     fetchAvailableMonths();
-  }, [activeMonth, activeYear])
+  }
+}, [activeMonth, activeYear]); 
 
-  const fetchAvailableMonths = async () => {
-    try {
-      // Fetch from all sources using authenticated API client
-      const [archived, shifts, missions] = await Promise.all([
-        getAvailableMonths(),
-        getAvailableShiftMonths(),
-        getAvailableMissionMonths()
-      ]);
+// ✅ Add optional parameters to use fresh values
+const fetchAvailableMonths = async (forceMonth?: number, forceYear?: number) => {
+  try {
+    const [archived, shifts, missions] = await Promise.all([
+      getAvailableMonths(),
+      getAvailableShiftMonths(),
+      getAvailableMissionMonths()
+    ]);
 
-      const allMonths = [...archived];
+    console.log('[Navbar] Fetched months - archived:', archived, 'shifts:', shifts, 'missions:', missions);
 
-      [...shifts, ...missions].forEach((m: any) => {
-        if (!allMonths.find((am: any) => am.month === m.month && am.year === m.year)) {
-          allMonths.push(m);
-        }
-      });
+    const allMonths = [...archived];
 
-      // Always add active month if not in list (so there's at least one option)
-      if (activeMonth && activeYear) {
-        const hasActiveMonth = allMonths.some((m: any) => m.month === activeMonth && m.year === activeYear);
-        if (!hasActiveMonth) {
-          allMonths.unshift({
-            month: activeMonth,
-            year: activeYear,
-            label: `${activeMonth}/${activeYear}`
-          });
-        }
+    // Add months from shifts
+    [...shifts, ...missions].forEach((m: any) => {
+      if (!allMonths.find((am: any) => am.month === m.month && am.year === m.year)) {
+        allMonths.push(m);
       }
+    });
 
-      // If still empty, add current month as fallback
-      allMonths.sort((a: any, b: any) => {
-        if (a.year !== b.year) return b.year - a.year;
-        return b.month - a.month;
-      });
+    // ✅ Use forced values if provided, otherwise use context
+    const monthToUse = forceMonth ?? activeMonth;
+    const yearToUse = forceYear ?? activeYear;
 
-      setAvailableMonths(allMonths);
+    console.log('[Navbar] Using month:', monthToUse, 'year:', yearToUse);
 
-      const selectedExists = allMonths.some((m: any) => `${m.month}-${m.year}` === selectedMonth);
-      if (!selectedExists && activeMonth && activeYear) {
-        setSelectedMonth(`${activeMonth}-${activeYear}`);
+    // ✅ Always add active month if not in list
+    if (monthToUse && yearToUse) {
+      const hasActiveMonth = allMonths.some((m: any) => m.month === monthToUse && m.year === yearToUse);
+      if (!hasActiveMonth) {
+        console.log('[Navbar] Adding active month to list:', monthToUse, yearToUse);
+        allMonths.unshift({
+          month: monthToUse,
+          year: yearToUse,
+          label: `${monthToUse}/${yearToUse}`
+        });
       }
-    } catch (error) {
-      // Fallback: add current month
-      const now = new Date();
+    }
+
+    // Sort by year desc, then month desc
+    allMonths.sort((a: any, b: any) => {
+      if (a.year !== b.year) return b.year - a.year;
+      return b.month - a.month;
+    });
+
+    console.log('[Navbar] Final available months:', allMonths);
+    setAvailableMonths(allMonths);
+
+    // Only reset selectedMonth if it's empty
+    if (!selectedMonth && monthToUse && yearToUse) {
+      console.log('[Navbar] selectedMonth is empty, setting to activeMonth:', monthToUse, yearToUse);
+      setSelectedMonth(`${monthToUse}-${yearToUse}`);
+    }
+    
+  } catch (error) {
+    console.error('[Navbar] Error fetching available months:', error);
+    
+    // Fallback: at minimum show the active month
+    const monthToUse = forceMonth ?? activeYear;
+    const yearToUse = forceYear ?? activeYear;
+    
+    if (monthToUse && yearToUse) {
       setAvailableMonths([{
-        month: now.getMonth() + 1,
-        year: now.getFullYear(),
-        label: `${now.getMonth() + 1}/${now.getFullYear()}`
+        month: monthToUse,
+        year: yearToUse,
+        label: `${monthToUse}/${yearToUse}`
       }]);
     }
-  };
+  }
+};
 
   useEffect(() => {
     const handleScroll = () => {
@@ -106,46 +128,68 @@ const Navbar: React.FC = () => {
     setShowConfirm(true);
   };
 
-  const handleConfirmClose = async () => {
-    if (isClosingMonth) return; // Prevent double-click
+const handleConfirmClose = async () => {
+  if (isClosingMonth) return;
+  
+  setIsClosingMonth(true);
+  setIsRollingOver(true);
+  setShowConfirm(false);
+
+  const { month, year } = confirmData;
+
+  try {
+    setAlertMessage('جاري إغلاق الشهر... الرجاء الانتظار');
+    setAlertType('info');
+    setShowAlert(true);
+
+    console.log('Starting month rollover for:', month, year);
+
+    const response = await rolloverMonth(month, year);
+    console.log('Rollover response:', response);
+
+    const newMonth = response.newActiveMonth;
+    const newYear = response.newActiveYear;
     
-    setIsClosingMonth(true);
-    setShowConfirm(false);
+    console.log('New month from rollover response:', newMonth, newYear);
 
-    const { month, year } = confirmData;
+    // ✅ Update selected month FIRST
+    setSelectedMonth(`${newMonth}-${newYear}`);
+    console.log('Updated selected month to:', newMonth, newYear);
 
-    try {
-      // Show processing message immediately
-      setAlertMessage('جاري إغلاق الشهر... الرجاء الانتظار');
-      setAlertType('info');
-      setShowAlert(true);
+    // Refresh context
+    console.log('Calling refreshActiveMonth to sync context...');
+    await refreshActiveMonth();
 
-      // Wait for rollover to complete
-      await rolloverMonth(month, year);
+    // ✅ Pass the NEW month values directly to fetchAvailableMonths
+    setTimeout(async () => {
+      console.log('Fetching available months with new month:', newMonth, newYear);
+      await fetchAvailableMonths(newMonth, newYear);
+    }, 500);
 
-      // Update to success message
-      setAlertMessage('تم إغلاق الشهر بنجاح! جاري التحديث...');
-      setAlertType('success');
-      setShowAlert(true);
+    setAlertMessage('تم إغلاق الشهر بنجاح!');
+    setAlertType('success');
+    setShowAlert(true);
 
-      // Reload page after a short delay to show success message
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    } catch (error) {
-      setIsClosingMonth(false); // Re-enable on error
-      setAlertMessage('حدث خطأ أثناء إغلاق الشهر');
-      setAlertType('error');
-      setShowAlert(true);
-    }
-  };
+    setTimeout(() => {
+      setIsClosingMonth(false);
+      setIsRollingOver(false);
+    }, 1500);
+  } catch (error: any) {
+    console.error('Error closing month:', error);
+    setIsClosingMonth(false);
+    setIsRollingOver(false);
+    setAlertMessage('حدث خطأ أثناء إغلاق الشهر: ' + (error?.message || 'Unknown error'));
+    setAlertType('error');
+    setShowAlert(true);
+  }
+};
 
   return (
     <nav className={`navbar ${isVisible ? 'visible' : 'hidden'}`}>
       <div className="nav-container">
         <div className="nav-brand">
           <img src="/logo.png" alt="Lebanese Civil Defense" className="nav-logo" />
-          <h1 className="nav-title">الدفاع المدني - عمليات عرمون</h1>
+          <h1 className="nav-title">الدفاع المدني - عمليات {admin?.stationName} </h1>
         </div>
 
         <div className="nav-links">

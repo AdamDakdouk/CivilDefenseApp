@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IShift extends Document {
+  adminId: mongoose.Types.ObjectId;
   date: string;              // YYYY-MM-DD format (e.g., "2025-11-14")
   team: '1' | '2' | '3';
   participants: {
@@ -14,6 +15,11 @@ export interface IShift extends Document {
 }
 
 const ShiftSchema = new Schema<IShift>({
+  adminId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Admin',
+    required: true
+  },
   date: {
     type: String,
     required: true,

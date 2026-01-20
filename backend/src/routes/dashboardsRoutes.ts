@@ -3,7 +3,7 @@ import Mission from '../models/Mission';
 import Shift from '../models/Shift';
 import User from '../models/User';
 import MonthlyReport from '../models/MonthlyReport';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { calculateHours } from '../utils/timeUtils';
 
 const router = express.Router();
@@ -11,8 +11,11 @@ const router = express.Router();
 // Apply authentication to all routes
 router.use(authenticateToken);
 
-router.get('/stats', async (req: Request, res: Response) => {
+router.get('/stats', async (req: AuthRequest, res: Response) => {
     try {
+        if (!req.admin) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
         const { month, year } = req.query;
 
         if (!month || !year) {
@@ -24,16 +27,18 @@ router.get('/stats', async (req: Request, res: Response) => {
         const lastDay = new Date(Number(year), Number(month), 0).getDate();
         const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
-        // Get all missions for the month
+        // Get all missions for the month FOR THIS ADMIN
         const missions = await Mission.find({
+            adminId: req.admin.adminId,
             date: {
                 $gte: startDate,
                 $lte: endDate
             }
         }).populate('participants.user');
 
-        // Get all shifts for the month (not used for now, but keep for future)
+        // Get all shifts for the month FOR THIS ADMIN (not used for now, but keep for future)
         const shifts = await Shift.find({
+            adminId: req.admin.adminId,
             date: {
                 $gte: startDate,
                 $lte: endDate

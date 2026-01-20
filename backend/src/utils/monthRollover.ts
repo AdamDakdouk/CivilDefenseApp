@@ -5,18 +5,21 @@ import mongoose from 'mongoose';
 import Attendance from '../models/Attendance';
 import Settings from '../models/Settings';
 
-export const rolloverMonth = async (month: number, year: number) => {
+export const rolloverMonth = async (month: number, year: number, adminId: string) => {
     try {
+        // Convert string adminId to ObjectId
+        const adminObjectId = new mongoose.Types.ObjectId(adminId);
 
-        // Get all users
-        const users = await User.find();
+        // Get all users FOR THIS ADMIN
+        const users = await User.find({ adminId: adminObjectId });
 
-        // Get missions for this month using string dates
+        // Get missions for this month FOR THIS ADMIN using string dates
         const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
         const lastDay = new Date(year, month, 0).getDate();
         const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
         const missions = await Mission.find({
+            adminId: adminObjectId,
             date: {
                 $gte: startDate,
                 $lte: endDate
@@ -80,6 +83,7 @@ export const rolloverMonth = async (month: number, year: number) => {
 
             // Check if report already exists
             const existingReport = await MonthlyReport.findOne({
+                adminId: adminObjectId,
                 userId: user._id,
                 month,
                 year
@@ -87,6 +91,7 @@ export const rolloverMonth = async (month: number, year: number) => {
 
             if (!existingReport) {
                 await MonthlyReport.create({
+                    adminId: adminObjectId,
                     userId: user._id,
                     month,
                     year,
@@ -99,9 +104,9 @@ export const rolloverMonth = async (month: number, year: number) => {
             }
         }
 
-        // Reset current month fields for all users
+        // Reset current month fields for users of THIS ADMIN
         const resetResult = await User.updateMany(
-            {},
+            { adminId: adminObjectId },
             {
                 $set: {
                     currentMonthHours: 0,
@@ -116,9 +121,10 @@ export const rolloverMonth = async (month: number, year: number) => {
         const nextYear = month === 12 ? year + 1 : year;
 
 
-        // Find the last shift of the closing month to determine rotation
+        // Find the last shift of the closing month to determine rotation FOR THIS ADMIN
         const Shift = mongoose.model('Shift');
         const lastShift = await Shift.findOne({
+            adminId: adminObjectId,
             date: {
                 $gte: startDate,
                 $lte: endDate
@@ -131,7 +137,7 @@ export const rolloverMonth = async (month: number, year: number) => {
         } 
 
         const settings = await Settings.findOneAndUpdate(
-            {},
+            { adminId: adminObjectId },
             {
                 activeMonth: nextMonth,
                 activeYear: nextYear,
@@ -140,9 +146,27 @@ export const rolloverMonth = async (month: number, year: number) => {
             {
                 upsert: true,
                 new: true,
-                runValidators: true
+                runValidators: true,
+                setDefaultsOnInsert: true
             }
         );
+
+        // ✅ Add verification logging
+        console.log('✅ Settings updated:', {
+            adminId: adminObjectId.toString(),
+            activeMonth: settings?.activeMonth,
+            activeYear: settings?.activeYear,
+            lastMonthEndTeam: settings?.lastMonthEndTeam
+        });
+
+        // ✅ Verify it was actually saved
+        const verify = await Settings.findOne({ adminId: adminObjectId });
+        console.log('✅ Verification read from DB:', {
+            adminId: verify?.adminId?.toString(),
+            activeMonth: verify?.activeMonth,
+            activeYear: verify?.activeYear,
+            lastMonthEndTeam: verify?.lastMonthEndTeam
+        });
 
         return { success: true, usersProcessed: users.length };
     } catch (error) {
