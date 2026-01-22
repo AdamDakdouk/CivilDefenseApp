@@ -7,9 +7,6 @@ const mailerSend = new MailerSend({
 
 export const sendResetCode = async (email: string, code: string): Promise<boolean> => {
   try {
-    console.log('📧 Attempting to send email to:', email);
-    console.log('🔑 Using MailerSend API Key:', process.env.MAILERSEND_API_KEY ? 'Configured' : 'MISSING');
-
     if (!process.env.MAILERSEND_API_KEY) {
       console.error('❌ MAILERSEND_API_KEY is not configured');
       return false;
@@ -29,7 +26,7 @@ export const sendResetCode = async (email: string, code: string): Promise<boolea
   <style>
     body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
     .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; }
-    .logo { display: block; margin: 10px auto 15px; width: 90px; height: 90px; }
+    .logo { display: block; margin: 10px auto 15px; width: 77px; height: 83px; }
     h2 { text-align: center; color: #333; margin: 0 0 20px; font-size: 22px; }
     p { color: #666; line-height: 1.6; margin: 10px 0; text-align: right; }
     .code-box { background: #f0f0f0; padding: 20px; text-align: center; margin: 20px 0; border-radius: 5px; }
