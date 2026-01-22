@@ -26,48 +26,56 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
-      <div className="login-box">
-        <div className="login-header">
-          <img src="/logo.png" alt="الدفاع المدني اللبناني" />
-          <h1>الدفاع المدني اللبناني</h1>
-          <h2>تسجيل الدخول</h2>
+      <div className="login-content-wrapper">
+        <div className="login-box">
+          <div className="login-header">
+            <img src="/logo.png" alt="الدفاع المدني اللبناني" />
+            <h1>الدفاع المدني اللبناني</h1>
+            <h2>تسجيل الدخول</h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className="login-form">
+            {error && <div className="error-message">{error}</div>}
+
+            <div className="form-group">
+              <label>البريد الإلكتروني</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                placeholder="أدخل البريد الإلكتروني"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>كلمة المرور</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                placeholder="أدخل كلمة المرور"
+              />
+            </div>
+
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+            </button>
+
+            <div className="login-footer">
+              <Link to="/forgot-password">نسيت كلمة المرور؟</Link>
+            </div>
+          </form>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          {error && <div className="error-message">{error}</div>}
-
-          <div className="form-group">
-            <label>البريد الإلكتروني</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              placeholder="أدخل البريد الإلكتروني"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>كلمة المرور</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              placeholder="أدخل كلمة المرور"
-            />
-          </div>
-
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
-          </button>
-
-          <div className="login-footer">
-            <Link to="/forgot-password">نسيت كلمة المرور؟</Link>
-          </div>
-        </form>
+        <div className="login-page-footer">
+          <p>مبادرة تطوير نظام إداري لمراكز الدفاع المدني</p>
+          <span className="station-name">مركز عرمون</span>
+          {/* <p className="copyright">© 2026 جميع الحقوق محفوظة</p> */}
+        </div>
       </div>
     </div>
   );

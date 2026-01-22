@@ -35,6 +35,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Serve public assets
+app.use('/public', express.static(path.join(__dirname, '../public')));
+
 // API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/shifts', shiftRoutes);

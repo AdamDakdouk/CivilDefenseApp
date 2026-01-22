@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import Admin from '../models/Admin';
 import Settings from '../models/Settings';
-import { sendResetCode } from '../utils/emailService';
+import { sendResetCode } from '../utils/mailersendService';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { replace, useNavigate } from 'react-router-dom';
 import api from '../services/api'; // Add this import
 
 interface Admin {
@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessionStorage.setItem('stationName', response.data.stationName);
       setToken(response.data.token);
       setAdmin(response.data.admin);
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true } );
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Login failed';
       throw new Error(errorMessage);
@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sessionStorage.removeItem('stationName');
     setToken(null);
     setAdmin(null);
-    navigate('/login');
+    navigate('/login', { replace: true   });
   };
 
   return (
