@@ -1,5 +1,5 @@
 .navbar {
-  background-color: #c41e1e;
+  background: linear-gradient(135deg, #e52044  0%, #5e0815 100%);
   color: #fff;
   padding: 13px 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -18,28 +18,28 @@
 }
 
 .nav-container {
-  max-width: 1190px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 17px;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
-  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
   gap: 13px;
+  flex-shrink: 0;
 }
 
 .nav-logo {
-  height: 60px;
-  width: 60px;
+  height: 50px;
+  width: 50px;
   padding: 1.3px;
   background-color: white;
-  padding: 2px 3px 3px 2px;
+  padding: 2px 2px 2px 2px;
   border-radius: 50%;
   object-fit: contain;
 }
@@ -47,12 +47,16 @@
 .nav-title {
   font-size: 20px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
+/* Middle: Page Links */
 .nav-links {
   display: flex;
   gap: 25px;
-  flex-wrap: wrap;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
 }
 
 .nav-links a {
@@ -60,36 +64,20 @@
   text-decoration: none;
   font-size: 15px;
   transition: opacity 0.2s;
+  white-space: nowrap;
 }
 
 .nav-links a:hover {
   opacity: 0.8;
 }
 
-.close-month-btn {
-  background-color: #a50000;
-  color: white;
-  padding: 7px 14px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
-  margin-left: 17px;
-  transition: background-color 0.3s;
-  white-space: nowrap;
-}
-
-.close-month-btn:hover {
-  background-color: #a01830;
-}
-
+/* ✅ Right: Controls (Month Selector + Buttons) */
 .navbar-controls {
   display: flex;
   align-items: center;
-  gap: 13px;
-  margin-left: 17px;
-  flex-wrap: wrap;
+  gap: 12px;
+  direction: rtl;
+  flex-shrink: 0;
 }
 
 .month-selector-navbar {
@@ -105,212 +93,102 @@
 }
 
 .month-selector-navbar select {
-  padding: 4px 7px;
+  padding: 7px 10px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
-  min-width: 102px;
+  min-width: 110px;
   direction: rtl;
   background-color: white;
+  transition: all 0.2s ease;
 }
 
-.admin-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-left: 20px;
+.month-selector-navbar select:hover {
+  border-color: #ccc;
 }
 
-.admin-info span {
-  color: white;
-  font-weight: bold;
-}
-
-.logout-btn {
-  background: #c41e3a;
+.close-month-btn {
+  background: #940d21;
   color: white;
   padding: 8px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-month-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5e0815 0%, #e52044 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.close-month-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-month-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.logout-btn {
+  background: #940d21;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 34px;
+  margin-right: 20px;
+}
+
+.logout-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: white;
 }
 
 .logout-btn:hover {
-  background: #a01629;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #e52044 0%, #5e0815 100%);
 }
 
-/* Mobile Responsive Styles */
+.logout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile responsive */
 @media (max-width: 768px) {
-  .navbar {
-    padding: 10px 0;
-  }
-
-  .nav-container {
-    padding: 0 12px;
-    gap: 10px;
-  }
-
-  .nav-logo {
-    height: 36px;
-    width: 36px;
-  }
-
-  .nav-title {
-    font-size: 16px;
-  }
-
-  .nav-links {
-    gap: 15px;
-    font-size: 14px;
-  }
-
-  .nav-links a {
-    font-size: 13px;
-  }
-
-  .navbar-controls {
-    margin-left: 0;
-    gap: 8px;
-    width: 100%;
-    justify-content: flex-start;
-    margin-top: 8px;
-  }
-
-  .month-selector-navbar {
-    gap: 5px;
-  }
-
-  .month-selector-navbar label {
-    font-size: 12px;
-  }
-
-  .month-selector-navbar select {
-    padding: 4px 6px;
-    font-size: 12px;
-    min-width: 90px;
-  }
-
-  .close-month-btn {
-    padding: 6px 10px;
-    font-size: 11px;
-    margin-left: 0;
-  }
-
-  .admin-info {
-    margin-left: 0;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .admin-info span {
-    font-size: 13px;
-  }
-
   .logout-btn {
-    padding: 6px 12px;
-    font-size: 13px;
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+  }
+
+  .logout-btn svg {
+    width: 16px;
+    height: 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .navbar {
-    padding: 8px 0;
-  }
-
-  .nav-container {
-    padding: 0 10px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .nav-brand {
-    gap: 10px;
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .nav-logo {
-    height: 32px;
-    width: 32px;
-  }
-
-  .nav-title {
-    font-size: 15px;
-  }
-
-  .nav-links {
-    width: 100%;
-    gap: 10px;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .nav-links a {
-    font-size: 12px;
-    padding: 4px 0;
-  }
-
-  .navbar-controls {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    margin-top: 5px;
-  }
-
-  .month-selector-navbar {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .month-selector-navbar select {
-    flex: 1;
-    max-width: 150px;
-  }
-
-  .close-month-btn {
-    width: 100%;
-    padding: 8px 12px;
-    margin-left: 0;
-  }
-
-  .admin-info {
-    width: 100%;
-    justify-content: space-between;
-    margin-left: 0;
-    padding-top: 5px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .admin-info span {
-    font-size: 12px;
-  }
-
   .logout-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 360px) {
-  .nav-title {
-    font-size: 14px;
-  }
-
-  .nav-links a {
-    font-size: 11px;
-  }
-
-  .month-selector-navbar label {
-    font-size: 11px;
-  }
-
-  .month-selector-navbar select {
-    font-size: 11px;
-    min-width: 80px;
+    width: 34px;
+    height: 34px;
   }
 }

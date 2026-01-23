@@ -15,7 +15,7 @@ export const sendResetCode = async (email: string, code: string): Promise<boolea
     // ✅ Use your hosted logo URL
     const logoUrl = process.env.BACKEND_URL 
       ? `${process.env.BACKEND_URL}/public/logo.png`
-      : 'https://civil-defense-app.onrender/public/logo.png';
+      : 'https://civil-defense-app.onrender.com/public/logo.png';
 
     // ✅ Gmail-compatible HTML with hosted logo
     const htmlContent = `<!DOCTYPE html>
@@ -26,7 +26,7 @@ export const sendResetCode = async (email: string, code: string): Promise<boolea
   <style>
     body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
     .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; }
-    .logo { display: block; margin: 10px auto 15px; width: 77px; height: 83px; }
+    .logo { display: block; margin: 10px auto 15px; width: 72px; height: 80px; }
     h2 { text-align: center; color: #333; margin: 0 0 20px; font-size: 22px; }
     p { color: #666; line-height: 1.6; margin: 10px 0; text-align: right; }
     .code-box { background: #f0f0f0; padding: 20px; text-align: center; margin: 20px 0; border-radius: 5px; }

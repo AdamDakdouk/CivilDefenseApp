@@ -19,77 +19,78 @@ const Navbar: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmData, setConfirmData] = useState({ month: 0, year: 0, monthName: '' });
   const [isClosingMonth, setIsClosingMonth] = useState(false); // Loading state for month close
-  const [isRollingOver, setIsRollingOver] = useState(false); // ✅ Flag to prevent reset during rollover
+  const [isRollingOver, setIsRollingOver] = useState(false); // Flag to prevent reset during rollover
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-useEffect(() => {
-  if (activeMonth && activeYear) {
-    fetchAvailableMonths();
-  }
-}, [activeMonth, activeYear]); 
+  useEffect(() => {
+    if (activeMonth && activeYear) {
+      fetchAvailableMonths();
+    }
+  }, [activeMonth, activeYear]);
 
-// ✅ Add optional parameters to use fresh values
-const fetchAvailableMonths = async (forceMonth?: number, forceYear?: number) => {
-  try {
-    const [archived, shifts, missions] = await Promise.all([
-      getAvailableMonths(),
-      getAvailableShiftMonths(),
-      getAvailableMissionMonths()
-    ]);
+  // Add optional parameters to use fresh values
+  const fetchAvailableMonths = async (forceMonth?: number, forceYear?: number) => {
+    try {
+      const [archived, shifts, missions] = await Promise.all([
+        getAvailableMonths(),
+        getAvailableShiftMonths(),
+        getAvailableMissionMonths()
+      ]);
 
-    const allMonths = [...archived];
+      const allMonths = [...archived];
 
-    // Add months from shifts
-    [...shifts, ...missions].forEach((m: any) => {
-      if (!allMonths.find((am: any) => am.month === m.month && am.year === m.year)) {
-        allMonths.push(m);
+      // Add months from shifts
+      [...shifts, ...missions].forEach((m: any) => {
+        if (!allMonths.find((am: any) => am.month === m.month && am.year === m.year)) {
+          allMonths.push(m);
+        }
+      });
+
+      // ✅ Use forced values if provided, otherwise use context
+      const monthToUse = forceMonth ?? activeMonth;
+      const yearToUse = forceYear ?? activeYear;
+
+      // ✅ Always add active month if not in list
+      if (monthToUse && yearToUse) {
+        const hasActiveMonth = allMonths.some((m: any) => m.month === monthToUse && m.year === yearToUse);
+        if (!hasActiveMonth) {
+          allMonths.unshift({
+            month: monthToUse,
+            year: yearToUse,
+            label: `${monthToUse}/${yearToUse}`
+          });
+        }
       }
-    });
 
-    // ✅ Use forced values if provided, otherwise use context
-    const monthToUse = forceMonth ?? activeMonth;
-    const yearToUse = forceYear ?? activeYear;
+      // Sort by year desc, then month desc
+      allMonths.sort((a: any, b: any) => {
+        if (a.year !== b.year) return b.year - a.year;
+        return b.month - a.month;
+      });
 
-    // ✅ Always add active month if not in list
-    if (monthToUse && yearToUse) {
-      const hasActiveMonth = allMonths.some((m: any) => m.month === monthToUse && m.year === yearToUse);
-      if (!hasActiveMonth) {
-        allMonths.unshift({
+      setAvailableMonths(allMonths);
+
+      // Only reset selectedMonth if it's empty
+      if (!selectedMonth && monthToUse && yearToUse) {
+        setSelectedMonth(`${monthToUse}-${yearToUse}`);
+      }
+
+    } catch (error) {
+      console.error('[Navbar] Error fetching available months:', error);
+
+      // Fallback: at minimum show the active month
+      const monthToUse = forceMonth ?? activeYear;
+      const yearToUse = forceYear ?? activeYear;
+
+      if (monthToUse && yearToUse) {
+        setAvailableMonths([{
           month: monthToUse,
           year: yearToUse,
           label: `${monthToUse}/${yearToUse}`
-        });
+        }]);
       }
     }
-
-    // Sort by year desc, then month desc
-    allMonths.sort((a: any, b: any) => {
-      if (a.year !== b.year) return b.year - a.year;
-      return b.month - a.month;
-    });
-
-    setAvailableMonths(allMonths);
-
-    // Only reset selectedMonth if it's empty
-    if (!selectedMonth && monthToUse && yearToUse) {
-      setSelectedMonth(`${monthToUse}-${yearToUse}`);
-    }
-    
-  } catch (error) {
-    console.error('[Navbar] Error fetching available months:', error);
-    
-    // Fallback: at minimum show the active month
-    const monthToUse = forceMonth ?? activeYear;
-    const yearToUse = forceYear ?? activeYear;
-    
-    if (monthToUse && yearToUse) {
-      setAvailableMonths([{
-        month: monthToUse,
-        year: yearToUse,
-        label: `${monthToUse}/${yearToUse}`
-      }]);
-    }
-  }
-};
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -121,53 +122,63 @@ const fetchAvailableMonths = async (forceMonth?: number, forceYear?: number) => 
     setShowConfirm(true);
   };
 
-const handleConfirmClose = async () => {
-  if (isClosingMonth) return;
-  
-  setIsClosingMonth(true);
-  setIsRollingOver(true);
-  setShowConfirm(false);
+  const handleConfirmClose = async () => {
+    if (isClosingMonth) return;
 
-  const { month, year } = confirmData;
+    setIsClosingMonth(true);
+    setIsRollingOver(true);
+    setShowConfirm(false);
 
-  try {
-    setAlertMessage('جاري إغلاق الشهر... الرجاء الانتظار');
-    setAlertType('info');
-    setShowAlert(true);
+    const { month, year } = confirmData;
 
-    const response = await rolloverMonth(month, year);
+    try {
+      setAlertMessage('جاري إغلاق الشهر... الرجاء الانتظار');
+      setAlertType('info');
+      setShowAlert(true);
 
-    const newMonth = response.newActiveMonth;
-    const newYear = response.newActiveYear;
-    
-    // ✅ Update selected month FIRST
-    setSelectedMonth(`${newMonth}-${newYear}`);
+      const response = await rolloverMonth(month, year);
 
-    // Refresh context
-    await refreshActiveMonth();
+      const newMonth = response.newActiveMonth;
+      const newYear = response.newActiveYear;
 
-    // ✅ Pass the NEW month values directly to fetchAvailableMonths
-    setTimeout(async () => {
-      await fetchAvailableMonths(newMonth, newYear);
-    }, 500);
+      // ✅ Update selected month FIRST
+      setSelectedMonth(`${newMonth}-${newYear}`);
 
-    setAlertMessage('تم إغلاق الشهر بنجاح!');
-    setAlertType('success');
-    setShowAlert(true);
+      // Refresh context
+      await refreshActiveMonth();
 
-    setTimeout(() => {
+      // ✅ Pass the NEW month values directly to fetchAvailableMonths
+      setTimeout(async () => {
+        await fetchAvailableMonths(newMonth, newYear);
+      }, 500);
+
+      setAlertMessage('تم إغلاق الشهر بنجاح!');
+      setAlertType('success');
+      setShowAlert(true);
+
+      setTimeout(() => {
+        setIsClosingMonth(false);
+        setIsRollingOver(false);
+      }, 1500);
+    } catch (error: any) {
+      console.error('Error closing month:', error);
       setIsClosingMonth(false);
       setIsRollingOver(false);
-    }, 1500);
-  } catch (error: any) {
-    console.error('Error closing month:', error);
-    setIsClosingMonth(false);
-    setIsRollingOver(false);
-    setAlertMessage('حدث خطأ أثناء إغلاق الشهر: ' + (error?.message || 'Unknown error'));
-    setAlertType('error');
-    setShowAlert(true);
-  }
-};
+      setAlertMessage('حدث خطأ أثناء إغلاق الشهر: ' + (error?.message || 'Unknown error'));
+      setAlertType('error');
+      setShowAlert(true);
+    }
+  };
+
+  // Handle logout
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleConfirmLogout = () => {
+    setShowLogoutConfirm(false);
+    logout();
+  };
 
   return (
     <nav className={`navbar ${isVisible ? 'visible' : 'hidden'}`}>
@@ -203,6 +214,28 @@ const handleConfirmClose = async () => {
             disabled={isClosingMonth}
           >
             {isClosingMonth ? 'جاري الإغلاق...' : 'إغلاق الشهر'}
+
+          </button>
+          <button
+            onClick={handleLogoutClick}
+            className="logout-btn"
+            title="تسجيل الخروج"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
           </button>
         </div>
       </div>
@@ -214,6 +247,16 @@ const handleConfirmClose = async () => {
           onConfirm={handleConfirmClose}
           onCancel={() => setShowConfirm(false)}
           loading={isClosingMonth}
+        />
+      )}
+
+      {showLogoutConfirm && (
+        <ConfirmCloseMonth
+          title="هل أنت متأكد من تسجيل الخروج؟"
+          message=""
+          onConfirm={handleConfirmLogout}
+          onCancel={() => setShowLogoutConfirm(false)}
+          loading={false}
         />
       )}
 

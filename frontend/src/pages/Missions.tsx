@@ -162,10 +162,10 @@ return (
             <h2 className="page-title">المهمات</h2>
             <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                 <button onClick={handlePrint} className="export-btn">
-                    طباعة / تصدير PDF
+                   <span> طباعة / تصدير PDF</span>
                 </button>
                 {isCurrentMonth() && (
-                    <button onClick={() => { setEditingMission(null); setShowModal(true); }}>
+                    <button className='btn-add' onClick={() => { setEditingMission(null); setShowModal(true); }}>
                         إضافة مهمة
                     </button>
                 )}

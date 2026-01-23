@@ -166,19 +166,49 @@
 }
 
 .print-btn {
-  background-color: #27ae60;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #186e0e 0%, #62ce4f 100%);
   color: white;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 12px;
-  margin-left: 12px;
+  font-size: 14px;
+  white-space: nowrap;
+    display: block;
+  margin-right: auto;
 }
 
-.print-btn:hover {
-  background-color: #229954;
+/* overlay */
+.print-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.25); /* light white fill */
+  transition: width 0.35s ease;
+  z-index: 0;
+}
+
+/* overlay */
+.print-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.25); /* light white fill */
+  transition: width 0.35s ease;
+  z-index: 0;
+}
+
+.print-btn:hover::after {
+  width: 100%;
 }
 
 @media print {
@@ -309,7 +339,7 @@
   }
 
   .print-btn {
-    padding: 8px 12px;
+    padding: 6px 10px;
     font-size: 11px;
     margin-left: 0;
     margin-bottom: 10px;

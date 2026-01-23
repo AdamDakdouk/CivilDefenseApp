@@ -150,6 +150,7 @@ if (loading) {
           <select
             value={teamFilter}
             onChange={(e) => setTeamFilter(e.target.value as 'all' | '1' | '2' | '3')}
+            className='team-selector'
             style={{
               fontSize: '15px',
               cursor: 'pointer',
@@ -163,7 +164,7 @@ if (loading) {
             <option value="3">الفريق 3</option>
           </select>
           {isCurrentMonth() && (
-            <button onClick={() => { setEditingShift(null); setShowModal(true); }}>
+            <button className='btn-add' onClick={() => { setEditingShift(null); setShowModal(true); }}>
               إضافة مناوبة
             </button>
           )}

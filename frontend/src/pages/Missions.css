@@ -6,7 +6,7 @@
 }
 
 .btn-edit-small {
-  background-color: #ffc107 !important;
+  background: linear-gradient(135deg, #a0a30c 0%, #fbff09 100%);
   color: #000 !important;
   padding: 5px 10px;
   font-size: 11px;
@@ -14,11 +14,11 @@
 }
 
 .btn-edit-small:hover {
-  background-color: #e0a800 !important;
+  background: linear-gradient(135deg, #fbff09 0%,#6c6e09  100%);
 }
 
 .btn-delete-small {
-  background-color: #c41e3a !important;
+  background: linear-gradient(135deg, #5e0815 0%, #e52044 100%);
   color: #fff !important;
   padding: 5px 10px;
   font-size: 11px;
@@ -26,7 +26,7 @@
 }
 
 .btn-delete-small:hover {
-  background-color: #a01629 !important;
+  background: linear-gradient(135deg, #e52044  0%,#5e0815 100%);
 }
 
 table {
@@ -172,8 +172,10 @@ table thead tr:last-child th {
   flex-wrap: wrap;
 }
 
-.export-btn {
-  background-color: #27ae60;
+.btn-add {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #186e0e 0%, #62ce4f 100%);
   color: white;
   padding: 10px 20px;
   border: none;
@@ -184,8 +186,57 @@ table thead tr:last-child th {
   white-space: nowrap;
 }
 
-.export-btn:hover {
-  background-color: #229954;
+/* overlay */
+.btn-add::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: width 0.35s ease;
+  z-index: 0;
+}
+
+.btn-add:hover::after {
+  width: 100%;
+}
+
+.export-btn {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #186e0e 0%, #62ce4f 100%);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* overlay */
+.export-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.25); /* light white fill */
+  transition: width 0.35s ease;
+  z-index: 0;
+}
+
+.export-btn:hover::after {
+  width: 100%;
+}
+
+.export-btn span {
+  position: relative;
+  z-index: 1;
 }
 
 .empty-state {
