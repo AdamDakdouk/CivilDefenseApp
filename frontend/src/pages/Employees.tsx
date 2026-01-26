@@ -91,7 +91,7 @@ const Employees: React.FC = () => {
 
       // Fetch attendance for the month (works for both current and archived)
       const attendanceData = await getAttendanceByMonth(month, year);
-      setAttendance(attendanceData);
+      setAttendance(attendanceData.filter(a => a.userId != null));
 
       setLoading(false);
     } catch (error) {

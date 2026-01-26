@@ -194,6 +194,7 @@ const Navbar: React.FC = () => {
           <Link to="/employees">الموظفون</Link>
           <Link to="/shifts">الحضور اليومي </Link>
           <Link to="/missions">المهمات</Link>
+          <Link to="/users">إدارة العناصر</Link>
         </div>
 
 

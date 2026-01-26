@@ -223,4 +223,8 @@
     .missions-page-print .report-header + table {
         margin-top: 5mm;
     }
+    
+    .no-print {
+        display: none !important;
+  }
 }

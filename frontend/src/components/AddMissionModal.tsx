@@ -269,8 +269,11 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
     return (
         <div className="modal-overlay">
             <div className="modal-content modal-large mission-modal" onClick={(e) => e.stopPropagation()}>
-                <h2>{editMode ? 'تعديل المهمة' : 'إضافة مهمة جديدة'}</h2>
 
+                <h2>{editMode ? 'تعديل المهمة' : 'إضافة مهمة جديدة'}</h2>
+                <button className="modal-close-btn" onClick={onClose}>
+                    ×
+                </button>
                 <div className="form-row mission-form-row">
                     {/* Date Selection */}
                     <div className="form-group mission-form-group">
@@ -628,18 +631,11 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                                         <button
                                             type="button"
                                             onClick={() => toggleCustomTimes(p.userId)}
-                                            style={{
-                                                padding: '4px 8px',
-                                                fontSize: '12px',
-                                                backgroundColor: p.showCustomTimes ? '#28a745' : '#007bff',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer'
-                                            }}
+                                            className={`custom-time-btn ${p.showCustomTimes ? 'active' : 'inactive'}`}
                                         >
                                             {p.showCustomTimes ? '✓ وقت خاص' : '⏱ تعديل الوقت'}
                                         </button>
+
                                     </div>
 
                                     {/* Show custom time pickers if enabled */}
@@ -680,7 +676,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                 </div>
 
                 <div className="modal-actions">
-                    <button onClick={handleSubmit} disabled={isSubmitting}>{isSubmitting ? 'جاري الحفظ...' : editMode ? 'تحديث' : 'حفظ'}</button>
+                    <button onClick={handleSubmit} className='btn-save' disabled={isSubmitting}>{isSubmitting ? 'جاري الحفظ...' : editMode ? 'تحديث' : 'حفظ'}</button>
                     <button onClick={onClose} className="btn-cancel" disabled={isSubmitting}>إلغاء</button>
                 </div>
             </div>

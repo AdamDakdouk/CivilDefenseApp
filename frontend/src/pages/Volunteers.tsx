@@ -172,24 +172,32 @@ const Volunteers: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {volunteers.map(volunteer => (
-            <tr key={volunteer._id}>
-              <td><strong>{volunteer.name}</strong></td>
-              <td>{volunteer.cardNumber || ''}</td>
-              <td>متطوع</td>
-              <td>{volunteer.currentMonthDays}</td>
-              <td>{missionCounts[volunteer._id]?.fire || ''}</td>
-              <td>{missionCounts[volunteer._id]?.rescue || ''}</td>
-              <td>{missionCounts[volunteer._id]?.medic || ''}</td>
-              <td>{missionCounts[volunteer._id]?.publicService || ''}</td>
-              <td>{missionCounts[volunteer._id]?.misc || ''}</td>
-              <td>{volunteer.currentMonthHours}</td>
-              <td></td>
-            </tr>
-          ))}
+          {volunteers.map((volunteer, index) => {
+            const next = volunteers[index + 1];
+            const isTeamEnd = !next || next.team !== volunteer.team;
 
-
+            return (
+              <tr
+                key={volunteer._id}
+                className={isTeamEnd ? 'team-end-row' : ''}
+              >
+                <td><strong>{volunteer.name}</strong></td>
+                <td>{volunteer.cardNumber || ''}</td>
+                <td>متطوع</td>
+                <td>{volunteer.currentMonthDays}</td>
+                <td>{missionCounts[volunteer._id]?.fire || ''}</td>
+                <td>{missionCounts[volunteer._id]?.rescue || ''}</td>
+                <td>{missionCounts[volunteer._id]?.medic || ''}</td>
+                <td>{missionCounts[volunteer._id]?.publicService || ''}</td>
+                <td>{missionCounts[volunteer._id]?.misc || ''}</td>
+                <td>{volunteer.currentMonthHours}</td>
+                <td></td>
+              </tr>
+            );
+          })}
         </tbody>
+
+
       </table>
 
       {/* Footer */}

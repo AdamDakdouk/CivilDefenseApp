@@ -6,9 +6,9 @@ import User from '../models/User';
 import Settings from '../models/Settings';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { calculateHours, daysBetween, timeToMinutes } from '../utils/timeUtils';
+import Admin from '../models/Admin';
 
 const router = express.Router();
-const suffix = '\\د م ع ر';
 
 // Apply authentication to all routes
 router.use(authenticateToken);
@@ -196,6 +196,11 @@ router.post('/', async (req: AuthRequest, res: Response) => {
         customEndTime: p.customEndTime
       } : {})
     }));
+
+    const admin = await Admin.findById(req.admin.adminId).select('missionSuffix');
+
+    const suffix = admin?.missionSuffix ? admin.missionSuffix : '';
+
 
     const mission = new Mission({
       adminId: req.admin.adminId,
@@ -505,10 +510,10 @@ router.get('/available-months', async (req: AuthRequest, res: Response) => {
     if (!req.admin) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    
+
     // ✅ Convert to ObjectId for aggregate query
     const adminObjectId = new mongoose.Types.ObjectId(req.admin.adminId);
-    
+
     const months = await Mission.aggregate([
       { $match: { adminId: adminObjectId } }, // ✅ Use ObjectId
       {

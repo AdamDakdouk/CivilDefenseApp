@@ -188,14 +188,13 @@
   background-color: #229954;
 }
 
-.report-container tbody tr:nth-child(3) td,
-.report-container tbody tr:nth-child(5) td,
-.report-container tbody tr:nth-child(10) td {
-  border-bottom: 2px solid #c41e1e;
-}
-
 @media print {
   .print-btn {
     display: none !important;
   }
 }
+
+.team-end-row td {
+  border-bottom: 2px solid #c41e1e;
+}
+

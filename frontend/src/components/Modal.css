@@ -15,6 +15,7 @@
 }
 
 .modal-content {
+  position: relative;
   background-color: white;
   padding: 30px;
   border-radius: 8px;
@@ -30,6 +31,24 @@
   font-size: 24px;
 }
 
+.modal-close-btn {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  color: rgba(181, 12, 12, 0.801)
+}
+
+.modal-close-btn:hover {
+  color: #d20101;
+  background: transparent;
+  font-size: 35px;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -40,7 +59,8 @@
   font-weight: 600;
 }
 
-input, select {
+input,
+select {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -50,7 +70,8 @@ input, select {
   box-sizing: border-box;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #000;
 }
@@ -83,7 +104,7 @@ textarea:focus {
   max-height: 200px;
   overflow-y: auto;
   z-index: 1001;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .suggestion-item {
@@ -114,9 +135,31 @@ textarea:focus {
   background-color: #999 !important;
 }
 
+.btn-save {
+  background: linear-gradient(135deg, #186e0e 0%, #62ce4f 100%);
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #62ce4f 0%, #186e0e 100%);
+}
+
 .btn-cancel {
-  background-color: #6c757d !important;
-  color: #fff !important;
+  position: relative;
+  color: #2e2a2a;
+  overflow: hidden;
+  font-size: 14px !important;
+  cursor: pointer;
+  background: linear-gradient(100deg, #858484 0%, #d2d2d2 100%);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.btn-cancel:hover {
+  background: linear-gradient(135deg, #dee0dd 0%, #a0a0a0 100%);
 }
 
 .btn-cancel:hover {
@@ -124,22 +167,28 @@ textarea:focus {
 }
 
 .btn-remove {
+  background: linear-gradient(135deg, #5e0815 0%, #e52044 100%);
   align-self: left;
   justify-self: left;
   margin-top: 5px;
 }
 
 .btn-remove:hover {
-  background-color: #a01629 !important;
+  background: linear-gradient(135deg, #e52044 0%, #5e0815 100%);
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: center;
 }
 
 .btn-danger {
-  background-color: #c41e3a !important;
+  background: linear-gradient(135deg, #5e0815 0%, #e52044 100%);
   color: #fff !important;
 }
 
 .btn-danger:hover {
-  background-color: #a01629 !important;
+  background: linear-gradient(135deg, #e52044 0%, #5e0815 100%);
 }
 
 .confirm-modal {
@@ -215,7 +264,7 @@ textarea:focus {
   background-color: #b1b1b170;
   border-radius: 5px;
   position: relative;
-  width:100%;
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -337,6 +386,23 @@ textarea:focus {
 
 .mission-form-row {
   gap: 15px;
+}
+
+.custom-time-btn {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.custom-time-btn.active {
+  background: linear-gradient(135deg, #186e0e 0%, #62ce4f 100%);
+}
+
+.custom-time-btn.inactive {
+  background: linear-gradient(135deg, #16b5bb 0%, #0a575a 100%);
 }
 
 .form-row .form-group {
@@ -512,7 +578,7 @@ textarea:focus {
   align-items: start;
   margin-bottom: 10px;
   padding: 10px;
-  background-color: #b1b1b170;
+  background: linear-gradient(100deg, #858484 0%, #d2d2d2 100%);
   border-radius: 6px;
 }
 
@@ -547,7 +613,9 @@ textarea:focus {
     margin-bottom: 16px;
   }
 
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     padding: 10px;
     font-size: 15px;
   }
@@ -670,7 +738,9 @@ textarea:focus {
     margin-bottom: 6px;
   }
 
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     padding: 9px;
     font-size: 14px;
   }
@@ -881,7 +951,9 @@ textarea:focus {
     font-size: 16px;
   }
 
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     padding: 8px;
     font-size: 13px;
   }

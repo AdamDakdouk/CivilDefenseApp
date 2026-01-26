@@ -13,7 +13,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ message, onConfirm, onCance
     <div className="modal-overlay" onClick={loading ? undefined : onCancel}>
       <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
         <h3>{message}</h3>
-        <div className="modal-actions">
+        <div className="modal-actions confirm-modal-actions">
           <button onClick={onConfirm} className="btn-danger" disabled={loading}>
             {loading ? 'جاري المعالجة...' : 'تأكيد'}
           </button>

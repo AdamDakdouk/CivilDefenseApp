@@ -268,6 +268,31 @@ table thead tr:last-child th {
   margin-top: 10px;
 }
 
+.suffix-preview {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.suffix-preview strong {
+  font-weight: bold;
+}
+
+.suffix-form {
+  display: flex;
+  justify-content: center;
+  gap: 12px; /* space between buttons */
+}
+
+.suffix-form-title {
+    display: flex;
+  justify-content: center;
+}
+
+.suffix-form-input {
+  margin-top: 10px;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .report-header {

@@ -5,7 +5,6 @@ import path from 'path';
 import cron from 'node-cron';
 import { checkAndPerformReset } from './utils/monthlyReset';
 import { connectDB } from './config/database';
-import userRoutes from './routes/userRoutes';
 import shiftRoutes from './routes/shiftRoutes';
 import missionRoutes from './routes/missionRoutes';
 import monthlyReportRoutes from './routes/monthlyReportRoutes';
@@ -15,6 +14,8 @@ import monthRolloverRoutes from './routes/monthRolloverRoutes'
 import settingsRoutes from './routes/settingsRoutes';
 import dashboardRoutes from './routes/dashboardsRoutes';
 import authRoutes from './routes//authRoutes';
+import usersRoutes from './routes/usersRoutes';
+import adminRoutes from './routes/adminRoutes';
 
 dotenv.config();
 
@@ -39,7 +40,6 @@ app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, '../public')));
 
 // API Routes
-app.use('/api/users', userRoutes);
 app.use('/api/shifts', shiftRoutes);
 app.use('/api/missions', missionRoutes);
 app.use('/api/monthly-reports', monthlyReportRoutes);
@@ -49,6 +49,8 @@ app.use('/api/month-rollover', monthRolloverRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {

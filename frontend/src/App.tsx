@@ -12,6 +12,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import { MonthProvider } from './contexts/MonthContext';
 import Dashboard from './pages/Dashboard';
+import Users from './pages/Users';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
                         <Route path="/employees" element={<Employees />} />
                         <Route path="/shifts" element={<Shifts />} />
                         <Route path="/missions" element={<Missions />} />
+                        <Route path="/users" element={<Users />} />
                         <Route path="/" element={<Navigate to="/dashboard" />} />
                       </Routes>
                     </div>

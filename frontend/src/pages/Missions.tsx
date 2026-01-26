@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getMissions, getMissionsByMonth, getAvailableMissionMonths, createMission, updateMission, deleteMission } from '../services/api';
+import { getMissions, getMissionsByMonth, getAvailableMissionMonths, createMission, updateMission, deleteMission, getAdminMe, updateMissionSuffix } from '../services/api';
 import { Mission } from '../types';
 import AddMissionModal from '../components/AddMissionModal';
 import ConfirmModal from '../components/ConfirmModal';
@@ -22,11 +22,26 @@ const Missions: React.FC = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
+    const [missionSuffix, setMissionSuffix] = useState('');
+    const [showSuffixModal, setShowSuffixModal] = useState(false);
     const [deletingMission, setDeletingMission] = useState(false);
 
     useEffect(() => {
         fetchMissions();
     }, [selectedMonth]);
+
+    useEffect(() => {
+        const loadSuffix = async () => {
+            try {
+                const res = await getAdminMe();
+                setMissionSuffix(res.missionSuffix || '');
+            } catch {
+                console.error('Failed to load suffix');
+            }
+        };
+
+        loadSuffix();
+    }, []);
 
     const fetchMissions = async () => {
         try {
@@ -156,180 +171,235 @@ const Missions: React.FC = () => {
         );
     }
 
-return (
-    <div className="container missions-page-print">
-        <div className="page-header">
-            <h2 className="page-title">المهمات</h2>
-            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                <button onClick={handlePrint} className="export-btn">
-                   <span> طباعة / تصدير PDF</span>
-                </button>
-                {isCurrentMonth() && (
-                    <button className='btn-add' onClick={() => { setEditingMission(null); setShowModal(true); }}>
-                        إضافة مهمة
+    return (
+        <div className="container missions-page-print">
+            <div className="page-header">
+                <h2 className="page-title">المهمات</h2>
+                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                    <button onClick={handlePrint} className="export-btn">
+                        <span> طباعة / تصدير PDF</span>
                     </button>
-                )}
+                    {isCurrentMonth() && (
+                        <button className='btn-add' onClick={() => { setEditingMission(null); setShowModal(true); }}>
+                            إضافة مهمة
+                        </button>
+                    )}
+                </div>
             </div>
-        </div>
 
-        {missions.length === 0 ? (
-            <div className="empty-state">
-                <div className="empty-icon">🚒</div>
-                <p className="empty-message">لا توجد مهمات مسجلة</p>
-                <p className="empty-hint">قم بإضافة مهمة جديدة للبدء</p>
-            </div>
-        ) : (
-            <>
-                {/* Report Header */}
-                <div className="report-header">
-                    <div className="header-right">
-                        <div>الجمهورية اللبنانية</div>
-                        <div>وزارة الداخلية والبلديات</div>
-                        <div>المديرية العامة للدفاع المدني</div>
-                        <div><strong>مركز عرمون</strong></div>
-                        <div className="doc-info">
-                            <span>برقية رقم: </span>
-                            <input
-                                type="text"
-                                value={docNumber}
-                                onChange={(e) => setDocNumber(e.target.value)}
-                                placeholder="..."
-                                className="inline-input"
-                            />
+            {missions.length === 0 ? (
+                <div className="empty-state">
+                    <div className="empty-icon">🚒</div>
+                    <p className="empty-message">لا توجد مهمات مسجلة</p>
+                    <p className="empty-hint">قم بإضافة مهمة جديدة للبدء</p>
+                </div>
+            ) : (
+                <>
+                    {/* Report Header */}
+                    <div className="report-header">
+                        <div className="header-right">
+                            <div>الجمهورية اللبنانية</div>
+                            <div>وزارة الداخلية والبلديات</div>
+                            <div>المديرية العامة للدفاع المدني</div>
+                            <div><strong>مركز عرمون</strong></div>
+                            <div className="doc-info">
+                                <span>رقم البرقية:</span>
+                                <input
+                                    type="text"
+                                    value={docNumber}
+                                    onChange={(e) => setDocNumber(e.target.value)}
+                                    placeholder="..."
+                                    className="inline-input"
+                                />
+                            </div>
+                            <div className="doc-info">
+                                <span>التاريخ: </span>
+                                <input
+                                    type="date"
+                                    value={docDate}
+                                    onChange={(e) => setDocDate(e.target.value)}
+                                    className="date-input-arabic"
+                                    onFocus={(e) => {
+                                        try {
+                                            e.target.showPicker();
+                                        } catch (err) {
+                                            // Browser blocked showPicker (needs user gesture)
+                                            // Ignore the error, user can click manually
+                                        }
+                                    }}
+                                />
+                                <span className="date-display-overlay">
+                                    {toArabicNumerals(docDate.split('-').join('/'))}
+                                </span>
+                            </div>
                         </div>
-                        <div className="doc-info">
-                            <span>التاريخ: </span>
-                            <input
-                                type="date"
-                                value={docDate}
-                                onChange={(e) => setDocDate(e.target.value)}
-                                className="date-input-arabic"
-                                onFocus={(e) => {
+
+                        <div className="header-center">
+                            <h1 className="main-title">
+                                سعادة المدير العام الدفاع المدني بالتكليف<br />
+                                العميد الركن عماد خريش <span className="hierarchy">بالتراتبيه</span>
+                            </h1>
+                            <p className="subtitle">
+                                ارفع لسعادتكم جدول بالمهمات والخدمات المنفذة في المركز خلال شهر {getMonthName()}
+                            </p>
+                        </div>
+                    </div>
+
+                    <table className='mission-table'>
+                        <thead>
+                            <tr>
+                                <th rowSpan={2}>التاريخ</th>
+                                <th
+                                    rowSpan={2}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => setShowSuffixModal(true)}
+                                >
+                                    رقم البرقية <span className="no-print">⚙️</span>
+                                </th>
+
+                                <th colSpan={2}>نوع المهمة</th>
+                                <th rowSpan={2}>المكان</th>
+                                <th rowSpan={2}>العناصر المنفذة</th>
+                                <th colSpan={2}>الساعة</th>
+                                <th rowSpan={2}>نوع الآلية</th>
+                                <th rowSpan={2}>ملاحظات</th>
+                                <th rowSpan={2}>إجراءات</th>
+                            </tr>
+                            <tr>
+                                <th>اسعاف - اطفاء</th>
+                                <th>خدمة عامة</th>
+                                <th>الذهاب</th>
+                                <th>الإياب</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {missions.map(mission => (
+                                <tr key={mission._id}>
+                                    <td>{mission.date ? new Date(mission.date).toLocaleDateString('ar-LB') : ''}</td>
+                                    <td>{mission.referenceNumber}</td>
+                                    <td>
+                                        {(mission.missionType === 'fire' || mission.missionType === 'rescue' || mission.missionType === 'medic' || mission.missionType === 'misc')
+                                            ? mission.missionDetails
+                                            : ''}
+                                    </td>
+                                    <td>
+                                        {mission.missionType === 'public-service' ? mission.missionDetails : ''}
+                                    </td>
+                                    <td>{mission.location}</td>
+                                    <td>{mission.participants
+                                        .filter(p => p && p.user) // ✅ Filter out null/undefined participants
+                                        .sort((a, b) => {
+                                            // ✅ Additional safety check
+                                            if (!a?.user || !b?.user) return 0;
+                                            if (a.user.role === 'head') return -1;
+                                            if (b.user.role === 'head') return 1;
+                                            return 0;
+                                        })
+                                        .map(p => p.user.name)
+                                        .join('، ')}</td>
+                                    <td>{mission.startTime}</td>
+                                    <td>{mission.endTime}</td>
+                                    <td>{Array.isArray(mission.vehicleNumbers)
+                                        ? mission.vehicleNumbers.join(', ')
+                                        : mission.vehicleNumbers || ''}</td>
+                                    <td>{mission.notes || ' '}</td>
+                                    <td>
+                                        {isCurrentMonth() && (
+                                            <div className="action-buttons">
+                                                <button onClick={() => handleEditMission(mission)} className="edit-btn">
+                                                    <span className='gradient-text-edit'>✎</span>
+                                                </button>
+                                                <button onClick={() => confirmDelete(mission._id)} className="delete-btn">
+                                                    <span className='gradient-text-delete'>🗑️</span>
+                                                </button>
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </>
+            )}
+
+            {showModal && (
+                <AddMissionModal
+                    isOpen={showModal}
+                    onClose={() => { setShowModal(false); setEditingMission(null); }}
+                    onSave={handleSaveMission}
+                    editMode={!!editingMission}
+                    initialData={editingMission}
+                />
+            )}
+
+            {showConfirmDelete && (
+                <ConfirmModal
+                    message="هل أنت متأكد من حذف هذه المهمة؟"
+                    onConfirm={handleDeleteMission}
+                    onCancel={() => {
+                        if (!deletingMission) {
+                            setShowConfirmDelete(false);
+                            setMissionToDelete(null);
+                        }
+                    }}
+                    loading={deletingMission}
+                />
+            )}
+
+            {showAlert && (
+                <CustomAlert
+                    message={alertMessage}
+                    onClose={() => setShowAlert(false)}
+                    type={alertType}
+                />
+            )}
+
+            {showSuffixModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+
+                        <h3 className='suffix-form-title'>تعديل لاحقة رقم البرقية</h3>
+
+                        <label className='suffix-form-label'>اللاحقة</label>
+                        <input
+                        className='suffix-form-input'
+                            type="text"
+                            value={missionSuffix}
+                            onChange={(e) => setMissionSuffix(e.target.value)}
+                        />
+
+                        <div className="suffix-preview">
+                            معاينة: <strong>123{missionSuffix}</strong>
+                        </div>
+
+                        <div className="form-actions suffix-form">
+                            <button
+                            className='btn-save btn-save-suffix'
+                                onClick={async () => {
                                     try {
-                                        e.target.showPicker();
-                                    } catch (err) {
-                                        // Browser blocked showPicker (needs user gesture)
-                                        // Ignore the error, user can click manually
+                                        await updateMissionSuffix(missionSuffix);
+
+                                        alert('تم حفظ اللاحقة بنجاح');
+                                        setShowSuffixModal(false);
+                                    } catch {
+                                        alert('فشل في حفظ اللاحقة');
                                     }
                                 }}
-                            />
-                            <span className="date-display-overlay">
-                                {toArabicNumerals(docDate.split('-').join('/'))}
-                            </span>
-                        </div>
-                    </div>
+                            >
+                                حفظ
+                            </button>
 
-                    <div className="header-center">
-                        <h1 className="main-title">
-                            سعادة المدير العام الدفاع المدني بالتكليف<br />
-                            العميد الركن عماد خريش <span className="hierarchy">بالتراتبيه</span>
-                        </h1>
-                        <p className="subtitle">
-                            ارفع لسعادتكم جدول بالمهمات والخدمات المنفذة في المركز خلال شهر {getMonthName()}
-                        </p>
+                            <button className='btn-cancel' onClick={() => setShowSuffixModal(false)}>
+                                إلغاء
+                            </button>
+                        </div>
+
                     </div>
                 </div>
+            )}
 
-                <table className='mission-table'>
-                    <thead>
-                        <tr>
-                            <th rowSpan={2}>التاريخ</th>
-                            <th rowSpan={2}>رقم البرقية</th>
-                            <th colSpan={2}>نوع المهمة</th>
-                            <th rowSpan={2}>المكان</th>
-                            <th rowSpan={2}>العناصر المنفذة</th>
-                            <th colSpan={2}>الساعة</th>
-                            <th rowSpan={2}>نوع الآلية</th>
-                            <th rowSpan={2}>ملاحظات</th>
-                            <th rowSpan={2}>إجراءات</th>
-                        </tr>
-                        <tr>
-                            <th>اسعاف - اطفاء</th>
-                            <th>خدمة عامة</th>
-                            <th>الذهاب</th>
-                            <th>الإياب</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {missions.map(mission => (
-                            <tr key={mission._id}>
-                                <td>{mission.date ? new Date(mission.date).toLocaleDateString('ar-LB') : ''}</td>
-                                <td>{mission.referenceNumber}</td>
-                                <td>
-                                    {(mission.missionType === 'fire' || mission.missionType === 'rescue' || mission.missionType === 'medic' || mission.missionType === 'misc')
-                                        ? mission.missionDetails
-                                        : ''}
-                                </td>
-                                <td>
-                                    {mission.missionType === 'public-service' ? mission.missionDetails : ''}
-                                </td>
-                                <td>{mission.location}</td>
-                                <td>{mission.participants
-                                    .sort((a, b) => {
-                                        if (a.user.role === 'head') return -1;
-                                        if (b.user.role === 'head') return 1;
-                                        return 0;
-                                    })
-                                    .map(p => p.user.name)
-                                    .join('، ')}</td>
-                                <td>{mission.startTime}</td>
-                                <td>{mission.endTime}</td>
-                                <td>{Array.isArray(mission.vehicleNumbers)
-                                    ? mission.vehicleNumbers.join(', ')
-                                    : mission.vehicleNumbers || ''}</td>
-                                <td>{mission.notes || ' '}</td>
-                                <td>
-                                    {isCurrentMonth() && (
-                                        <div className="action-buttons">
-                                            <button onClick={() => handleEditMission(mission)} className="btn-edit-small">
-                                                تعديل
-                                            </button>
-                                            <button onClick={() => confirmDelete(mission._id)} className="btn-delete-small">
-                                                حذف
-                                            </button>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </>
-        )}
-
-        {showModal && (
-            <AddMissionModal
-                isOpen={showModal}
-                onClose={() => { setShowModal(false); setEditingMission(null); }}
-                onSave={handleSaveMission}
-                editMode={!!editingMission}
-                initialData={editingMission}
-            />
-        )}
-
-        {showConfirmDelete && (
-            <ConfirmModal
-                message="هل أنت متأكد من حذف هذه المهمة؟"
-                onConfirm={handleDeleteMission}
-                onCancel={() => {
-                    if (!deletingMission) {
-                        setShowConfirmDelete(false);
-                        setMissionToDelete(null);
-                    }
-                }}
-                loading={deletingMission}
-            />
-        )}
-
-        {showAlert && (
-            <CustomAlert
-                message={alertMessage}
-                onClose={() => setShowAlert(false)}
-                type={alertType}
-            />
-        )}
-    </div>
-);
+        </div>
+    );
 };
 
 export default Missions;

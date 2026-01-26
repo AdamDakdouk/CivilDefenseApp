@@ -32,7 +32,7 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
         const day = String(now.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     };
-    
+
     const { activeMonth, activeYear, selectedMonth } = useMonth();
     const today = getToday();
     const [date, setDate] = useState(initialData?.date || today);
@@ -84,29 +84,29 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     const validateDateTimeChange = (newDatetime: string, shiftDate: string): boolean => {
         const newDate = new Date(newDatetime.split('T')[0]);
         const shiftDateObj = new Date(shiftDate);
-        
+
         // Check if shift is on the last day of the month
         const lastDayOfMonth = new Date(shiftDateObj.getFullYear(), shiftDateObj.getMonth() + 1, 0).getDate();
         const isLastDayOfMonth = shiftDateObj.getDate() === lastDayOfMonth;
-        
+
         if (isLastDayOfMonth) {
             // Allow same month OR next month only
             const shiftMonth = shiftDateObj.getMonth();
             const shiftYear = shiftDateObj.getFullYear();
             const newMonth = newDate.getMonth();
             const newYear = newDate.getFullYear();
-            
+
             const isSameMonth = (newMonth === shiftMonth && newYear === shiftYear);
             const isNextMonth = (
                 (newMonth === shiftMonth + 1 && newYear === shiftYear) || // Next month same year
                 (newMonth === 0 && shiftMonth === 11 && newYear === shiftYear + 1) // Dec -> Jan
             );
-            
+
             return isSameMonth || isNextMonth;
         } else {
             // Not last day - must be same month/year
-            return newDate.getMonth() === shiftDateObj.getMonth() && 
-                   newDate.getFullYear() === shiftDateObj.getFullYear();
+            return newDate.getMonth() === shiftDateObj.getMonth() &&
+                newDate.getFullYear() === shiftDateObj.getFullYear();
         }
     };
 
@@ -252,7 +252,7 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                 setLastMonthEndTeam(data.lastMonthEndTeam);
             }
         } catch (error) {
-            throw(error)
+            throw (error)
         }
     };
 
@@ -362,7 +362,7 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
     const updateParticipant = (userId: string, field: 'checkIn' | 'checkOut', value: string) => {
         // Extract time only (HH:mm format)
         const timeOnly = value.includes('T') ? value.split('T')[1] : value;
-        
+
         setParticipants(participants.map(p =>
             p.userId === userId ? { ...p, [field]: timeOnly } : p
         ));
@@ -417,7 +417,9 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
         <div className="modal-overlay">
             <div className="modal-content shift-modal" onClick={(e) => e.stopPropagation()}>
                 <h2>{editMode ? 'تعديل المناوبة' : 'إضافة مناوبة جديدة'}</h2>
-
+                <button className="modal-close-btn" onClick={onClose}>
+                    ×
+                </button>
                 <input
                     type="date"
                     value={date}
@@ -507,7 +509,7 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
                 )}
 
                 <div className="modal-actions">
-                    <button onClick={handleSubmit} disabled={isSubmitting}>{isSubmitting ? 'جاري الحفظ...' : editMode ? 'تحديث' : 'حفظ'}</button>
+                    <button onClick={handleSubmit} className='btn-save' disabled={isSubmitting}>{isSubmitting ? 'جاري الحفظ...' : editMode ? 'تحديث' : 'حفظ'}</button>
                     <button onClick={onClose} className="btn-cancel" disabled={isSubmitting}>إلغاء</button>
                 </div>
             </div>

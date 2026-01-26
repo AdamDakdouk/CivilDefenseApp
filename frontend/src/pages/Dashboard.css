@@ -38,11 +38,11 @@
 }
 
 .missions-card {
-    border-top: 4px solid #3498db;
+    border-top: 4px solid #0e588a;
 }
 
 .hours-card {
-    border-top: 4px solid #27ae60;
+    border-top: 4px solid #15713c;
 }
 
 .metric-icon {
@@ -120,7 +120,7 @@
 
 .type-progress-fill {
     height: 100%;
-    background: linear-gradient(135deg, #4b9dd4 0%, #226b9b 100%);
+    background: linear-gradient(130deg, #1fd74a 0%, #0b6921 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -187,7 +187,7 @@
 .contributor-rank {
     width: 35px;
     height: 35px;
-    background: #3498db;
+    background: linear-gradient(270deg, #1ac2c8  0%, #0a575a 100%);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -220,7 +220,7 @@
 }
 
 .team-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1ac2c8  0%, #0a575a 100%);
     color: white;
     padding: 20px;
     border-radius: 8px;
@@ -279,7 +279,7 @@
     width: 100%;
     min-width: 25px;
     height: 40px;
-    background: linear-gradient(180deg, #27ae60, #229954);
+    background: linear-gradient(90deg, #126133, #21c465);
     border-radius: 4px 4px 0 0;
     position: relative;
     display: flex;

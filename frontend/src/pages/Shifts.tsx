@@ -131,16 +131,16 @@ const Shifts: React.FC = () => {
     ? shifts
     : shifts.filter(shift => shift.team === teamFilter);
 
-if (loading) {
-  return (
-    <div className="container">
-      <div className="loading-state">
-        <div className="loading-spinner"></div>
-        <p className="loading-text">جاري التحميل...</p>
+  if (loading) {
+    return (
+      <div className="container">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">جاري التحميل...</p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
     <div className="container">
@@ -204,6 +204,7 @@ if (loading) {
               </thead>
               <tbody>
                 {[...shift.participants]
+                  .filter(a => a && a.user)
                   .sort((a, b) => {
                     // Sort order: employee/head/admin first, then volunteers
                     const roleOrder: any = {

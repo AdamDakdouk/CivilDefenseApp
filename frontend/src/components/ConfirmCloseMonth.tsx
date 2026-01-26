@@ -17,11 +17,11 @@ const ConfirmCloseMonth: React.FC<ConfirmCloseMonth> = ({ title, message, onConf
         <h3 className="confirm-title">{title}</h3>
         <div className="confirm-message">{message}</div>
         <div className="confirm-buttons">
-          <button className="confirm-btn cancel-btn" onClick={onCancel} disabled={loading}>
+          <button className="btn-cancel" onClick={onCancel} disabled={loading}>
             إلغاء
           </button>
-          <button className="confirm-btn confirm-yes-btn" onClick={onConfirm} disabled={loading}>
-            {loading ? 'جاري المعالجة...' : 'نعم، متأكد'}
+          <button className="btn-save" onClick={onConfirm} disabled={loading}>
+            {loading ? 'جاري المعالجة...' : 'متأكد'}
           </button>
         </div>
       </div>

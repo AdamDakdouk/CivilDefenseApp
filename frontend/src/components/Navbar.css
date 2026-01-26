@@ -45,7 +45,7 @@
 }
 
 .nav-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -53,7 +53,7 @@
 /* Middle: Page Links */
 .nav-links {
   display: flex;
-  gap: 25px;
+  gap: 20px;
   flex: 1;
   justify-content: center;
   align-items: center;
@@ -71,7 +71,6 @@
   opacity: 0.8;
 }
 
-/* ✅ Right: Controls (Month Selector + Buttons) */
 .navbar-controls {
   display: flex;
   align-items: center;
@@ -93,19 +92,19 @@
 }
 
 .month-selector-navbar select {
-  padding: 7px 10px;
+  padding: 6.5px 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
-  min-width: 110px;
+  min-width: 100px;
   direction: rtl;
   background-color: white;
   transition: all 0.2s ease;
 }
 
 .month-selector-navbar select:hover {
-  border-color: #ccc;
+  border-color: #938f8f;
 }
 
 .close-month-btn {
@@ -152,7 +151,7 @@
   justify-content: center;
   width: 35px;
   height: 34px;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .logout-btn svg {

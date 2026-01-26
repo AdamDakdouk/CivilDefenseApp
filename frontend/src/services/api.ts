@@ -155,4 +155,28 @@ export const getActiveMonth = async (): Promise<any> => {
   return response.data;
 };
 
+export const createUser = async (userData: any) => {
+  const response = await api.post('/users', userData);
+  return response.data;
+};
+
+export const updateUser = async (userId: string, userData: any) => {
+  const response = await api.put(`/users/${userId}`, userData);
+  return response.data;
+};
+
+export const deleteUser = async (userId: string) => {
+  await api.delete(`/users/${userId}`);
+};
+
+export const getAdminMe = async () => {
+  const res = await api.get('/admin/me');
+  return res.data;
+};
+
+export const updateMissionSuffix = async (missionSuffix: string) => {
+  const res = await api.put('/admin/mission-suffix', { missionSuffix });
+  return res.data;
+};
+
 export default api;
