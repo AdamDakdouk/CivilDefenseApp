@@ -219,7 +219,7 @@ const Users: React.FC = () => {
                         className="search-input"
                     />
                     <button onClick={handleAdd} className="add-user-btn">
-                        + إضافة مستخدم
+                        + إضافة عنصر
                     </button>
                 </div>
             </div>
@@ -463,40 +463,40 @@ const Users: React.FC = () => {
                                 </div>
                             )}
 
-<div className="form-group">
-    <label>الفريق *</label>
-    <div className="team-checkboxes">
-        <label className={`team-option ${formData.team === '1' ? 'checked' : ''}`}>
-            <input
-                type="checkbox"
-                checked={formData.team === '1'}
-                onChange={() => setFormData({ ...formData, team: '1' })}
-            />
-            <span className="checkmark">✓</span>
-            <span className="team-text">فريق 1</span>
-        </label>
-        
-        <label className={`team-option ${formData.team === '2' ? 'checked' : ''}`}>
-            <input
-                type="checkbox"
-                checked={formData.team === '2'}
-                onChange={() => setFormData({ ...formData, team: '2' })}
-            />
-            <span className="checkmark">✓</span>
-            <span className="team-text">فريق 2</span>
-        </label>
-        
-        <label className={`team-option ${formData.team === '3' ? 'checked' : ''}`}>
-            <input
-                type="checkbox"
-                checked={formData.team === '3'}
-                onChange={() => setFormData({ ...formData, team: '3' })}
-            />
-            <span className="checkmark">✓</span>
-            <span className="team-text">فريق 3</span>
-        </label>
-    </div>
-</div>
+                            <div className="form-group">
+                                <label>الفريق *</label>
+                                <div className="team-checkboxes">
+                                    <label className={`team-option ${formData.team === '1' ? 'checked' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.team === '1'}
+                                            onChange={() => setFormData({ ...formData, team: '1' })}
+                                        />
+                                        <span className="checkmark">✓</span>
+                                        <span className="team-text">فريق 1</span>
+                                    </label>
+
+                                    <label className={`team-option ${formData.team === '2' ? 'checked' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.team === '2'}
+                                            onChange={() => setFormData({ ...formData, team: '2' })}
+                                        />
+                                        <span className="checkmark">✓</span>
+                                        <span className="team-text">فريق 2</span>
+                                    </label>
+
+                                    <label className={`team-option ${formData.team === '3' ? 'checked' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.team === '3'}
+                                            onChange={() => setFormData({ ...formData, team: '3' })}
+                                        />
+                                        <span className="checkmark">✓</span>
+                                        <span className="team-text">فريق 3</span>
+                                    </label>
+                                </div>
+                            </div>
 
                             <div className="form-actions">
                                 <button type="submit" className="btn-save">
