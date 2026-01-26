@@ -1,0 +1,304 @@
+/* Vehicle Management Modal */
+.vehicle-modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.vehicle-modal-header {
+    background: transparent; /* Removed gradient background */
+    color: #333; /* Changed to dark text */
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: center; /* Center the title */
+    align-items: center;
+    position: relative; /* For absolute positioning of close button */
+    border-bottom: 2px solid #e0e0e0; /* Added border for separation */
+}
+
+.vehicle-modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.close-btn {
+    position: absolute;
+    right: 1.5rem; /* Position on the right */
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    color: #666;
+    font-size: 1.75rem;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+}
+
+.close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+.vehicle-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Add Vehicle Button */
+.add-vehicle-btn {
+    width: auto;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, #186e0e 0%, #62ce4f 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    display: block; 
+}
+
+.add-vehicle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 110, 14, 0.3);
+}
+
+.btn-add-text {
+    font-size: 1rem;
+}
+
+/* Vehicles List */
+.vehicles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.empty-vehicles {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #666;
+}
+
+.empty-vehicles p {
+    font-size: 1.1rem;
+}
+
+.vehicle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.vehicle-item:hover {
+    border-color: #186e0e;
+    background: #f8fdf8;
+}
+
+.vehicle-info {
+    flex: 1;
+}
+
+.vehicle-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.vehicle-plate {
+    font-size: 0.9rem;
+    color: #666;
+    direction: ltr;
+    text-align: right; /* Changed from left to right */
+}
+
+.vehicle-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.edit-vehicle-btn,
+.delete-vehicle-btn {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.edit-vehicle-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.edit-vehicle-btn:hover {
+    transform: scale(1.1);
+}
+
+.delete-vehicle-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.delete-vehicle-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Vehicle Form */
+.vehicle-form {
+    animation: slideIn 0.3s ease;
+}
+
+.vehicle-form h4 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.form-field {
+    margin-bottom: 1.25rem;
+}
+
+.form-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.form-field input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-field input:focus {
+    outline: none;
+    border-color: #186e0e;
+    box-shadow: 0 0 0 3px rgba(24, 110, 14, 0.1);
+}
+
+.form-field input.error {
+    border-color: #ca1515;
+}
+
+.error-text {
+    display: block;
+    color: #ca1515;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.cancel-btn,
+.save-btn {
+    flex: 1;
+    padding: 0.875rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.cancel-btn:hover {
+    background: #d0d0d0;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #186e0e 0%, #62ce4f 100%);
+    color: white;
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 110, 14, 0.3);
+}
+
+/* Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .vehicle-modal {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .vehicle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .vehicle-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .add-vehicle-btn {
+        width: 100%;
+    }
+}
+/* Responsive */
+@media (max-width: 600px) {
+    .vehicle-modal {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .vehicle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .vehicle-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

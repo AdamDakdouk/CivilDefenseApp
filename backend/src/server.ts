@@ -16,6 +16,7 @@ import dashboardRoutes from './routes/dashboardsRoutes';
 import authRoutes from './routes//authRoutes';
 import usersRoutes from './routes/usersRoutes';
 import adminRoutes from './routes/adminRoutes';
+import vehicleRoutes from './routes/vehicleRoutes';
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use('/public', express.static(path.join(__dirname, '../public')));
 // API Routes
 app.use('/api/shifts', shiftRoutes);
 app.use('/api/missions', missionRoutes);
+app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/monthly-reports', monthlyReportRoutes);
 app.use('/api/volunteer-stats', volunteerStatsRoutes);
 app.use('/api/attendance', attendanceRoutes);
@@ -51,6 +53,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/admin', adminRoutes);
+
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {

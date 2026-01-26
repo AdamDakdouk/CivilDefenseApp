@@ -57,3 +57,11 @@ export interface Attendance {
   code: 'ح' | 'مأ' | 'غ' | 'ع' | 'م' | 'ب';
   createdAt: string;
 }
+
+export interface Vehicle {
+  _id: string;
+  name: string;
+  plateNumber: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

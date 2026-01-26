@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../types';
-import { searchUsers, getUsers } from '../services/api';
+import { searchUsers, getUsers, getVehicles } from '../services/api';
 import TimePicker from './TimePicker';
 import './Modal.css';
 import { useMonth } from '../contexts/MonthContext';
 import CustomAlert from './CustomAlert';
 import { getCurrentDate, getTeamForDate } from '../utils/timeUtils';
+import VehicleManagement from './VehicleManagement';
+
 
 interface Participant {
     userId: string;
@@ -53,6 +55,15 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
     const [alertMessage, setAlertMessage] = useState('');
     const [alertType, setAlertType] = useState<'error' | 'success' | 'warning' | 'info'>('info');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showVehicleManagement, setShowVehicleManagement] = useState(false);
+    const [availableVehicles, setAvailableVehicles] = useState<Array<{ _id: string, name: string, plateNumber: string }>>([]);
+
+    // Add this useEffect to fetch vehicles
+    useEffect(() => {
+        if (isOpen) {
+            fetchVehicles();
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         fetchAllUsers();
@@ -99,6 +110,15 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
     const fetchAllUsers = async () => {
         const users = await getUsers();
         setAllUsers(users);
+    };
+
+    const fetchVehicles = async () => {
+        try {
+            const data = await getVehicles();
+            setAvailableVehicles(data);
+        } catch (error) {
+            console.error('Error fetching vehicles:', error);
+        }
     };
 
     const fetchSettings = async () => {
@@ -488,68 +508,60 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                 </div>
 
                 <div className="form-group mission-form-group">
-                    <label className='required mission-required'>نوع الآلية</label>
-                    <div className="radio-group mission-radio-group" data-field="vehicleNumber">
-                        <label className="radio-label mission-radio-label">
-                            <input
-                                type="checkbox"
-                                value="921306"
-                                checked={vehicleNumbers.includes("921306")}
-                                onChange={(e) => {
-                                    if (e.target.checked) {
-                                        setVehicleNumbers([...vehicleNumbers, "921306"]);
-                                    } else {
-                                        setVehicleNumbers(vehicleNumbers.filter(v => v !== "921306"));
-                                    }
-                                    if (errors.vehicleNumber) setErrors({ ...errors, vehicleNumber: false });
-                                }}
-                            />
-                            Renault
-                        </label>
-                        <label className="radio-label mission-radio-label">
-                            <input
-                                type="checkbox"
-                                value="921034"
-                                checked={vehicleNumbers.includes("921034")}
-                                onChange={(e) => {
-                                    if (e.target.checked) {
-                                        setVehicleNumbers([...vehicleNumbers, "921034"]);
-                                    } else {
-                                        setVehicleNumbers(vehicleNumbers.filter(v => v !== "921034"));
-                                    }
-                                    if (errors.vehicleNumber) setErrors({ ...errors, vehicleNumber: false });
-                                }}
-                            />
-                            Envoy
-                        </label>
-                        <label className="radio-label mission-radio-label">
-                            <input
-                                type="checkbox"
-                                value="921269"
-                                checked={vehicleNumbers.includes("921269")}
-                                onChange={(e) => {
-                                    if (e.target.checked) {
-                                        setVehicleNumbers([...vehicleNumbers, "921269"]);
-                                    } else {
-                                        setVehicleNumbers(vehicleNumbers.filter(v => v !== "921269"));
-                                    }
-                                    if (errors.vehicleNumber) setErrors({ ...errors, vehicleNumber: false });
-                                }}
-                            />
-                            Rio
-                        </label>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <label className='required mission-required'>نوع الآلية</label>
+                        <button
+                            type="button"
+                            className="settings-btn"
+                            onClick={() => setShowVehicleManagement(true)}
+                            title="إدارة الآليات"
+                        >
+                            ⚙️
+                        </button>
                     </div>
+
+                    {availableVehicles.length === 0 ? (
+                        <div className="no-vehicles">
+                            <p>لا توجد آليات مضافة بعد</p>
+                            <button
+                                type="button"
+                                className="btn-add add-vehicle-btn"
+                                onClick={() => setShowVehicleManagement(true)}
+                            >
+                                + إضافة آلية
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="radio-group mission-radio-group" data-field="vehicleNumber">
+                            {availableVehicles.map(vehicle => (
+                                <label key={vehicle._id} className="radio-label mission-radio-label">
+                                    <input
+                                        type="checkbox"
+                                        value={vehicle.plateNumber}
+                                        checked={vehicleNumbers.includes(vehicle.plateNumber)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setVehicleNumbers([...vehicleNumbers, vehicle.plateNumber]);
+                                            } else {
+                                                setVehicleNumbers(vehicleNumbers.filter(v => v !== vehicle.plateNumber));
+                                            }
+                                            if (errors.vehicleNumber) setErrors({ ...errors, vehicleNumber: false });
+                                        }}
+                                    />
+                                    {vehicle.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+
+
                     {vehicleNumbers.length > 0 && (
                         <div className="selected-participants mission-selected-participants" style={{ marginTop: '10px' }}>
                             {vehicleNumbers.map(vNum => {
-                                const vehicleNames: { [key: string]: string } = {
-                                    "921306": "Renault",
-                                    "921034": "Envoy",
-                                    "921269": "Rio"
-                                };
+                                const vehicle = availableVehicles.find(v => v.plateNumber === vNum);
                                 return (
                                     <span key={vNum} className="participant-tag mission-participant-tag">
-                                        {vehicleNames[vNum] || vNum}
+                                        {vehicle?.name || vNum}
                                         <button
                                             onClick={() => {
                                                 setVehicleNumbers(vehicleNumbers.filter(v => v !== vNum));
@@ -561,7 +573,11 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                             })}
                         </div>
                     )}
-                    {errors.vehicleNumber && <span className="error-icon mission-error-icon" style={{ position: 'static', marginTop: '5px', display: 'block' }}>⚠ يرجى اختيار آلية واحدة على الأقل</span>}
+                    {errors.vehicleNumber && (
+                        <span className="error-icon mission-error-icon" style={{ position: 'static', marginTop: '5px', display: 'block' }}>
+                            ⚠ يرجى اختيار آلية واحدة على الأقل
+                        </span>
+                    )}
                 </div>
 
                 <TimePicker
@@ -688,6 +704,12 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                     type={alertType}
                 />
             )}
+
+            <VehicleManagement
+                isOpen={showVehicleManagement}
+                onClose={() => setShowVehicleManagement(false)}
+                onSave={() => fetchVehicles()}
+            />
         </div >
     );
 };

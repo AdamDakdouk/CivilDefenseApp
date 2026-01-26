@@ -306,8 +306,9 @@ const Users: React.FC = () => {
                                             className={deletingUserId === user._id ? 'deleting-row' : ''}
                                         >
                                             <td>
-                                                {user.name}
+                                                {user.name.split(' ')[0]}
                                                 {user.middleName && ` ${user.middleName}`}
+                                                {` ${user.name.split(' ').slice(1).join(' ')}`}
                                             </td>
                                             <td>{user.motherName || '-'}</td>
                                             <td className='card-number'>
