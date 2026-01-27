@@ -643,16 +643,21 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
     // Check if there are any OTHER shifts on this same day
     const otherShiftsOnDay = await Shift.find({
       date: shift.date,
-      _id: { $ne: id }
+      _id: { $ne: id },
+      adminId: req.admin.adminId
     });
 
     if (otherShiftsOnDay.length === 0) {
       // No other shifts on this day - DELETE all attendance records
-      await Attendance.deleteMany({ date: shift.date });
+      await Attendance.deleteMany({
+        date: shift.date,
+        adminId: req.admin.adminId
+      });
     } else {
       // There are other shifts - recalculate attendance
       const allStaff = await User.find({
-        role: { $in: ['employee', 'head', 'administrative staff'] }
+        adminId: req.admin.adminId,
+        role: { $in: ['employee', 'head', 'administrative staff'] },
       });
 
       const allParticipantIds = otherShiftsOnDay.flatMap(s =>
@@ -666,6 +671,7 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
       for (const staff of allStaff) {
         if (allParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString())) {
           await Attendance.create({
+            adminId: req.admin.adminId,
             userId: staff._id,
             date: shift.date,
             code: 'ح'
@@ -722,10 +728,10 @@ router.get('/available-months', async (req: AuthRequest, res: Response) => {
     if (!req.admin) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    
+
     // ✅ Convert to ObjectId for aggregate query
     const adminObjectId = new mongoose.Types.ObjectId(req.admin.adminId);
-    
+
     const months = await Shift.aggregate([
       { $match: { adminId: adminObjectId } }, // ✅ Use ObjectId
       {
