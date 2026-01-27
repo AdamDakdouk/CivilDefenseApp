@@ -71,7 +71,7 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
     }, []);
 
     useEffect(() => {
-        if (allUsers.length > 0 && !editMode) {
+        if (allUsers.length > 0 ) {
             autoFillTeamEmployees(team);
         }
     }, [team, allUsers]);

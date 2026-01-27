@@ -80,36 +80,6 @@ const AddShiftModal: React.FC<AddShiftModalProps> = ({ isOpen, onClose, onSave, 
         return currentParticipants;
     };
 
-    // Helper: Validate datetime change (allow day change, block month/year change)
-    const validateDateTimeChange = (newDatetime: string, shiftDate: string): boolean => {
-        const newDate = new Date(newDatetime.split('T')[0]);
-        const shiftDateObj = new Date(shiftDate);
-
-        // Check if shift is on the last day of the month
-        const lastDayOfMonth = new Date(shiftDateObj.getFullYear(), shiftDateObj.getMonth() + 1, 0).getDate();
-        const isLastDayOfMonth = shiftDateObj.getDate() === lastDayOfMonth;
-
-        if (isLastDayOfMonth) {
-            // Allow same month OR next month only
-            const shiftMonth = shiftDateObj.getMonth();
-            const shiftYear = shiftDateObj.getFullYear();
-            const newMonth = newDate.getMonth();
-            const newYear = newDate.getFullYear();
-
-            const isSameMonth = (newMonth === shiftMonth && newYear === shiftYear);
-            const isNextMonth = (
-                (newMonth === shiftMonth + 1 && newYear === shiftYear) || // Next month same year
-                (newMonth === 0 && shiftMonth === 11 && newYear === shiftYear + 1) // Dec -> Jan
-            );
-
-            return isSameMonth || isNextMonth;
-        } else {
-            // Not last day - must be same month/year
-            return newDate.getMonth() === shiftDateObj.getMonth() &&
-                newDate.getFullYear() === shiftDateObj.getFullYear();
-        }
-    };
-
     useEffect(() => {
         fetchAllUsers();
         fetchSettings();

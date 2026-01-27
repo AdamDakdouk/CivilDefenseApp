@@ -35,7 +35,7 @@ router.get('/search', async (req: AuthRequest, res: Response) => {
     }
 
     const query = req.query.q as string;
-    
+
     if (!query) {
       return res.status(400).json({ message: 'Search query required' });
     }
@@ -68,18 +68,23 @@ router.post('/', async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: 'Name, role, and team are required' });
     }
 
-    if (role === 'employee' && !autoNumber) {
-      return res.status(400).json({ message: 'Auto number is required for employees' });
-    }
-
-    // Check if auto number or card number already exists
-    if (role === 'employee') {
-      const existing = await User.findOne({ adminId: req.admin.adminId, autoNumber });
+    // Only check autoNumber if it's provided and not empty
+    if (['employee', 'head', 'administrative staff'].includes(role) && autoNumber && autoNumber.trim()) {
+      const existing = await User.findOne({
+        adminId: req.admin.adminId,
+        autoNumber: autoNumber.trim()
+      });
       if (existing) {
         return res.status(400).json({ message: 'الرقم الآلي موجود مسبقاً' });
       }
-    } else {
-      const existing = await User.findOne({ adminId: req.admin.adminId, cardNumber });
+    }
+
+    // Only check cardNumber if it's provided and not empty
+    if (role === 'volunteer' && cardNumber && cardNumber.trim()) {
+      const existing = await User.findOne({
+        adminId: req.admin.adminId,
+        cardNumber: cardNumber.trim()
+      });
       if (existing) {
         return res.status(400).json({ message: 'رقم البطاقة موجود مسبقاً' });
       }
@@ -92,8 +97,14 @@ router.post('/', async (req: AuthRequest, res: Response) => {
       motherName: motherName || undefined,
       role,
       team,
-      autoNumber: role === 'employee' ? autoNumber : undefined,
-      cardNumber: role === 'volunteer' ? cardNumber : undefined,
+      // ✅ Save autoNumber for employee, head, and admin staff
+      autoNumber: ['employee', 'head', 'administrative staff'].includes(role) && autoNumber
+        ? autoNumber
+        : undefined,
+      // ✅ Save cardNumber for volunteer
+      cardNumber: role === 'volunteer' && cardNumber
+        ? cardNumber
+        : undefined,
       currentMonthHours: 0,
       currentMonthMissions: 0,
       currentMonthDays: 0
@@ -120,7 +131,7 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
 
     // Find user and verify ownership
     const user = await User.findOne({ _id: id, adminId: req.admin.adminId });
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -130,28 +141,23 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: 'Name, role, and team are required' });
     }
 
-    if (role === 'employee' && !autoNumber) {
-      return res.status(400).json({ message: 'Auto number is required for employees' });
-    }
-
-    if (role === 'volunteer' && !cardNumber) {
-      return res.status(400).json({ message: 'Card number is required for volunteers' });
-    }
-
-    // Check for duplicate numbers (excluding current user)
-    if (role === 'employee') {
-      const existing = await User.findOne({ 
-        adminId: req.admin.adminId, 
-        autoNumber,
+    // Check for duplicate autoNumber (excluding current user)
+    if (['employee', 'head', 'administrative staff'].includes(role) && autoNumber && autoNumber.trim()) {
+      const existing = await User.findOne({
+        adminId: req.admin.adminId,
+        autoNumber: autoNumber.trim(),
         _id: { $ne: id }
       });
       if (existing) {
         return res.status(400).json({ message: 'الرقم الآلي موجود مسبقاً' });
       }
-    } else {
-      const existing = await User.findOne({ 
-        adminId: req.admin.adminId, 
-        cardNumber,
+    }
+
+    // Check for duplicate cardNumber (excluding current user)
+    if (role === 'volunteer' && cardNumber && cardNumber.trim()) {
+      const existing = await User.findOne({
+        adminId: req.admin.adminId,
+        cardNumber: cardNumber.trim(),
         _id: { $ne: id }
       });
       if (existing) {
@@ -165,8 +171,14 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
     user.motherName = motherName || undefined;
     user.role = role;
     user.team = team;
-    user.autoNumber = role === 'employee' ? autoNumber : undefined;
-    user.cardNumber = role === 'volunteer' ? cardNumber : undefined;
+    // ✅ Save autoNumber for employee, head, and admin staff
+    user.autoNumber = ['employee', 'head', 'administrative staff'].includes(role) && autoNumber
+      ? autoNumber
+      : undefined;
+    // ✅ Save cardNumber for volunteer
+    user.cardNumber = role === 'volunteer' && cardNumber
+      ? cardNumber
+      : undefined;
 
     await user.save();
 

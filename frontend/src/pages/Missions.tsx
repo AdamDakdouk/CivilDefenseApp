@@ -176,6 +176,13 @@ const Missions: React.FC = () => {
             <div className="page-header">
                 <h2 className="page-title">المهمات</h2>
                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                    <button
+                        onClick={() => setShowSuffixModal(true)}
+                        className="settings-btn no-print"
+                        title="إعدادات رقم البرقية"
+                    >
+                        ⚙️
+                    </button>
                     <button onClick={handlePrint} className="export-btn">
                         <span> طباعة / تصدير PDF</span>
                     </button>
@@ -249,14 +256,7 @@ const Missions: React.FC = () => {
                         <thead>
                             <tr>
                                 <th rowSpan={2}>التاريخ</th>
-                                <th
-                                    rowSpan={2}
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => setShowSuffixModal(true)}
-                                >
-                                    رقم البرقية <span className="no-print">⚙️</span>
-                                </th>
-
+                                <th rowSpan={2}>رقم البرقية</th>
                                 <th colSpan={2}>نوع المهمة</th>
                                 <th rowSpan={2}>المكان</th>
                                 <th rowSpan={2}>العناصر المنفذة</th>
@@ -362,7 +362,7 @@ const Missions: React.FC = () => {
 
                         <label className='suffix-form-label'>اللاحقة</label>
                         <input
-                        className='suffix-form-input'
+                            className='suffix-form-input'
                             type="text"
                             value={missionSuffix}
                             onChange={(e) => setMissionSuffix(e.target.value)}
@@ -374,15 +374,19 @@ const Missions: React.FC = () => {
 
                         <div className="form-actions suffix-form">
                             <button
-                            className='btn-save btn-save-suffix'
+                                className='btn-save btn-save-suffix'
                                 onClick={async () => {
                                     try {
                                         await updateMissionSuffix(missionSuffix);
 
-                                        alert('تم حفظ اللاحقة بنجاح');
+                                        setAlertMessage('تم حفظ اللاحقة بنجاح');
+                                        setAlertType('success')
+                                        setShowAlert(true);
                                         setShowSuffixModal(false);
                                     } catch {
-                                        alert('فشل في حفظ اللاحقة');
+                                        setAlertMessage('فشل في حفظ اللاحقة');
+                                        setAlertType('warning')
+                                        setShowAlert(true);
                                     }
                                 }}
                             >

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getVehicles, createVehicle, updateVehicle, deleteVehicle } from '../services/api';
+import ConfirmModal from '../components/ConfirmModal';
 import './VehicleManagement.css';
 
 interface Vehicle {
@@ -20,6 +21,10 @@ const VehicleManagement: React.FC<VehicleManagementProps> = ({ isOpen, onClose, 
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ name: '', plateNumber: '' });
     const [errors, setErrors] = useState({ name: false, plateNumber: false });
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
 
     useEffect(() => {
         if (isOpen) {
@@ -76,17 +81,28 @@ const VehicleManagement: React.FC<VehicleManagementProps> = ({ isOpen, onClose, 
         setShowForm(true);
     };
 
-    const handleDelete = async (vehicleId: string) => {
-        if (!window.confirm('هل أنت متأكد من حذف هذه الآلية؟')) return;
+    const handleDelete = (vehicleId: string) => {
+        setVehicleToDelete(vehicleId);
+        setShowConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!vehicleToDelete) return;
 
         try {
-            await deleteVehicle(vehicleId);
+            setDeleteLoading(true);
+            await deleteVehicle(vehicleToDelete);
             fetchVehicles();
-            onSave(); // Notify parent to refresh
+            onSave();
+            setShowConfirm(false);
+            setVehicleToDelete(null);
         } catch (error) {
             console.error('Error deleting vehicle:', error);
+        } finally {
+            setDeleteLoading(false);
         }
     };
+
 
     const handleCancel = () => {
         setFormData({ name: '', plateNumber: '' });
@@ -112,7 +128,7 @@ const VehicleManagement: React.FC<VehicleManagementProps> = ({ isOpen, onClose, 
                                 className="btn-add add-vehicle-btn"
                                 onClick={() => setShowForm(true)}
                             >
-                               <span className='btn-add-text'>+ إضافة آلية جديدة</span> 
+                                <span className='btn-add-text'>+ إضافة آلية جديدة</span>
                             </button>
 
                             <div className="vehicles-list">
@@ -192,6 +208,20 @@ const VehicleManagement: React.FC<VehicleManagementProps> = ({ isOpen, onClose, 
                     )}
                 </div>
             </div>
+
+            {showConfirm && (
+                <ConfirmModal
+                    message="هل أنت متأكد من حذف هذه الآلية؟"
+                    onConfirm={confirmDelete}
+                    onCancel={() => {
+                        if (deleteLoading) return;
+                        setShowConfirm(false);
+                        setVehicleToDelete(null);
+                    }}
+                    loading={deleteLoading}
+                />
+            )}
+
         </div>
     );
 };

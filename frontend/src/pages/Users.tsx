@@ -44,7 +44,7 @@ const Users: React.FC = () => {
         name: '',
         middleName: '',
         motherName: '',
-        role: 'volunteer' as 'employee' | 'volunteer',
+        role: 'volunteer' as 'employee' | 'volunteer' | 'head' | 'administrative staff',
         autoNumber: '',
         cardNumber: '',
         team: '1' as '1' | '2' | '3'
@@ -102,9 +102,7 @@ const Users: React.FC = () => {
             name: String(user.name || ''),
             middleName: String(user.middleName || ''),
             motherName: String(user.motherName || ''),
-            role: (user.role === 'employee' || user.role === 'volunteer'
-                ? user.role
-                : 'volunteer'), // fallback if it's head/admin
+            role: user.role, // ✅ Just use the role directly
             autoNumber: String(user.autoNumber || ''),
             cardNumber: String(user.cardNumber || ''),
             team: user.team
@@ -161,6 +159,53 @@ const Users: React.FC = () => {
         if (!formData.name.trim()) newErrors.name = true;
         if (formData.role === 'employee' && !formData.autoNumber.trim()) newErrors.autoNumber = true;
         if (!formData.team) newErrors.team = true;
+        if (formData.role === 'head') {
+            // Check if another user is already head (and it's not the current user being edited)
+            const existingHead = users.find(u =>
+                u.role === 'head' &&
+                (!editingUser || u._id !== editingUser._id)
+            );
+
+            if (existingHead) {
+                setAlertData({
+                    message: ` يوجود رئيس مركز  : ${existingHead.name}`,
+                    type: 'error'
+                });
+                return;
+            }
+        }
+
+        // Check for duplicate autoNumber on frontend
+        if (['employee', 'head', 'administrative staff'].includes(formData.role) && formData.autoNumber.trim()) {
+            const existingAutoNumber = users.find(u =>
+                u.autoNumber === formData.autoNumber.trim() &&
+                (!editingUser || u._id !== editingUser._id)
+            );
+
+            if (existingAutoNumber) {
+                setAlertData({
+                    message: `الرقم الآلي موجود مسبقاً: ${existingAutoNumber.name}`,
+                    type: 'error'
+                });
+                return;
+            }
+        }
+
+        // Check for duplicate cardNumber on frontend
+        if (formData.role === 'volunteer' && formData.cardNumber.trim()) {
+            const existingCardNumber = users.find(u =>
+                u.cardNumber === formData.cardNumber.trim() &&
+                (!editingUser || u._id !== editingUser._id)
+            );
+
+            if (existingCardNumber) {
+                setAlertData({
+                    message: `رقم البطاقة موجود مسبقاً: ${existingCardNumber.name}`,
+                    type: 'error'
+                });
+                return;
+            }
+        }
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -176,17 +221,23 @@ const Users: React.FC = () => {
         setErrors({});
 
         try {
-            const payload = {
+            const payload: any = {
                 name: formData.name.trim(),
                 middleName: formData.middleName.trim() || undefined,
                 motherName: formData.motherName.trim() || undefined,
                 role: formData.role,
-                team: formData.team,
-                ...(formData.role === 'employee'
-                    ? { autoNumber: formData.autoNumber.trim() }
-                    : { cardNumber: formData.cardNumber.trim() || undefined }
-                )
+                team: formData.team
             };
+
+            // Only add autoNumber if it exists
+            if (['employee', 'head', 'administrative staff'].includes(formData.role) && formData.autoNumber.trim()) {
+                payload.autoNumber = formData.autoNumber.trim();
+            }
+
+            // Only add cardNumber if it exists
+            if (formData.role === 'volunteer' && formData.cardNumber.trim()) {
+                payload.cardNumber = formData.cardNumber.trim();
+            }
 
             if (editingUser) {
                 await updateUser(editingUser._id, payload);
@@ -287,8 +338,23 @@ const Users: React.FC = () => {
                             ) : (
                                 users
                                     .filter(user => {
-                                        if (roleFilter !== 'all' && user.role !== roleFilter) return false;
+                                        // Role filter logic
+                                        if (roleFilter === 'employee') {
+                                            // Show employees, head, and admin staff
+                                            if (!['employee', 'head', 'administrative staff'].includes(user.role)) {
+                                                return false;
+                                            }
+                                        } else if (roleFilter === 'volunteer') {
+                                            // Show only volunteers
+                                            if (user.role !== 'volunteer') {
+                                                return false;
+                                            }
+                                        }
+                                        // 'all' shows everyone (no filtering needed)
+
+                                        // Team filter
                                         if (teamFilter !== 'all' && user.team !== teamFilter) return false;
+
                                         return true;
                                     })
                                     .sort((a, b) => {
@@ -312,12 +378,18 @@ const Users: React.FC = () => {
                                             </td>
                                             <td>{user.motherName || '-'}</td>
                                             <td className='card-number'>
-                                                {user.role === 'employee'
+                                                {['employee', 'head', 'administrative staff'].includes(user.role)
                                                     ? user.autoNumber
-                                                    : user.cardNumber}                                        </td>
+                                                    : user.cardNumber}
+                                            </td>
                                             <td>
-                                                <span className={`role-badge ${user.role}`}>
-                                                    {user.role === 'employee' ? 'موظف' : 'متطوع'}
+                                                <span className={`role-badge ${user.role.replace(/\s+/g, '-')}`}>
+                                                    {{
+                                                        'employee': 'موظف',
+                                                        'volunteer': 'متطوع',
+                                                        'head': 'رئيس مركز',
+                                                        'administrative staff': 'إداري'
+                                                    }[user.role]}
                                                 </span>
                                             </td>
                                             <td>فريق {user.team}</td>
@@ -371,7 +443,6 @@ const Users: React.FC = () => {
                                             setFormData({ ...formData, name: e.target.value });
                                             if (errors.name) setErrors({ ...errors, name: false });
                                         }}
-                                        placeholder="مثال: محمد حسن"
                                         style={{ borderColor: errors.name ? '#c41e3a' : '#ddd' }}
                                     />
                                     {errors.name && <span className="error-icon">⚠</span>}
@@ -431,10 +502,39 @@ const Users: React.FC = () => {
                                         <span className="checkmark">✓</span>
                                         <span className="role-text">موظف</span>
                                     </label>
+                                    <label className={`role-option ${formData.role === 'head' ? 'checked' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.role === 'head'}
+                                            onChange={() => setFormData({
+                                                ...formData,
+                                                role: 'head',
+                                                autoNumber: '',
+                                                cardNumber: ''
+                                            })}
+                                        />
+                                        <span className="checkmark">✓</span>
+                                        <span className="role-text">رئيس مركز</span>
+                                    </label>
+
+                                    <label className={`role-option ${formData.role === 'administrative staff' ? 'checked' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.role === 'administrative staff'}
+                                            onChange={() => setFormData({
+                                                ...formData,
+                                                role: 'administrative staff',
+                                                autoNumber: '',
+                                                cardNumber: ''
+                                            })}
+                                        />
+                                        <span className="checkmark">✓</span>
+                                        <span className="role-text">اداري</span>
+                                    </label>
                                 </div>
                             </div>
 
-                            {formData.role === 'employee' ? (
+                            {formData.role === 'employee' || formData.role === 'head' || formData.role === 'administrative staff' ? (
                                 <div className="form-group">
                                     <label>الرقم الآلي *</label>
                                     <div className="input-wrapper" data-field="autoNumber">
