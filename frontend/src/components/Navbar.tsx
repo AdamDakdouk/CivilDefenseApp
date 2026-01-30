@@ -21,6 +21,7 @@ const Navbar: React.FC = () => {
   const [isClosingMonth, setIsClosingMonth] = useState(false); // Loading state for month close
   const [isRollingOver, setIsRollingOver] = useState(false); // Flag to prevent reset during rollover
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (activeMonth && activeYear) {
@@ -180,6 +181,15 @@ const Navbar: React.FC = () => {
     logout();
   };
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
+
   return (
     <nav className={`navbar ${isVisible ? 'visible' : 'hidden'}`}>
       <div className="nav-container">
@@ -209,6 +219,7 @@ const Navbar: React.FC = () => {
               ))}
             </select>
           </div>
+
           <button
             onClick={closeCurrentMonth}
             className="close-month-btn"
@@ -217,6 +228,7 @@ const Navbar: React.FC = () => {
             {isClosingMonth ? 'جاري الإغلاق...' : 'إغلاق الشهر'}
 
           </button>
+
           <button
             onClick={handleLogoutClick}
             className="logout-btn"
@@ -238,6 +250,26 @@ const Navbar: React.FC = () => {
               <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
           </button>
+
+          <button
+            className={`hamburger-menu ${mobileMenuOpen ? 'active' : ''}`}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          {/* Mobile Menu Dropdown */}
+          <div className={`mobile-menu-dropdown ${mobileMenuOpen ? 'open' : ''}`}>
+            <Link to="/dashboard" onClick={closeMobileMenu}>لوحة المعلومات</Link>
+            <Link to="/missions" onClick={closeMobileMenu}>المهمات</Link>
+            <Link to="/shifts" onClick={closeMobileMenu}>المناوبات</Link>
+            <Link to="/employees" onClick={closeMobileMenu}>الموظفون</Link>
+            <Link to="/volunteers" onClick={closeMobileMenu}>المتطوعون</Link>
+            <Link to="/users" onClick={closeMobileMenu}>ادارة العناصر</Link>
+          </div>
         </div>
       </div>
 

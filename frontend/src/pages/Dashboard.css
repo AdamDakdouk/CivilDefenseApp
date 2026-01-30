@@ -312,6 +312,129 @@
     padding: 50px;
 }
 
+/* Floating Toggle Button */
+.floating-toggle-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.floating-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+/* Year Selector */
+.year-selector {
+    margin-top: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 16px;
+}
+
+.year-selector label {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.year-select-dropdown {
+    padding: 8px 15px;
+    font-size: 16px;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    background: white;
+    color: #2c3e50;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    min-width: 100px;
+    width: auto;
+}
+
+.year-select-dropdown:hover {
+    border-color: #2980b9;
+    background: #f8f9fa;
+}
+
+.year-select-dropdown:focus {
+    outline: none;
+    border-color: #2980b9;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Monthly Activity Chart (for Yearly Dashboard) */
+.monthly-activity-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    height: 250px;
+    padding: 20px 10px;
+    margin-top: 10px;
+}
+
+.month-bar-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-width: 40px;
+    height: 100%;
+}
+
+.month-bar {
+    width: 100%;
+    min-width: 40px;
+    background: linear-gradient(180deg, #126133, #21c465);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 8px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    min-height: 30px;
+}
+
+.month-bar:hover {
+    opacity: 0.8;
+}
+
+.month-bar .bar-value {
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.month-label {
+    font-size: 13px;
+    color: #7f8c8d;
+    font-weight: bold;
+    text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-container {
@@ -443,6 +566,30 @@
     .day-label {
         font-size: 11px;
     }
+
+    .monthly-activity-chart {
+        height: 200px;
+        gap: 8px;
+        padding: 15px 5px;
+    }
+
+    .month-bar-container {
+        min-width: 30px;
+        gap: 8px;
+    }
+
+    .month-bar {
+        min-width: 30px;
+        padding-top: 6px;
+    }
+
+    .month-bar .bar-value {
+        font-size: 12px;
+    }
+
+    .month-label {
+        font-size: 11px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -558,18 +705,23 @@
     }
 
     .daily-activity-chart {
-        height: 50px;
+        height: auto;
         gap: 4px;
         padding: 8px 0;
+        flex-wrap: wrap;
+        justify-content: flex-start;
     }
 
     .day-bar-container {
-        min-width: 20px;
+        min-width: calc((100% - 36px) / 10);
+        max-width: calc((100% - 36px) / 10);
+        flex: 0 0 calc((100% - 36px) / 10);
         gap: 6px;
     }
 
     .day-bar {
-        min-width: 20px;
+        min-width: 100%;
+        width: 100%;
         height: 25px;
     }
 
@@ -584,5 +736,55 @@
     .no-data {
         font-size: 14px;
         padding: 30px 15px;
+    }
+
+    .floating-toggle-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        bottom: 20px;
+        left: 20px;
+    }
+
+    .year-selector {
+        margin-top: 12px;
+        font-size: 14px;
+        gap: 8px;
+    }
+
+    .year-select-dropdown {
+        padding: 6px 12px;
+        font-size: 14px;
+        min-width: 90px;
+    }
+
+    .monthly-activity-chart {
+        height: auto;
+        gap: 8px;
+        padding: 15px 5px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .month-bar-container {
+        min-width: calc((100% - 40px) / 6);
+        max-width: calc((100% - 40px) / 6);
+        flex: 0 0 calc((100% - 40px) / 6);
+        gap: 8px;
+        height: 150px;
+    }
+
+    .month-bar {
+        min-width: 100%;
+        width: 100%;
+        padding-top: 6px;
+    }
+
+    .month-bar .bar-value {
+        font-size: 12px;
+    }
+
+    .month-label {
+        font-size: 11px;
     }
 }

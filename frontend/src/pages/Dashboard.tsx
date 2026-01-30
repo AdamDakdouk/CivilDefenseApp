@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMonth } from '../contexts/MonthContext';
 import api from '../services/api';
 import './Dashboard.css';
@@ -14,6 +15,7 @@ interface DashboardStats {
 }
 
 const Dashboard: React.FC = () => {
+    const navigate = useNavigate();
     const { selectedMonth } = useMonth();
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
@@ -78,6 +80,15 @@ if (loading) {
 
     return (
         <div className="dashboard-container">
+            {/* Floating Toggle Button */}
+            <button 
+                className="floating-toggle-btn"
+                onClick={() => navigate('/dashboard/yearly')}
+                title="عرض البيانات السنوية"
+            >
+                📊
+            </button>
+
             <div className="dashboard-header">
                 <h2>لوحة المعلومات - {getMonthName(displayMonth)} {displayYear}</h2>
             </div>

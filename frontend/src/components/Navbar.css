@@ -172,7 +172,121 @@
 }
 
 /* Mobile responsive */
+/* Hamburger Menu Button - Mobile Only */
+.hamburger-menu {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 1001;
+}
+
+.hamburger-menu span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.hamburger-menu.active span:nth-child(1) {
+  transform: rotate(45deg) translate(7px, 7px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Mobile Menu Dropdown */
+.mobile-menu-dropdown {
+  display: none;
+  position: fixed;
+  top: 76px;
+  left: 0;
+  width: 250px;
+  background: linear-gradient(135deg, #e52044 0%, #5e0815 100%);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.mobile-menu-dropdown.open {
+  max-height: 400px;
+}
+
+.mobile-menu-dropdown a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.2s;
+}
+
+.mobile-menu-dropdown a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu-dropdown a:last-child {
+  border-bottom: none;
+}
+
 @media (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+    order: -1;
+  }
+
+  .mobile-menu-dropdown {
+    display: block;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-container {
+    gap: 10px;
+  }
+
+  .navbar-controls {
+    gap: 8px;
+  }
+
+  .month-selector-navbar {
+    gap: 5px;
+  }
+
+  .month-selector-navbar label {
+    font-size: 13px;
+  }
+
+  .month-selector-navbar select {
+    padding: 5px 8px;
+    font-size: 13px;
+    min-width: 90px;
+  }
+
+  .close-month-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .nav-title {
+    font-size: 16px;
+  }
+
   .logout-btn {
     width: 36px;
     height: 36px;
@@ -186,8 +300,39 @@
 }
 
 @media (max-width: 480px) {
+  .nav-title {
+    display: none;
+  }
+
+  .month-selector-navbar label {
+    display: none;
+  }
+
+  .month-selector-navbar select {
+    min-width: 80px;
+    font-size: 12px;
+  }
+
+  .close-month-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
   .logout-btn {
     width: 34px;
     height: 34px;
+  }
+
+  .hamburger-menu span {
+    width: 22px;
+  }
+
+  .mobile-menu-dropdown {
+    width: 200px;
+  }
+
+  .mobile-menu-dropdown a {
+    padding: 12px 15px;
+    font-size: 14px;
   }
 }

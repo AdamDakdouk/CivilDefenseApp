@@ -13,10 +13,11 @@ import ResetPassword from './pages/ResetPassword';
 import { MonthProvider } from './contexts/MonthContext';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
+import YearlyDashboard from './pages/YearlyDashboard';
 
 function App() {
   return (
-<Router>
+    <Router>
       <AuthProvider>
         <Routes>
           {/* Public routes */}
@@ -35,6 +36,7 @@ function App() {
                     <div className="content">
                       <Routes>
                         <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/dashboard/yearly" element={<YearlyDashboard />} />
                         <Route path="/volunteers" element={<Volunteers />} />
                         <Route path="/employees" element={<Employees />} />
                         <Route path="/shifts" element={<Shifts />} />

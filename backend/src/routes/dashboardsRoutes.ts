@@ -160,4 +160,137 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
     }
 });
 
+// Yearly Dashboard Stats
+router.get('/yearly-stats', async (req: AuthRequest, res: Response) => {
+    try {
+        if (!req.admin) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const { year } = req.query;
+
+        if (!year) {
+            return res.status(400).json({ message: 'Year is required' });
+        }
+
+        // Create date range for the entire year
+        const startDate = `${year}-01-01`;
+        const endDate = `${year}-12-31`;
+
+        // Get all missions for the year FOR THIS ADMIN
+        const missions = await Mission.find({
+            adminId: req.admin.adminId,
+            date: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        }).populate('participants.user');
+
+        // Total missions
+        const totalMissions = missions.length;
+
+        // Total hours from MISSIONS ONLY
+        let totalHours = 0;
+        missions.forEach(mission => {
+            const hours = calculateHours(mission.startTime, mission.endTime);
+            totalHours += hours;
+        });
+
+        // Missions by type
+        const missionsByType: { [key: string]: number } = {};
+        const typeTranslations: { [key: string]: string } = {
+            'rescue': 'إنقاذ',
+            'medic': 'إسعاف',
+            'fire': 'إطفاء',
+            'public-service': 'خدمة عامة',
+            'misc': 'مختلف'
+        };
+
+        missions.forEach(mission => {
+            const typeKey = mission.missionType || 'misc';
+            const typeArabic = typeTranslations[typeKey] || mission.missionType || 'غير محدد';
+            missionsByType[typeArabic] = (missionsByType[typeArabic] || 0) + 1;
+        });
+
+        // Monthly activity (12 months)
+        const monthlyActivity = [];
+        for (let month = 1; month <= 12; month++) {
+            const monthString = String(month).padStart(2, '0');
+            const monthMissions = missions.filter(m => {
+                const missionMonth = m.date.substring(5, 7);
+                return missionMonth === monthString;
+            }).length;
+
+            monthlyActivity.push({
+                month,
+                missions: monthMissions
+            });
+        }
+
+        // Top contributors - VOLUNTEERS ONLY with custom hours
+        const volunteerMap = new Map();
+
+        missions.forEach(mission => {
+            const missionHours = calculateHours(mission.startTime, mission.endTime);
+
+            mission.participants.forEach((p: any) => {
+                if (p.user && p.user.role === 'volunteer') {
+                    const userId = p.user._id.toString();
+                    const userName = p.user.name;
+
+                    if (!volunteerMap.has(userId)) {
+                        volunteerMap.set(userId, {
+                            name: userName,
+                            hours: 0,
+                            missions: 0
+                        });
+                    }
+
+                    // Use participant's custom hours if available
+                    let participantHours = missionHours;
+                    if (p.customStartTime && p.customEndTime) {
+                        participantHours = calculateHours(p.customStartTime, p.customEndTime);
+                    }
+
+                    const contributor = volunteerMap.get(userId);
+                    contributor.hours += participantHours;
+                    contributor.missions += 1;
+                }
+            });
+        });
+
+        const topContributors = Array.from(volunteerMap.values())
+            .sort((a, b) => b.hours - a.hours);
+
+        // Team performance
+        const teamMap = new Map();
+
+        missions.forEach(mission => {
+            const team = mission.team || 'غير محدد';
+
+            if (!teamMap.has(team)) {
+                teamMap.set(team, { team, hours: 0, missions: 0 });
+            }
+
+            const hours = calculateHours(mission.startTime, mission.endTime);
+            teamMap.get(team).hours += hours;
+            teamMap.get(team).missions += 1;
+        });
+
+        const teamPerformance = Array.from(teamMap.values());
+
+        res.json({
+            totalMissions,
+            totalHours,
+            missionsByType,
+            monthlyActivity,
+            topContributors,
+            teamPerformance
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching yearly stats', error });
+    }
+});
+
 export default router;
