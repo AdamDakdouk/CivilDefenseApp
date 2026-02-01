@@ -243,7 +243,7 @@ const Missions: React.FC = () => {
 
                         <div className="header-center">
                             <h1 className="main-title">
-                                سعادة المدير العام الدفاع المدني بالتكليف<br />
+                                سعادة المدير العام الدفاع المدني<br />
                                 العميد الركن عماد خريش <span className="hierarchy">بالتراتبيه</span>
                             </h1>
                             <p className="subtitle">

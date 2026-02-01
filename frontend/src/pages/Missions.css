@@ -14,7 +14,7 @@
 }
 
 .btn-edit-small:hover {
-  background: linear-gradient(135deg, #fbff09 0%,#6c6e09  100%);
+  background: linear-gradient(135deg, #fbff09 0%, #6c6e09 100%);
 }
 
 .btn-delete-small {
@@ -26,18 +26,19 @@
 }
 
 .btn-delete-small:hover {
-  background: linear-gradient(135deg, #e52044  0%,#5e0815 100%);
+  background: linear-gradient(135deg, #e52044 0%, #5e0815 100%);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   font-size: 11px;
   border: 2px solid #000;
 }
 
-table th, table td {
+table th,
+table td {
   border: 1px solid #000;
   text-align: center;
   padding: 10px 8px;
@@ -45,7 +46,8 @@ table th, table td {
 
 .mission-table th,
 .mission-table td {
-  padding: 1px 2px; /* المسافة الصغيرة */
+  padding: 1px 2px;
+  /* المسافة الصغيرة */
 }
 
 
@@ -106,14 +108,17 @@ table thead tr:last-child th {
 }
 
 .inline-input {
-  width: 100px;
+  width: 90px;
+  margin-right: 3px;
   padding: 2px 4px;
-  border: none;
   background: transparent;
   font-size: 11px;
   direction: ltr;
   text-align: center;
   padding-left: 40px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  border-radius: 0;
 }
 
 .inline-input:focus {
@@ -151,10 +156,13 @@ table thead tr:last-child th {
 .date-display-overlay {
   display: inline-block;
   padding: 2px 4px;
-  min-width: 85px;
+  min-width: 80px;
   text-align: center;
   pointer-events: none;
   font-size: 11px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  border-radius: 0;
 }
 
 .missions-header {
@@ -225,7 +233,8 @@ table thead tr:last-child th {
   left: 0;
   width: 0%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.25); /* light white fill */
+  background: rgba(255, 255, 255, 0.25);
+  /* light white fill */
   transition: width 0.35s ease;
   z-index: 0;
 }
@@ -281,11 +290,12 @@ table thead tr:last-child th {
 .suffix-form {
   display: flex;
   justify-content: center;
-  gap: 12px; /* space between buttons */
+  gap: 12px;
+  /* space between buttons */
 }
 
 .suffix-form-title {
-    display: flex;
+  display: flex;
   justify-content: center;
 }
 
@@ -340,7 +350,8 @@ table thead tr:last-child th {
     width: 100%;
   }
 
-  table th, table td {
+  table th,
+  table td {
     padding: 8px 6px;
     font-size: 10px;
   }
@@ -419,7 +430,8 @@ table thead tr:last-child th {
     -webkit-overflow-scrolling: touch;
   }
 
-  table th, table td {
+  table th,
+  table td {
     padding: 6px 4px;
     font-size: 9px;
     min-width: 60px;
@@ -483,7 +495,8 @@ table thead tr:last-child th {
     font-size: 8px;
   }
 
-  table th, table td {
+  table th,
+  table td {
     padding: 5px 3px;
     font-size: 8px;
     min-width: 50px;
@@ -511,7 +524,8 @@ table thead tr:last-child th {
     font-size: 10px;
   }
 
-  table th, table td {
+  table th,
+  table td {
     padding: 8px 6px;
   }
 

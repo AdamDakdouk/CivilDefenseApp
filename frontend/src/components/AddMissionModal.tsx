@@ -71,10 +71,10 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
     }, []);
 
     useEffect(() => {
-        if (allUsers.length > 0 ) {
+        if (!editMode && allUsers.length > 0) {
             autoFillTeamEmployees(team);
         }
-    }, [team, allUsers]);
+    }, [team, allUsers, editMode]);
 
     useEffect(() => {
         if (isOpen && !editMode) {
@@ -593,10 +593,17 @@ const AddMissionModal: React.FC<AddMissionModalProps> = ({ isOpen, onClose, onSa
                 />
                 <div className="form-group mission-form-group">
                     <label>الفريق</label>
-                    <select value={team} onChange={(e) => {
-                        setTeam(e.target.value as '1' | '2' | '3');
-                        if (errors.referenceNumber) setErrors({ ...errors, referenceNumber: false });
-                    }}>
+                    <select
+                        value={team}
+                        onChange={(e) => {
+                            const newTeam = e.target.value as '1' | '2' | '3';
+                            setTeam(newTeam);
+
+                            if (editMode) {
+                                autoFillTeamEmployees(newTeam);
+                            }
+                            if (errors.referenceNumber) setErrors({ ...errors, referenceNumber: false });
+                        }}>
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
