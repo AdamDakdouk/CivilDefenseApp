@@ -4,7 +4,6 @@ import { searchUsers, getUsers } from '../services/api';
 import DateTimePicker from './DateTimePicker';
 import { useMonth } from '../contexts/MonthContext';
 import { getTeamForDate } from '../utils/timeUtils';
-import './Modal.css';
 import CustomAlert from './CustomAlert';
 
 interface Participant {

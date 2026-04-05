@@ -8,6 +8,7 @@
     "postbuild": "echo Build complete",
     "start": "node dist/server.js",
     "create-admin": "ts-node src/scripts/createAdmin.ts",
+    "seed-users": "ts-node src/scripts/seedUsers.ts",
     "clean": "ts-node -e \"import { clearDatabase } from './src/scripts/clearDatabase'; clearDatabase();\""
   },
   "keywords": [],

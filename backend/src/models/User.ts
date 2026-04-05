@@ -9,6 +9,7 @@ export interface IUser extends Document {
   autoNumber: string;
   role: 'volunteer' | 'employee' | 'head' | 'administrative staff';
   team: '1' | '2' | '3';
+  isActive: boolean;
   currentMonthHours: number;
   currentMonthMissions: number;
   currentMonthDays: number;
@@ -51,6 +52,10 @@ const UserSchema = new Schema<IUser>({
     type: String,
     enum: ['1', '2', '3'],
     required: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true
   },
   currentMonthHours: {
     type: Number,

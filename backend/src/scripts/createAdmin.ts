@@ -23,10 +23,10 @@ const createAdmin = async () => {
     // Create admin
     const hashedPassword = await bcrypt.hash('admin123', 10);
     const admin = new Admin({
-      email: 'adamwissamdakdouk2003@gmail.com',
+      email: 'adamdakdouk2003@gmail.com',
       password: hashedPassword,
       name: 'Administrator',
-      stationName: 'بنيه' // Update this with your station name
+      stationName: 'عرمون' // Update this with your station name
     });
 
     await admin.save();

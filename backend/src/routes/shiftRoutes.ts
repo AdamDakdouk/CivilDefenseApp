@@ -179,7 +179,8 @@ router.post('/', async (req: AuthRequest, res: Response) => {
     // Mark attendance for all staff
     for (const staff of allStaff) {
       const staffId = (staff._id as mongoose.Types.ObjectId).toString();
-      const code = participantIds.includes(staffId) ? 'ح' : 'ع';
+      // If inactive, mark as غ; otherwise mark as ح if in shift OR ع if not in shift
+      const code = !staff.isActive ? 'غ' : (participantIds.includes(staffId) ? 'ح' : 'ع');
 
       // Upsert attendance record (create or update)
       await Attendance.findOneAndUpdate(
@@ -472,7 +473,7 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
         );
 
         for (const staff of allStaff) {
-          const code = oldParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString()) ? 'ح' : 'ع';
+          const code = !staff.isActive ? 'غ' : (oldParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString()) ? 'ح' : 'ع');
           await Attendance.findOneAndUpdate(
             { userId: staff._id, date: oldShift.date },
             { code },
@@ -485,7 +486,7 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
     // Handle new date attendance
     const newParticipantIds = processedParticipants.map((p: any) => p.user.toString());
     for (const staff of allStaff) {
-      const code = newParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString()) ? 'ح' : 'ع';
+      const code = !staff.isActive ? 'غ' : (newParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString()) ? 'ح' : 'ع');
       await Attendance.findOneAndUpdate(
         { userId: staff._id, date: date },
         { code },
@@ -667,16 +668,17 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
       // Delete all attendance for this day first
       await Attendance.deleteMany({ date: shift.date });
 
-      // Re-create attendance only for participants in remaining shifts
+      // Re-create attendance for all staff
       for (const staff of allStaff) {
-        if (allParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString())) {
-          await Attendance.create({
-            adminId: req.admin.adminId,
-            userId: staff._id,
-            date: shift.date,
-            code: 'ح'
-          });
-        }
+        const isParticipant = allParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString());
+        const code = !staff.isActive ? 'غ' : (isParticipant ? 'ح' : 'ع');
+        
+        await Attendance.create({
+          adminId: req.admin.adminId,
+          userId: staff._id,
+          date: shift.date,
+          code
+        });
       }
     }
 
