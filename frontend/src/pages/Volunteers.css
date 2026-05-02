@@ -4,28 +4,6 @@
   padding: 13px;
 }
 
-.month-selector-header {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 13px;
-}
-
-.month-selector-header label {
-  font-weight: 600;
-}
-
-.month-selector-header select {
-  padding: 5px 8px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  font-size: 11px;
-  cursor: pointer;
-  width: 70px;
-  direction: rtl;
-  background-color: #fff;
-}
-
 /* Header */
 .header-section {
   margin-bottom: 13px;
@@ -37,11 +15,11 @@
 .title {
   margin-right: 2.7rem;
   font-weight: bold;
-  font-size: 15.5px;
+  font-size: 16px;
 }
 
 .date {
-  font-size: 15.5px;
+  font-size: 16px;
   font-weight: bold;
   margin-left: auto;
   margin-right: 10%;
@@ -64,7 +42,7 @@
   font-weight: bold;
   padding: 7px;
   text-align: center;
-  font-size: 11px;
+  font-size: 15px;
 }
 
 /* Inner borders (columns) */
@@ -91,7 +69,7 @@
   text-align: center;
   height: 18px;
   vertical-align: middle;
-  font-size: 11px;
+  font-size: 13.5px;
 }
 
 /* Header row border */
@@ -167,7 +145,7 @@
 .report-container tbody td:nth-child(8),
 .report-container tbody td:nth-child(9),
 .report-container tbody td:nth-child(10) {
-  font-size: 9px;
+  font-size: 13px;
   direction: ltr;
 }
 

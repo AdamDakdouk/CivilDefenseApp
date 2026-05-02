@@ -181,7 +181,7 @@ const Volunteers: React.FC = () => {
                 key={volunteer._id}
                 className={isTeamEnd ? 'team-end-row' : ''}
               >
-                <td><strong>{volunteer.name}</strong></td>
+                <td><strong><span style={{ fontSize : '14px'}}>{volunteer.name}</span></strong></td>
                 <td>{volunteer.cardNumber || ''}</td>
                 <td>متطوع</td>
                 <td>{volunteer.currentMonthDays}</td>

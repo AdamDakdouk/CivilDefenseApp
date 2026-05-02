@@ -254,7 +254,7 @@ const Missions: React.FC = () => {
 
                     <table className='mission-table'>
                         <thead>
-                            <tr>
+                            <tr className='missions-table-headers'>
                                 <th rowSpan={2}>التاريخ</th>
                                 <th rowSpan={2}>رقم البرقية</th>
                                 <th colSpan={2}>نوع المهمة</th>
@@ -265,7 +265,7 @@ const Missions: React.FC = () => {
                                 <th rowSpan={2}>ملاحظات</th>
                                 <th rowSpan={2}>إجراءات</th>
                             </tr>
-                            <tr>
+                            <tr className='missions-table-headers'>
                                 <th>اسعاف - اطفاء</th>
                                 <th>خدمة عامة</th>
                                 <th>الذهاب</th>
@@ -274,7 +274,7 @@ const Missions: React.FC = () => {
                         </thead>
                         <tbody>
                             {missions.map(mission => (
-                                <tr key={mission._id}>
+                                <tr className='missions-table-text' key={mission._id}>
                                     <td>{mission.date ? new Date(mission.date).toLocaleDateString('ar-LB') : ''}</td>
                                     <td>{mission.referenceNumber}</td>
                                     <td>

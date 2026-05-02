@@ -107,6 +107,7 @@
     font-weight: bold;
     color: #2c3e50;
     text-align: right;
+    font-size: 15px;
 }
 
 .type-progress-bar {
@@ -205,6 +206,7 @@
     font-weight: bold;
     color: #2c3e50;
     margin-bottom: 4px;
+    font-size: 15px;
 }
 
 .contributor-stats {

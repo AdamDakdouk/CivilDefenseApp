@@ -216,10 +216,12 @@ table thead tr:last-child th {
   overflow: hidden;
   background: linear-gradient(135deg, #186e0e 0%, #62ce4f 100%);
   color: white;
+  padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+  /* font-size: 14px; */
   white-space: nowrap;
 }
 
@@ -299,6 +301,26 @@ table thead tr:last-child th {
 
 .suffix-form-input {
   margin-top: 10px;
+}
+
+.missions-table-headers th {
+  font-size: 13px;
+}
+
+.missions-table-text td {
+font-size: 12.5px;
+}
+
+.mission-table td:first-child,
+.mission-table th:first-child {
+  min-width: 60px;
+  white-space: nowrap;
+}
+
+.mission-table td:nth-child(2),
+.mission-table th:nth-child(2) {
+  min-width: 60px;
+  white-space: nowrap;
 }
 
 /* Mobile Responsive Styles */

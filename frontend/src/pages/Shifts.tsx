@@ -195,7 +195,7 @@ const Shifts: React.FC = () => {
             </div>
             <table>
               <thead>
-                <tr>
+                <tr className='shifts-table-headers'>
                   <th>الاسم</th>
                   <th>وقت الدخول</th>
                   <th>وقت الخروج</th>
@@ -221,7 +221,7 @@ const Shifts: React.FC = () => {
                     return user && user.role !== 'employee' && user.role !== 'head' && user.role !== 'administrative staff';
                   })
                   .map((participant, index) => (
-                    <tr key={index}>
+                    <tr className='shifts-table-text' key={index}>
                       <td>{participant.user.name}</td>
                       <td>{formatTime(participant.checkIn)}</td>
                       <td>{formatTime(participant.checkOut)}</td>

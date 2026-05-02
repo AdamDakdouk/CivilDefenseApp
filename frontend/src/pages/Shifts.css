@@ -38,6 +38,14 @@
   flex-wrap: wrap;
 }
 
+.shifts-table-text td {
+  font-size: 12.5px !important;
+}
+
+.shifts-table-headers th {
+  font-size: 12.5px;
+}
+
 .team-selector {
   position: relative;
   overflow: hidden;
@@ -48,7 +56,6 @@
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 14px;
   white-space: nowrap;
 }
 
@@ -60,7 +67,7 @@
   background: linear-gradient(135deg, #a0a30c 0%, #fbff09 100%);
   color: #000 !important;
   padding: 6px 12px;
-  font-size: 11px;
+  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -72,7 +79,7 @@
   background: linear-gradient(135deg, #5e0815 0%, #e52044 100%);
   color: #fff !important;
   padding: 6px 12px;
-  font-size: 11px;
+  font-size: 13px;
   white-space: nowrap;
 }
 
