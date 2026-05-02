@@ -20,7 +20,7 @@
     -webkit-print-color-adjust: exact !important;
     margin: 0 !important;
     margin-top: 40mm !important;
-    padding: 0 !important;
+    padding: 0 3mm !important; /* add left/right padding here */
   }
 
   .legend-container {

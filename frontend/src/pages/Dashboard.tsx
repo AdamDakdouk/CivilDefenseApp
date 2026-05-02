@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMonth } from '../contexts/MonthContext';
 import api from '../services/api';
-import './Dashboard.css';
+import './Dashboard.css'
 
 interface DashboardStats {
     totalMissions: number;
@@ -153,7 +153,7 @@ if (loading) {
                                     <div className="contributor-info">
                                         <div className="contributor-name">{contributor.name}</div>
                                         <div className="contributor-stats">
-                                            {contributor.hours} ساعات • {contributor.missions === 1 ? 'مهمة واحدة' : `${contributor.missions} مهمات`}
+                                             ساعات : {contributor.hours} • مهمات : {contributor.missions}
                                         </div>
                                     </div>
                                 </div>

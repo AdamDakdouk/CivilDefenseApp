@@ -184,7 +184,7 @@ const Missions: React.FC = () => {
                         ⚙️
                     </button>
                     <button onClick={handlePrint} className="export-btn">
-                        <span> طباعة / تصدير PDF</span>
+                        <span style={{ fontSize: '14px' }}>طباعة الجدول</span>
                     </button>
                     {isCurrentMonth() && (
                         <button className='btn-add' onClick={() => { setEditingMission(null); setShowModal(true); }}>

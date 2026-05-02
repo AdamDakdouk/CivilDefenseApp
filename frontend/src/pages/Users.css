@@ -433,7 +433,7 @@
   }
 
   .role-text {
-    font-size: 0.85rem;
+    font-size: 12px;
     font-weight: 500;
     color: #333;
     user-select: none;
@@ -505,7 +505,7 @@
   }
 
   .team-text {
-    font-size: 0.85rem;
+    font-size: 12px;
     font-weight: 500;
     color: #333;
     user-select: none;
