@@ -7,6 +7,7 @@ import Attendance from '../models/Attendance';
 import Settings from '../models/Settings';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { calculateHours, timeToMinutes } from '../utils/timeUtils';
+import { isAutoCode, getDefaultAttendanceCode } from '../utils/attendancePrefill';
 
 const router = express.Router();
 
@@ -176,9 +177,17 @@ router.post('/', async (req: AuthRequest, res: Response) => {
     // Get participant IDs from this shift
     const participantIds = processedParticipants.map((p: any) => p.user.toString());
 
+    // Attendance may already be pre-filled for this date (month rollover) and edited by the admin
+    const existingAttendance = await Attendance.find({ adminId: req.admin.adminId, date: date });
+    const existingCodes = new Map(existingAttendance.map(a => [a.userId.toString(), a.code]));
+
     // Mark attendance for all staff
     for (const staff of allStaff) {
       const staffId = (staff._id as mongoose.Types.ObjectId).toString();
+
+      // Keep codes the admin set manually (مأ, م, ب, غ)
+      if (!isAutoCode(existingCodes.get(staffId))) continue;
+
       // If inactive, mark as غ; otherwise mark as ح if in shift OR ع if not in shift
       const code = !staff.isActive ? 'غ' : (participantIds.includes(staffId) ? 'ح' : 'ع');
 
@@ -463,7 +472,25 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
         date: oldShift.date
       });
 
-      if (oldShiftsOnOldDate.length === 0) {
+      // Attendance for the active month (and later) is pre-filled, so it is reset instead of emptied
+      const oldDateIsPrefilled = (oldYear * 12 + oldMonth) >= (activeYear * 12 + activeMonth);
+      const oldDateCodes = new Map(
+        (await Attendance.find({ adminId: req.admin.adminId, date: oldShift.date }))
+          .map(a => [a.userId.toString(), a.code])
+      );
+
+      if (oldShiftsOnOldDate.length === 0 && oldDateIsPrefilled) {
+        for (const staff of allStaff) {
+          // Keep codes the admin set manually (مأ, م, ب, غ)
+          if (!isAutoCode(oldDateCodes.get((staff._id as mongoose.Types.ObjectId).toString()))) continue;
+
+          await Attendance.findOneAndUpdate(
+            { userId: staff._id, date: oldShift.date },
+            { code: getDefaultAttendanceCode(staff, oldShift.date), adminId: req.admin.adminId },
+            { upsert: true }
+          );
+        }
+      } else if (oldShiftsOnOldDate.length === 0) {
         // No other shifts on old date - delete all attendance
         await Attendance.deleteMany({ date: oldShift.date });
       } else {
@@ -473,10 +500,12 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
         );
 
         for (const staff of allStaff) {
+          if (!isAutoCode(oldDateCodes.get((staff._id as mongoose.Types.ObjectId).toString()))) continue;
+
           const code = !staff.isActive ? 'غ' : (oldParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString()) ? 'ح' : 'ع');
           await Attendance.findOneAndUpdate(
             { userId: staff._id, date: oldShift.date },
-            { code },
+            { code, adminId: req.admin.adminId },
             { upsert: true }
           );
         }
@@ -485,11 +514,18 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
 
     // Handle new date attendance
     const newParticipantIds = processedParticipants.map((p: any) => p.user.toString());
+    const newDateCodes = new Map(
+      (await Attendance.find({ adminId: req.admin.adminId, date: date }))
+        .map(a => [a.userId.toString(), a.code])
+    );
     for (const staff of allStaff) {
+      // Keep codes the admin set manually (مأ, م, ب, غ)
+      if (!isAutoCode(newDateCodes.get((staff._id as mongoose.Types.ObjectId).toString()))) continue;
+
       const code = !staff.isActive ? 'غ' : (newParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString()) ? 'ح' : 'ع');
       await Attendance.findOneAndUpdate(
         { userId: staff._id, date: date },
-        { code },
+        { code, adminId: req.admin.adminId },
         { upsert: true }
       );
     }
@@ -648,7 +684,29 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
       adminId: req.admin.adminId
     });
 
-    if (otherShiftsOnDay.length === 0) {
+    // Attendance for the active month (and later) is pre-filled, so a day without shifts
+    // must go back to its default codes instead of being emptied
+    const isPrefilledMonth = (shiftYear * 12 + shiftMonth) >= (activeYear * 12 + activeMonth);
+
+    if (otherShiftsOnDay.length === 0 && isPrefilledMonth) {
+      const staffForReset = await User.find({
+        adminId: req.admin.adminId,
+        role: { $in: ['employee', 'head', 'administrative staff'] },
+      });
+      const currentAttendance = await Attendance.find({ adminId: req.admin.adminId, date: shift.date });
+      const currentCodes = new Map(currentAttendance.map(a => [a.userId.toString(), a.code]));
+
+      for (const staff of staffForReset) {
+        // Keep codes the admin set manually (مأ, م, ب, غ)
+        if (!isAutoCode(currentCodes.get((staff._id as mongoose.Types.ObjectId).toString()))) continue;
+
+        await Attendance.findOneAndUpdate(
+          { adminId: req.admin.adminId, userId: staff._id, date: shift.date },
+          { code: getDefaultAttendanceCode(staff, shift.date) },
+          { upsert: true }
+        );
+      }
+    } else if (otherShiftsOnDay.length === 0) {
       // No other shifts on this day - DELETE all attendance records
       await Attendance.deleteMany({
         date: shift.date,
@@ -665,14 +723,21 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
         s.participants.map((p: any) => p.user.toString())
       );
 
+      // Remember codes the admin set manually (مأ, م, ب, غ) so they survive the re-creation
+      const previousAttendance = await Attendance.find({ adminId: req.admin.adminId, date: shift.date });
+      const manualCodes = new Map(
+        previousAttendance.filter(a => !isAutoCode(a.code)).map(a => [a.userId.toString(), a.code])
+      );
+
       // Delete all attendance for this day first
       await Attendance.deleteMany({ date: shift.date });
 
       // Re-create attendance for all staff
       for (const staff of allStaff) {
-        const isParticipant = allParticipantIds.includes((staff._id as mongoose.Types.ObjectId).toString());
-        const code = !staff.isActive ? 'غ' : (isParticipant ? 'ح' : 'ع');
-        
+        const staffId = (staff._id as mongoose.Types.ObjectId).toString();
+        const isParticipant = allParticipantIds.includes(staffId);
+        const code = manualCodes.get(staffId) || (!staff.isActive ? 'غ' : (isParticipant ? 'ح' : 'ع'));
+
         await Attendance.create({
           adminId: req.admin.adminId,
           userId: staff._id,

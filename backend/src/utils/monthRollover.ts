@@ -4,6 +4,7 @@ import Mission from '../models/Mission';
 import mongoose from 'mongoose';
 import Attendance from '../models/Attendance';
 import Settings from '../models/Settings';
+import { prefillMonthAttendance } from './attendancePrefill';
 
 export const rolloverMonth = async (month: number, year: number, adminId: string) => {
     try {
@@ -150,6 +151,14 @@ export const rolloverMonth = async (month: number, year: number, adminId: string
                 setDefaultsOnInsert: true
             }
         );
+
+        // Pre-fill the employee attendance table for the new month.
+        // Must never break the rollover itself, so failures are only logged.
+        try {
+            await prefillMonthAttendance(nextMonth, nextYear, adminId);
+        } catch (prefillError) {
+            console.error('[Rollover] Failed to pre-fill attendance:', prefillError);
+        }
 
         return { success: true, usersProcessed: users.length };
     } catch (error) {
