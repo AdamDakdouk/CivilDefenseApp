@@ -726,3 +726,115 @@
     font-size: 9px;
   }
 }
+
+/* Background photo (public/login-bg.jpg) with a dark red overlay for readability */
+.login-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* photo is set inline in Login.tsx (CRA can't resolve root-relative url() here) */
+  background: linear-gradient(rgba(94, 8, 21, 0.55), rgba(20, 5, 10, 0.75));
+  background-size: cover;
+  background-position: center;
+}
+
+/* Footer text sits on the dark background now */
+.login-page-footer {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.login-page-footer .station-name {
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+}
+
+/* ---------- Glass redesign (overrides above) ---------- */
+
+/* Clear background: photo stays visible, only a light tint for contrast */
+.login-bg {
+  background: linear-gradient(rgba(20, 5, 10, 0.12), rgba(20, 5, 10, 0.35));
+  background-size: cover;
+  background-position: center;
+}
+
+/* Glass card */
+.login-box {
+  background: rgba(25, 8, 12, 0.32);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35),
+              inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.login-box::before {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+}
+
+.login-header img {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+              0 0 0 8px rgba(255, 255, 255, 0.15);
+}
+
+.login-header h1 {
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.login-header h2 {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.login-box .form-group label {
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+.login-box .form-group input {
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+
+.login-box .form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.login-box .form-group input:hover {
+  background-color: rgba(0, 0, 0, 0.32);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.login-box .form-group input:focus {
+  background-color: rgba(0, 0, 0, 0.38);
+  border-color: #fff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+}
+
+/* Keep browser autofill readable on the glass */
+.login-box .form-group input:-webkit-autofill {
+  -webkit-text-fill-color: #fff;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.login-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.login-footer a {
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.login-footer a:hover {
+  color: #ffd9de;
+}
+
+.error-message {
+  background: rgba(255, 255, 255, 0.85);
+}

@@ -26,6 +26,12 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
+      <div
+        className="login-bg"
+        style={{
+          backgroundImage: `linear-gradient(rgba(20, 5, 10, 0.12), rgba(20, 5, 10, 0.35)), url(${process.env.PUBLIC_URL}/login-bg.jpg)`
+        }}
+      />
       <div className="login-content-wrapper">
         <div className="login-box">
           <div className="login-header">
