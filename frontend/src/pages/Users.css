@@ -702,3 +702,34 @@
   .team-dropdown div:hover {
     background: rgba(255, 255, 255, 0.12);
   }
+/* Filterable headers (role / team): same size as the other headers, and clearly clickable */
+.users-table th .role-title,
+.users-table th .team-title {
+  font-size: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+  user-select: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.users-table th .role-title:hover,
+.users-table th .team-title:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.users-table th .role-arrow,
+.users-table th .team-arrow {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+/* Header with an active filter */
+.users-table th .filter-active {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: #fff;
+}

@@ -1,0 +1,310 @@
+/* Dark theme overrides.
+ * Only active when <html data-theme="dark"> and only inside the logged-in shell (.app),
+ * so the login page is untouched. Wrapped in @media screen so printing always stays light.
+ * The official sheets (employees, volunteers, missions) intentionally stay white like the paper forms. */
+@media screen {
+  html[data-theme="dark"] body:has(.app) { background-color: #12151a; color: #e7eaee; color-scheme: dark; }
+
+  html[data-theme="dark"] .app {
+    color:#e7eaee;
+  }
+
+  html[data-theme="dark"] .app .metric-card,
+  html[data-theme="dark"] .app .chart-card,
+  html[data-theme="dark"] .app .users-table-container,
+  html[data-theme="dark"] .app .shift-card,
+  html[data-theme="dark"] .app .shift-card table,
+  html[data-theme="dark"] .app .vehicle-modal,
+  html[data-theme="dark"] .app .custom-confirm-box,
+  html[data-theme="dark"] .app .custom-alert-box,
+  html[data-theme="dark"] .app .modal-content,
+  html[data-theme="dark"] .app .confirm-modal,
+  html[data-theme="dark"] .app .suggestions,
+  html[data-theme="dark"] .app .time-dropdown-menu,
+  html[data-theme="dark"] .app .shift-participants-list,
+  html[data-theme="dark"] .app .participants-list,
+  html[data-theme="dark"] .app .participant-row {
+    background:#1b2027 !important;background-color:#1b2027 !important;color:#e7eaee;border-color:#323b47;
+  }
+
+  html[data-theme="dark"] .app .custom-times-container,
+  html[data-theme="dark"] .app .participant-tag,
+  html[data-theme="dark"] .app .contributor-item,
+  html[data-theme="dark"] .app .no-vehicles,
+  html[data-theme="dark"] .app .suggestion-item:hover,
+  html[data-theme="dark"] .app .vehicle-item:hover {
+    background:#232a33 !important;color:#e7eaee;
+  }
+
+  html[data-theme="dark"] .app .contributor-item:hover {
+    background:#2b3440 !important;
+  }
+
+  html[data-theme="dark"] .app .participant-datetime-row {
+    background:#232a33 !important;border-color:#323b47;
+  }
+
+  html[data-theme="dark"] .app .no-vehicles p {
+    color:#e6a0a8;
+  }
+
+  html[data-theme="dark"] .app .dashboard-header h2,
+  html[data-theme="dark"] .app .metric-value,
+  html[data-theme="dark"] .app .chart-card h3,
+  html[data-theme="dark"] .app .type-name-horizontal,
+  html[data-theme="dark"] .app .type-name,
+  html[data-theme="dark"] .app .type-count,
+  html[data-theme="dark"] .app .contributor-name,
+  html[data-theme="dark"] .app .year-selector label,
+  html[data-theme="dark"] .app .users-header h1,
+  html[data-theme="dark"] .app .users-table td,
+  html[data-theme="dark"] .app .modal-content h2,
+  html[data-theme="dark"] .app .form-group label,
+  html[data-theme="dark"] .app .role-text,
+  html[data-theme="dark"] .app .team-text,
+  html[data-theme="dark"] .app .confirm-title,
+  html[data-theme="dark"] .app .alert-message,
+  html[data-theme="dark"] .app .vehicle-modal-header,
+  html[data-theme="dark"] .app .vehicle-name,
+  html[data-theme="dark"] .app .vehicle-form h4,
+  html[data-theme="dark"] .app .form-field label,
+  html[data-theme="dark"] .app .time-display-button,
+  html[data-theme="dark"] .app .page-title,
+  html[data-theme="dark"] .app .shift-date,
+  html[data-theme="dark"] .app .users-page h2 {
+    color:#e7eaee !important;
+  }
+
+  html[data-theme="dark"] .app .confirm-message,
+  html[data-theme="dark"] .app .vehicle-plate,
+  html[data-theme="dark"] .app .empty-vehicles,
+  html[data-theme="dark"] .app .empty-message,
+  html[data-theme="dark"] .app .loading,
+  html[data-theme="dark"] .app .loading-text,
+  html[data-theme="dark"] .app .close-btn,
+  html[data-theme="dark"] .app .suffix-preview,
+  html[data-theme="dark"] .app .empty-hint,
+  html[data-theme="dark"] .app .metric-label {
+    color:#9aa4b0 !important;
+  }
+
+  html[data-theme="dark"] .app .chart-card h3,
+  html[data-theme="dark"] .app .vehicle-modal-header {
+    border-bottom-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .type-progress-bar,
+  html[data-theme="dark"] .app .type-bar-container {
+    background:#232a33 !important;
+  }
+
+  html[data-theme="dark"] .app .loading-spinner,
+  html[data-theme="dark"] .app .spinner-icon {
+    border-color:#323b47;border-top-color:#e52044;
+  }
+
+  html[data-theme="dark"] .app input,
+  html[data-theme="dark"] .app select,
+  html[data-theme="dark"] .app textarea,
+  html[data-theme="dark"] .app .search-input,
+  html[data-theme="dark"] .app .year-select-dropdown,
+  html[data-theme="dark"] .app .time-input,
+  html[data-theme="dark"] .app .date-input,
+  html[data-theme="dark"] .app .time-picker-inputs select,
+  html[data-theme="dark"] .app .vehicle-form input,
+  html[data-theme="dark"] .app .form-field input,
+  html[data-theme="dark"] .app .form-group input,
+  html[data-theme="dark"] .app .form-group select {
+    background:#161b21 !important;background-color:#161b21 !important;color:#e7eaee !important;border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app input::placeholder,
+  html[data-theme="dark"] .app textarea::placeholder {
+    color:#9aa4b0;
+  }
+
+  html[data-theme="dark"] .app .form-group input:hover,
+  html[data-theme="dark"] .app .form-group select:hover,
+  html[data-theme="dark"] .app .year-select-dropdown:hover,
+  html[data-theme="dark"] .app .form-group input:focus,
+  html[data-theme="dark"] .app .form-group select:focus {
+    background-color:#1c232b !important;
+  }
+
+  html[data-theme="dark"] .app .inline-input,
+  html[data-theme="dark"] .app .date-display-overlay {
+    color:#e7eaee;border-bottom-color:#323b47;
+  }
+
+  html[data-theme="dark"] .app .time-display-button {
+    background:#161b21 !important;background-color:#161b21 !important;border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .hour-button,
+  html[data-theme="dark"] .app .minute-button {
+    background-color:#161b21 !important;color:#e7eaee !important;border-color:#323b47;
+  }
+
+  html[data-theme="dark"] .app .hour-button:hover,
+  html[data-theme="dark"] .app .minute-button:hover {
+    background-color:#2b3440 !important;color:#fff !important;
+  }
+
+  html[data-theme="dark"] .app .hour-button.selected,
+  html[data-theme="dark"] .app .minute-button.selected {
+    background-color:#e52044 !important;color:#fff !important;
+  }
+
+  html[data-theme="dark"] .app .role-option,
+  html[data-theme="dark"] .app .team-option,
+  html[data-theme="dark"] .app .checkmark,
+  html[data-theme="dark"] .app .team-option .checkmark {
+    background:#161b21 !important;border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .role-option:hover,
+  html[data-theme="dark"] .app .team-option:hover {
+    background:#1f2a22 !important;
+  }
+
+  html[data-theme="dark"] .app .role-option.checked,
+  html[data-theme="dark"] .app .team-option.checked {
+    background:#1d3322 !important;
+  }
+
+  html[data-theme="dark"] .app .role-option.checked .role-text,
+  html[data-theme="dark"] .app .team-option.checked .team-text {
+    color:#7ddc6f !important;
+  }
+
+  html[data-theme="dark"] .app .users-table tbody tr:hover {
+    background-color:#232a33 !important;
+  }
+
+  html[data-theme="dark"] .app .users-table td {
+    border-color:#323b47;
+  }
+
+  html[data-theme="dark"] .app .edit-btn:hover {
+    background:#1e3a52 !important;
+  }
+
+  html[data-theme="dark"] .app .delete-btn:hover {
+    background:#4a1d26 !important;
+  }
+
+  html[data-theme="dark"] .app .role-badge.employee {
+    background:#16324a !important;color:#7fc0f5 !important;
+  }
+
+  html[data-theme="dark"] .app .role-badge.volunteer {
+    background:#33203c !important;color:#d29be6 !important;
+  }
+
+  html[data-theme="dark"] .app .role-badge.head {
+    background:#3d1f24 !important;color:#ff8a8a !important;
+  }
+
+  html[data-theme="dark"] .app .role-badge.administrative-staff {
+    background:#26372a !important;color:#a9d6a9 !important;
+  }
+
+  html[data-theme="dark"] .app .cancel-btn,
+  html[data-theme="dark"] .app .btn-cancel {
+    background:#3a424d !important;color:#e7eaee !important;
+  }
+
+  html[data-theme="dark"] .app .cancel-btn:hover,
+  html[data-theme="dark"] .app .btn-cancel:hover {
+    background:#4a5460 !important;
+  }
+
+  html[data-theme="dark"] .app .team-selector {
+    background:linear-gradient(135deg,#3a424d,#55606c) !important;color:#fff;
+  }
+
+  html[data-theme="dark"] .app .shift-card th,
+  html[data-theme="dark"] .app .shift-card td {
+    border-color:#323b47;color:#e7eaee;
+  }
+
+  html[data-theme="dark"] .app .year-select-dropdown {
+    border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .month-selector-navbar select {
+    background-color:#161b21 !important;color:#e7eaee !important;border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .month-selector-navbar label {
+    color:#9aa4b0;
+  }
+
+  html[data-theme="dark"] .app .navbar {
+    color:#fff;background:#1b2027;border-bottom:2px solid rgba(229,32,68,.75);box-shadow:0 4px 16px rgba(0,0,0,.4);
+  }
+
+  html[data-theme="dark"] .app .nav-links a {
+    color:#cfd5dc;
+  }
+
+  html[data-theme="dark"] .app .nav-links a:hover {
+    color:#fff;opacity:1;
+  }
+
+  html[data-theme="dark"] .app .logout-btn {
+    background:#2a323d !important;color:#e7eaee;border:1px solid #3a4552;box-shadow:none;
+  }
+
+  html[data-theme="dark"] .app .logout-btn:hover {
+    background:#364150 !important;border-color:#4a5666;box-shadow:none;
+  }
+
+  html[data-theme="dark"] .app .close-month-btn {
+    background:transparent !important;border:1px solid #e5506a;color:#ff8a9b;box-shadow:none;
+  }
+
+  html[data-theme="dark"] .app .close-month-btn:hover:not(:disabled) {
+    background:rgba(229,32,68,.2) !important;color:#fff;box-shadow:none;
+  }
+
+  html[data-theme="dark"] .app .mobile-menu-dropdown {
+    background:#1b2027;border:1px solid #323b47;
+  }
+
+  html[data-theme="dark"] .app .mobile-menu-dropdown a {
+    color:#e7eaee;border-bottom-color:#323b47;
+  }
+
+  html[data-theme="dark"] .app .mobile-menu-dropdown a:hover {
+    background:#232a33;
+  }
+
+  html[data-theme="dark"] .app .hamburger-menu span {
+    background:#e7eaee;
+  }
+
+  html[data-theme="dark"] .app .attendance-container,
+  html[data-theme="dark"] .app .report-container,
+  html[data-theme="dark"] .app .missions-page-print .report-header,
+  html[data-theme="dark"] .app .missions-page-print table {
+    background:#fff !important;color:#000 !important;
+  }
+
+  html[data-theme="dark"] .app .attendance-container *,
+  html[data-theme="dark"] .app .report-container *,
+  html[data-theme="dark"] .app .missions-page-print table * {
+    color:#000;
+  }
+
+  html[data-theme="dark"] .app .attendance-container select,
+  html[data-theme="dark"] .app .attendance-container option {
+    background:#fff !important;color:#000 !important;
+  }
+
+  html[data-theme="dark"] .app .attendance-container .print-btn,
+  html[data-theme="dark"] .app .report-container .print-btn {
+    color:#fff;
+  }
+
+}

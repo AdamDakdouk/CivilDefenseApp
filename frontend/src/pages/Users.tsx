@@ -290,7 +290,7 @@ const Users: React.FC = () => {
                                     onMouseLeave={() => setShowRoleDropdown(false)}
                                 >
                                     <span
-                                        className="role-title"
+                                        className={`role-title ${roleFilter !== 'all' ? 'filter-active' : ''}`}
                                         onClick={() => setShowRoleDropdown(prev => !prev)}
                                     >
                                         الدور <span className="role-arrow">▾</span>
@@ -311,7 +311,7 @@ const Users: React.FC = () => {
                                     onMouseLeave={() => setShowTeamDropdown(false)}
                                 >
                                     <span
-                                        className="team-title"
+                                        className={`team-title ${teamFilter !== 'all' ? 'filter-active' : ''}`}
                                         onClick={() => setShowTeamDropdown(prev => !prev)}
                                     >
                                         الفريق <span className="team-arrow">▾</span>

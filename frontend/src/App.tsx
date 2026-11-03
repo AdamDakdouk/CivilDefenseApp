@@ -14,6 +14,7 @@ import { MonthProvider } from './contexts/MonthContext';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import YearlyDashboard from './pages/YearlyDashboard';
+import './dark.css'; // keep last so the dark overrides load after every page stylesheet
 
 function App() {
   return (

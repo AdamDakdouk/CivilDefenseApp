@@ -6,9 +6,18 @@ import './Navbar.css';
 import CustomAlert from './CustomAlert';
 import ConfirmCloseMonth from './ConfirmCloseMonth';
 import { useAuth } from '../contexts/AuthContext';
+import { applyTheme, getStoredTheme, Theme } from '../utils/theme';
 
 const Navbar: React.FC = () => {
   const { logout, admin } = useAuth();
+  const [theme, setTheme] = useState<Theme>(getStoredTheme());
+
+  const toggleTheme = () => {
+    const next: Theme = theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    setTheme(next);
+  };
+
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { selectedMonth, setSelectedMonth, activeMonth, activeYear, refreshActiveMonth } = useMonth(); const [availableMonths, setAvailableMonths] = useState<any[]>([]);
@@ -227,6 +236,23 @@ const Navbar: React.FC = () => {
           >
             {isClosingMonth ? 'جاري الإغلاق...' : 'إغلاق الشهر'}
 
+          </button>
+
+          <button
+            onClick={toggleTheme}
+            className="logout-btn theme-btn"
+            title={theme === 'dark' ? 'الوضع الفاتح' : 'الوضع الداكن'}
+          >
+            {theme === 'dark' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            )}
           </button>
 
           <button
