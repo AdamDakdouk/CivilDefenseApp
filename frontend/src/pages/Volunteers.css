@@ -176,3 +176,125 @@
   border-bottom: 2px solid #c41e1e;
 }
 
+
+/* ---------- Screen view (the official sheet is print-only) ---------- */
+.volunteers-screen {
+  direction: rtl;
+}
+
+.volunteers-screen .volunteers-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.volunteers-screen .volunteers-title {
+  font-size: 22px;
+  color: #1f2933;
+  margin: 0;
+}
+
+.volunteers-screen .subtitle-line {
+  font-size: 13px;
+  color: #667085;
+  margin-top: 2px;
+}
+
+.volunteers-screen .print-btn {
+  margin: 0;
+}
+
+
+
+
+
+
+
+.volunteers-screen .volunteers-table-wrap {
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 12px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+.volunteers-screen table.volunteers-table {
+  width: 100%;
+  border: none;
+  box-shadow: none;
+  border-collapse: collapse;
+  table-layout: auto;
+  margin: 0;
+}
+
+.volunteers-screen .volunteers-table th,
+.volunteers-screen .volunteers-table td {
+  border: none;
+  border-bottom: 1px solid #eef0f2;
+  padding: 11px 12px;
+  text-align: center;
+  font-size: 15px;
+  color: #1f2933;
+  height: auto;
+  direction: rtl;
+  width: auto;
+}
+
+.volunteers-screen .volunteers-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f7f8fa;
+  color: #5b6672;
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  border-bottom: 1px solid #e3e6ea;
+}
+
+.volunteers-screen .volunteers-table .col-name {
+  text-align: right;
+  font-weight: 600;
+  min-width: 180px;
+}
+
+.volunteers-screen .volunteers-table .num {
+  white-space: nowrap;
+  direction: ltr;
+  font-variant-numeric: tabular-nums;
+}
+
+.volunteers-screen .volunteers-table .strong {
+  font-weight: 700;
+}
+
+.volunteers-screen .volunteers-table tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+.volunteers-screen .volunteers-table tbody tr:hover {
+  background: #f2f4f7;
+}
+
+.volunteers-screen .volunteers-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.volunteers-screen .volunteers-table .empty-row {
+  padding: 28px;
+  color: #667085;
+}
+
+.volunteers-screen .team-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.volunteers-screen .team-badge.team-1 { background: #d1e9ff; color: #175cd3; }
+.volunteers-screen .team-badge.team-2 { background: #d1fadf; color: #067647; }
+.volunteers-screen .team-badge.team-3 { background: #fee4e2; color: #b42318; }

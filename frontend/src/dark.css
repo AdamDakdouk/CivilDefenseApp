@@ -284,6 +284,94 @@
     background:#e7eaee;
   }
 
+  html[data-theme="dark"] .app .missions-screen .print-meta,
+  html[data-theme="dark"] .app .missions-screen .missions-list-wrap,
+  html[data-theme="dark"] .app .volunteers-screen .volunteers-table-wrap {
+    background:#1b2027 !important;border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .print-meta-title,
+  html[data-theme="dark"] .app .missions-screen .missions-list-table td,
+  html[data-theme="dark"] .app .volunteers-screen .volunteers-table td,
+  html[data-theme="dark"] .app .volunteers-screen h2 {
+    color:#e7eaee !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .print-meta-field,
+  html[data-theme="dark"] .app .volunteers-screen .subtitle-line {
+    color:#9aa4b0 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-table thead th,
+  html[data-theme="dark"] .app .volunteers-screen .volunteers-table thead th {
+    background:#232a33 !important;color:#9aa4b0 !important;border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-table td,
+  html[data-theme="dark"] .app .volunteers-screen .volunteers-table td {
+    border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-table tbody tr:hover,
+  html[data-theme="dark"] .app .volunteers-screen .volunteers-table tbody tr:hover {
+    background:#232a33 !important;
+  }
+
+  html[data-theme="dark"] .app .volunteers-screen .volunteers-table tbody tr:nth-child(even) {
+    background:#1f252d;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .person-chip {
+    background:#2b3440 !important;color:#d5dae1 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .type-badge.type-fire,
+  html[data-theme="dark"] .app .volunteers-screen .team-badge.team-3 {
+    background:#4a1d26 !important;color:#ff9aa8 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .type-badge.type-rescue {
+    background:#47370f !important;color:#f5c96b !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .type-badge.type-medic,
+  html[data-theme="dark"] .app .volunteers-screen .team-badge.team-1 {
+    background:#16324a !important;color:#7fc0f5 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .type-badge.type-public-service,
+  html[data-theme="dark"] .app .volunteers-screen .team-badge.team-2 {
+    background:#18382a !important;color:#7ddc9a !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .type-badge.type-misc {
+    background:#2b3440 !important;color:#c1c8d1 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-wrap {
+    background:#161b21 !important;border:none !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-table thead th {
+    background:transparent !important;border:none !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-table td {
+    background:#1b2027 !important;border-top:1px solid #323b47 !important;border-bottom:1px solid #323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-table td:first-child {
+    border-right:1px solid #323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-table td:last-child {
+    border-left:1px solid #323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .missions-screen .missions-list-table tbody tr:hover td {
+    background:#232a33 !important;
+  }
+
   html[data-theme="dark"] .app .attendance-container,
   html[data-theme="dark"] .app .report-container,
   html[data-theme="dark"] .app .missions-page-print .report-header,

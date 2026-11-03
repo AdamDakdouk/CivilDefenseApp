@@ -9,6 +9,14 @@ import './Missions.print.css';
 import CustomAlert from '../components/CustomAlert';
 import { getCurrentDate } from '../utils/timeUtils';
 
+const MISSION_TYPE_LABELS: { [key: string]: string } = {
+    fire: 'إطفاء',
+    rescue: 'إنقاذ',
+    medic: 'إسعاف',
+    'public-service': 'خدمة عامة',
+    misc: 'مختلف'
+};
+
 const Missions: React.FC = () => {
     const [missions, setMissions] = useState<Mission[]>([]);
     const [loading, setLoading] = useState(true);
@@ -202,6 +210,97 @@ const Missions: React.FC = () => {
                 </div>
             ) : (
                 <>
+                    {/* Screen view (never printed) */}
+                    <div className="screen-only missions-screen">
+                        <div className="print-meta">
+                            <span className="print-meta-title">بيانات الطباعة</span>
+                            <label className="print-meta-field">
+                                <span>رقم البرقية</span>
+                                <input
+                                    type="text"
+                                    value={docNumber}
+                                    onChange={(e) => setDocNumber(e.target.value)}
+                                    placeholder="..."
+                                />
+                            </label>
+                            <label className="print-meta-field">
+                                <span>التاريخ</span>
+                                <input
+                                    type="date"
+                                    value={docDate}
+                                    onChange={(e) => setDocDate(e.target.value)}
+                                />
+                            </label>
+                        </div>
+
+                        <div className="missions-list-wrap">
+                            <table className="missions-list-table">
+                                <thead>
+                                    <tr>
+                                        <th>التاريخ</th>
+                                        <th>رقم البرقية</th>
+                                        <th>النوع</th>
+                                        <th>التفاصيل</th>
+                                        <th>المكان</th>
+                                        <th>العناصر المنفذة</th>
+                                        <th>الذهاب</th>
+                                        <th>الإياب</th>
+                                        <th>الآلية</th>
+                                        <th>ملاحظات</th>
+                                        {isCurrentMonth() && <th></th>}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {missions.map(mission => (
+                                        <tr key={mission._id}>
+                                            <td className="nowrap">{mission.date ? new Date(mission.date).toLocaleDateString('ar-LB') : ''}</td>
+                                            <td className="nowrap">{mission.referenceNumber}</td>
+                                            <td>
+                                                <span className={`type-badge type-${mission.missionType}`}>
+                                                    {MISSION_TYPE_LABELS[mission.missionType] || mission.missionType}
+                                                </span>
+                                            </td>
+                                            <td className="cell-wide">{mission.missionDetails}</td>
+                                            <td className="cell-wide">{mission.location}</td>
+                                            <td className="cell-people">
+                                                {mission.participants
+                                                    .filter(p => p && p.user)
+                                                    .sort((a, b) => {
+                                                        if (a.user.role === 'head') return -1;
+                                                        if (b.user.role === 'head') return 1;
+                                                        return 0;
+                                                    })
+                                                    .map(p => (
+                                                        <span key={p.user._id} className="person-chip">{p.user.name}</span>
+                                                    ))}
+                                            </td>
+                                            <td className="nowrap time">{mission.startTime}</td>
+                                            <td className="nowrap time">{mission.endTime}</td>
+                                            <td className="nowrap">{Array.isArray(mission.vehicleNumbers)
+                                                ? mission.vehicleNumbers.join(', ')
+                                                : mission.vehicleNumbers || ''}</td>
+                                            <td className="cell-wide">{mission.notes}</td>
+                                            {isCurrentMonth() && (
+                                                <td>
+                                                    <div className="action-buttons">
+                                                        <button onClick={() => handleEditMission(mission)} className="edit-btn">
+                                                            <span className='gradient-text-edit'>✎</span>
+                                                        </button>
+                                                        <button onClick={() => confirmDelete(mission._id)} className="delete-btn">
+                                                            <span className='gradient-text-delete'>🗑️</span>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Official sheet: only shown when printing, markup unchanged */}
+                    <div className="print-only">
                     {/* Report Header */}
                     <div className="report-header">
                         <div className="header-right">
@@ -319,6 +418,7 @@ const Missions: React.FC = () => {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 </>
             )}
 

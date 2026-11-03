@@ -550,3 +550,197 @@ font-size: 12.5px;
   }
 
 }
+/* ---------- Screen view (the official sheet is print-only) ---------- */
+.missions-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.missions-screen .print-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 10px;
+}
+
+.missions-screen .print-meta-title {
+  font-weight: 700;
+  color: #1f2933;
+  font-size: 14px;
+}
+
+.missions-screen .print-meta-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #5b6672;
+}
+
+.missions-screen .print-meta-field input {
+  padding: 6px 10px;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #f7f8fa;
+  color: #1f2933;
+}
+
+
+
+
+
+
+.missions-screen .missions-list-wrap {
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 12px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+.missions-screen table.missions-list-table {
+  width: 100%;
+  border: none;
+  box-shadow: none;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.missions-screen .missions-list-table th,
+.missions-screen .missions-list-table td {
+  border: none;
+  border-bottom: 1px solid #eef0f2;
+  padding: 12px 12px;
+  text-align: right;
+  vertical-align: middle;
+  color: #1f2933;
+}
+
+.missions-screen .missions-list-table thead th {
+  background: #f7f8fa;
+  color: #5b6672;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  border-bottom: 1px solid #e3e6ea;
+}
+
+.missions-screen .missions-list-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+.missions-screen .missions-list-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.missions-screen .nowrap { white-space: nowrap; }
+.missions-screen .time { direction: ltr; text-align: center; }
+.missions-screen .cell-wide { min-width: 120px; max-width: 240px; }
+.missions-screen .cell-people { min-width: 160px; max-width: 280px; }
+
+.missions-screen .type-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.missions-screen .type-badge.type-fire { background: #fee4e2; color: #b42318; }
+.missions-screen .type-badge.type-rescue { background: #fef0c7; color: #b54708; }
+.missions-screen .type-badge.type-medic { background: #d1e9ff; color: #175cd3; }
+.missions-screen .type-badge.type-public-service { background: #d1fadf; color: #067647; }
+.missions-screen .type-badge.type-misc { background: #eaecf0; color: #475467; }
+
+.missions-screen .person-chip {
+  display: inline-block;
+  margin: 2px 0 2px 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f2f4f7;
+  color: #344054;
+  font-size: 12px;
+}
+
+/* Readability and alignment tweaks */
+.missions-screen table.missions-list-table {
+  font-size: 15px;
+}
+
+.missions-screen .missions-list-table thead th {
+  font-size: 13.5px;
+}
+
+.missions-screen .missions-list-table td {
+  font-size: 15px;
+}
+
+.missions-screen .missions-list-table th:nth-child(3),
+.missions-screen .missions-list-table td:nth-child(3),
+.missions-screen .missions-list-table th:nth-child(7),
+.missions-screen .missions-list-table td:nth-child(7),
+.missions-screen .missions-list-table th:nth-child(8),
+.missions-screen .missions-list-table td:nth-child(8) {
+  text-align: center;
+}
+
+.missions-screen .type-badge {
+  font-size: 13.5px;
+}
+
+.missions-screen .person-chip {
+  font-size: 13.5px;
+}
+
+/* Floating rows: each mission is its own rounded row, no table lines */
+.missions-screen .missions-list-wrap {
+  background: #f2f4f7;
+  border: none;
+  box-shadow: none;
+  padding: 0 10px 6px;
+}
+
+.missions-screen table.missions-list-table {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.missions-screen .missions-list-table thead th {
+  background: transparent;
+  border: none;
+  padding: 14px 14px 6px;
+}
+
+.missions-screen .missions-list-table td {
+  background: #ffffff;
+  border: none;
+  border-top: 1px solid #e8ebef;
+  border-bottom: 1px solid #e8ebef;
+  padding: 16px 14px;
+}
+
+.missions-screen .missions-list-table td:first-child {
+  border-right: 1px solid #e8ebef;
+  border-radius: 0 12px 12px 0;
+}
+
+.missions-screen .missions-list-table td:last-child {
+  border-left: 1px solid #e8ebef;
+  border-radius: 12px 0 0 12px;
+}
+
+.missions-screen .missions-list-table tbody tr:hover td {
+  background: #fbfcfd;
+}
+
+.missions-screen .missions-list-table tbody tr:last-child td {
+  border-bottom: 1px solid #e8ebef;
+}

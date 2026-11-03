@@ -66,3 +66,16 @@ button:hover {
 .btn-cancel:hover {
   background-color: #5a6268;
 }
+/* Screen/print split: pages show a neat screen view, while the official sheet
+   (kept exactly as it was) is only rendered for printing */
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+@media print {
+  .screen-only {
+    display: none !important;
+  }
+}

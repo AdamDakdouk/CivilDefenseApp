@@ -132,8 +132,70 @@ const Volunteers: React.FC = () => {
     );
   }
 
+  const countOf = (id: string, key: string): number => missionCounts[id]?.[key] || 0;
+
   return (
-    <div className="report-container">
+    <>
+    {/* Screen view (never printed) */}
+    <div className="container screen-only volunteers-screen">
+      <div className="volunteers-head">
+        <div>
+          <h2 className="volunteers-title">المتطوعون</h2>
+          <div className="subtitle-line">خلال شهر {getMonthName()}</div>
+        </div>
+        <button onClick={handlePrint} className="print-btn">
+          طباعة الجدول
+        </button>
+      </div>
+
+      <div className="volunteers-table-wrap">
+        <table className="volunteers-table">
+          <thead>
+            <tr>
+              <th className="col-name">الاسم</th>
+              <th>رقم البطاقة</th>
+              <th>الفريق</th>
+              <th>الحضور</th>
+              <th>اطفاء</th>
+              <th>انقاذ</th>
+              <th>اسعاف</th>
+              <th>خدمة عامة</th>
+              <th>مختلف</th>
+              <th>مجموع الساعات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {volunteers.length === 0 ? (
+              <tr>
+                <td colSpan={10} className="empty-row">لا يوجد متطوعون</td>
+              </tr>
+            ) : (
+              volunteers.map(volunteer => (
+                <tr key={volunteer._id}>
+                  <td className="col-name">{volunteer.name}</td>
+                  <td className="num">{volunteer.cardNumber || '-'}</td>
+                  <td>
+                    {volunteer.team ? (
+                      <span className={`team-badge team-${volunteer.team}`}>فريق {volunteer.team}</span>
+                    ) : '-'}
+                  </td>
+                  <td className="num">{volunteer.currentMonthDays}</td>
+                  <td className="num">{countOf(volunteer._id, 'fire') || '-'}</td>
+                  <td className="num">{countOf(volunteer._id, 'rescue') || '-'}</td>
+                  <td className="num">{countOf(volunteer._id, 'medic') || '-'}</td>
+                  <td className="num">{countOf(volunteer._id, 'publicService') || '-'}</td>
+                  <td className="num">{countOf(volunteer._id, 'misc') || '-'}</td>
+                  <td className="num strong">{volunteer.currentMonthHours}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {/* Official sheet: only shown when printing, markup unchanged */}
+    <div className="report-container print-only">
       {/* Header Section */}
       <button onClick={handlePrint} className="print-btn">
         طباعة الجدول
@@ -203,6 +265,7 @@ const Volunteers: React.FC = () => {
       {/* Footer */}
       <div className="footer-text">للتفضل بالاطلاع والقرار</div>
     </div>
+    </>
   );
 };
 
