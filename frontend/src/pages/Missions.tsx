@@ -182,7 +182,10 @@ const Missions: React.FC = () => {
     return (
         <div className="container missions-page-print">
             <div className="page-header">
-                <h2 className="page-title">المهمات</h2>
+                <div>
+                    <h2 className="missions-title">المهمات</h2>
+                    <div className="missions-subtitle-line">خلال شهر {getMonthName()}</div>
+                </div>
                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                     <button
                         onClick={() => setShowSuffixModal(true)}

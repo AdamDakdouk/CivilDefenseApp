@@ -372,6 +372,14 @@
     background:#232a33 !important;
   }
 
+  html[data-theme="dark"] .app .missions-title {
+    color:#e7eaee !important;
+  }
+
+  html[data-theme="dark"] .app .missions-subtitle-line {
+    color:#9aa4b0 !important;
+  }
+
   html[data-theme="dark"] .app .attendance-container,
   html[data-theme="dark"] .app .report-container,
   html[data-theme="dark"] .app .missions-page-print .report-header,

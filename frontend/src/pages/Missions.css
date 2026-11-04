@@ -744,3 +744,16 @@ font-size: 12.5px;
 .missions-screen .missions-list-table tbody tr:last-child td {
   border-bottom: 1px solid #e8ebef;
 }
+
+/* Page title, same look as the volunteers page */
+.missions-page-print .missions-title {
+  font-size: 22px;
+  color: #1f2933;
+  margin: 0;
+}
+
+.missions-page-print .missions-subtitle-line {
+  font-size: 13px;
+  color: #667085;
+  margin-top: 2px;
+}
