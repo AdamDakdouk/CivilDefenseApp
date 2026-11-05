@@ -1,0 +1,172 @@
+/* ---------- Page title ---------- */
+.fuel-page-print .fuel-title {
+  font-size: 22px;
+  color: #1f2933;
+  margin: 0;
+}
+
+.fuel-page-print .fuel-subtitle-line {
+  font-size: 13px;
+  color: #667085;
+  margin-top: 2px;
+}
+
+/* ---------- Screen view (the official sheet is print-only) ---------- */
+.fuel-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.fuel-screen .print-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #e3e6ea;
+  border-radius: 10px;
+}
+
+.fuel-screen .print-meta-title {
+  font-weight: 700;
+  color: #1f2933;
+  font-size: 14px;
+}
+
+.fuel-screen .print-meta-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #5b6672;
+}
+
+.fuel-screen .print-meta-field input {
+  padding: 6px 10px;
+  border: 1px solid #d3d8de;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #f7f8fa;
+  color: #1f2933;
+}
+
+/* Floating rows: each voucher is its own rounded row, no table lines */
+.fuel-screen .fuel-list-wrap {
+  background: #f2f4f7;
+  border-radius: 12px;
+  overflow-x: auto;
+  padding: 0 10px 6px;
+}
+
+.fuel-screen table.fuel-list-table {
+  width: 100%;
+  border: none;
+  box-shadow: none;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  font-size: 15px;
+}
+
+.fuel-screen .fuel-list-table th,
+.fuel-screen .fuel-list-table td {
+  border: none;
+  text-align: right;
+  vertical-align: middle;
+  color: #1f2933;
+}
+
+.fuel-screen .fuel-list-table thead th {
+  background: transparent;
+  color: #5b6672;
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 14px 14px 6px;
+}
+
+.fuel-screen .fuel-list-table td {
+  background: #ffffff;
+  border-top: 1px solid #e8ebef;
+  border-bottom: 1px solid #e8ebef;
+  padding: 16px 14px;
+  font-size: 15px;
+}
+
+.fuel-screen .fuel-list-table td:first-child {
+  border-right: 1px solid #e8ebef;
+  border-radius: 0 12px 12px 0;
+}
+
+.fuel-screen .fuel-list-table td:last-child {
+  border-left: 1px solid #e8ebef;
+  border-radius: 12px 0 0 12px;
+}
+
+.fuel-screen .fuel-list-table tbody tr:hover td {
+  background: #fbfcfd;
+}
+
+.fuel-screen .fuel-list-table th.center,
+.fuel-screen .fuel-list-table td.center,
+.fuel-screen .fuel-list-table th:nth-child(5),
+.fuel-screen .fuel-list-table th:nth-child(6),
+.fuel-screen .fuel-list-table th:nth-child(7),
+.fuel-screen .fuel-list-table th:nth-child(8) {
+  text-align: center;
+}
+
+.fuel-screen .nowrap { white-space: nowrap; }
+.fuel-screen .num { font-variant-numeric: tabular-nums; }
+
+.fuel-screen .vehicle-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fuel-screen .vehicle-plate-sub {
+  font-size: 12.5px;
+  color: #667085;
+}
+
+.fuel-screen .fuel-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fuel-screen .fuel-badge.type-fire { background: #fee4e2; color: #b42318; }
+.fuel-screen .fuel-badge.type-jeep { background: #d1e9ff; color: #175cd3; }
+.fuel-screen .fuel-badge.fuel-gasoline { background: #fef0c7; color: #b54708; }
+.fuel-screen .fuel-badge.fuel-diesel { background: #d1fadf; color: #067647; }
+
+.fuel-screen .fuel-list-table td.center.num {
+  white-space: nowrap;
+}
+
+.fuel-screen .vehicle-cell > span:first-child {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* A global mobile rule makes every table display:block; keep this one a real table */
+.fuel-screen table.fuel-list-table {
+  display: table;
+  overflow: visible;
+}
+
+.fuel-screen .fuel-list-table thead {
+  display: table-header-group;
+  width: auto;
+}
+
+.fuel-screen .fuel-list-table tbody {
+  display: table-row-group;
+  width: auto;
+}

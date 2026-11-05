@@ -298,3 +298,19 @@
 .volunteers-screen .team-badge.team-1 { background: #d1e9ff; color: #175cd3; }
 .volunteers-screen .team-badge.team-2 { background: #d1fadf; color: #067647; }
 .volunteers-screen .team-badge.team-3 { background: #fee4e2; color: #b42318; }
+
+/* Missions.css makes every table display:block on mobile; keep this one a real table */
+.volunteers-screen table.volunteers-table {
+  display: table;
+  overflow: visible;
+}
+
+.volunteers-screen .volunteers-table thead {
+  display: table-header-group;
+  width: auto;
+}
+
+.volunteers-screen .volunteers-table tbody {
+  display: table-row-group;
+  width: auto;
+}

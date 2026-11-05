@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useMonth } from '../contexts/MonthContext';
 import { getAvailableMonths, getAvailableShiftMonths, getAvailableMissionMonths, rolloverMonth } from '../services/api';
 import './Navbar.css';
@@ -208,12 +208,13 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="nav-links">
-          <Link to="/dashboard">لوحة المعلومات</Link>
-          <Link to="/volunteers">المتطوعون</Link>
-          <Link to="/employees">الموظفون</Link>
-          <Link to="/shifts">الحضور اليومي </Link>
-          <Link to="/missions">المهمات</Link>
-          <Link to="/users">إدارة العناصر</Link>
+          <NavLink to="/dashboard">لوحة المعلومات</NavLink>
+          <NavLink to="/volunteers">المتطوعون</NavLink>
+          <NavLink to="/employees">الموظفون</NavLink>
+          <NavLink to="/shifts">الحضور اليومي </NavLink>
+          <NavLink to="/missions">المهمات</NavLink>
+          <NavLink to="/fuel">المحروقات</NavLink>
+          <NavLink to="/users">إدارة العناصر</NavLink>
         </div>
 
 
@@ -291,6 +292,7 @@ const Navbar: React.FC = () => {
           <div className={`mobile-menu-dropdown ${mobileMenuOpen ? 'open' : ''}`}>
             <Link to="/dashboard" onClick={closeMobileMenu}>لوحة المعلومات</Link>
             <Link to="/missions" onClick={closeMobileMenu}>المهمات</Link>
+            <Link to="/fuel" onClick={closeMobileMenu}>المحروقات</Link>
             <Link to="/shifts" onClick={closeMobileMenu}>المناوبات</Link>
             <Link to="/employees" onClick={closeMobileMenu}>الموظفون</Link>
             <Link to="/volunteers" onClick={closeMobileMenu}>المتطوعون</Link>

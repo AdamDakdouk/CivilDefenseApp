@@ -336,3 +336,59 @@
     font-size: 14px;
   }
 }
+
+/* ---------- Desktop layout: brand + controls on top, page tabs underneath ---------- */
+@media (min-width: 769px) {
+  .navbar {
+    padding: 10px 0 0;
+  }
+
+  .nav-container {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .nav-logo {
+    height: 46px;
+    width: 46px;
+  }
+
+  .navbar-controls {
+    gap: 10px;
+  }
+
+  .month-selector-navbar label {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .logout-btn {
+    margin-right: 0;
+  }
+
+  .nav-links {
+    order: 3;
+    flex: 0 0 100%;
+    justify-content: flex-start;
+    gap: 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .nav-links a {
+    padding: 11px 18px 9px;
+    font-size: 15px;
+    border-bottom: 3px solid transparent;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .nav-links a:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .nav-links a.active {
+    font-weight: 700;
+    border-bottom-color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

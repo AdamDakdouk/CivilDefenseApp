@@ -7,6 +7,7 @@ import Volunteers from './pages/Volunteers';
 import Employees from './pages/Employees';
 import Shifts from './pages/Shifts';
 import Missions from './pages/Missions';
+import Fuel from './pages/Fuel';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
@@ -42,6 +43,7 @@ function App() {
                         <Route path="/employees" element={<Employees />} />
                         <Route path="/shifts" element={<Shifts />} />
                         <Route path="/missions" element={<Missions />} />
+                        <Route path="/fuel" element={<Fuel />} />
                         <Route path="/users" element={<Users />} />
                         <Route path="/" element={<Navigate to="/dashboard" />} />
                       </Routes>

@@ -1,0 +1,142 @@
+@media print {
+  /* Page setup - landscape like the paper form */
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  html, body {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+  }
+
+  .navbar,
+  .fuel-page-print .page-header,
+  .fuel-page-print button {
+    display: none !important;
+  }
+
+  .fuel-page-print.container {
+    margin: 0 !important;
+    padding: 8mm 10mm !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .fuel-sheet * {
+    box-sizing: border-box !important;
+  }
+
+  .fuel-sheet {
+    direction: rtl;
+    font-family: 'Arial', sans-serif;
+    color: #000;
+  }
+
+  /* Header: organisation lines on the right, then the number / date line */
+  .fuel-sheet-header {
+    margin-bottom: 4mm;
+  }
+
+  .fuel-sheet-right {
+    text-align: right;
+    line-height: 1.6;
+    font-size: 11px;
+  }
+
+  .fuel-sheet-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3mm;
+    font-size: 12px;
+  }
+
+  /* Table */
+  .fuel-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+  }
+
+  .fuel-table th,
+  .fuel-table td {
+    border: 1px solid #000 !important;
+    padding: 3px 2px !important;
+    font-size: 10.5px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    overflow: hidden;
+    word-wrap: break-word;
+    height: 7mm;
+  }
+
+  .fuel-table thead th {
+    font-weight: 700 !important;
+    background-color: #f0f0f0 !important;
+  }
+
+  .fuel-table thead {
+    display: table-header-group !important;
+  }
+
+  .fuel-table tbody tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .fuel-total-row td {
+    font-weight: 700 !important;
+  }
+
+  /* Column widths (right to left) */
+  .fuel-table col:nth-child(1) { width: 6%; }   /* الشهر */
+  .fuel-table col:nth-child(2) { width: 8%; }   /* المركز */
+  .fuel-table col:nth-child(3) { width: 15%; }  /* اسم المحطة */
+  .fuel-table col:nth-child(4) { width: 6%; }   /* نوع */
+  .fuel-table col:nth-child(5) { width: 9%; }   /* ماركة */
+  .fuel-table col:nth-child(6) { width: 9%; }   /* رقم الآلية */
+  .fuel-table col:nth-child(7) { width: 6%; }   /* بنزين */
+  .fuel-table col:nth-child(8) { width: 6%; }   /* مازوت */
+  .fuel-table col:nth-child(9) { width: 11%; }  /* رقم القسيمة */
+  .fuel-table col:nth-child(10) { width: 10%; } /* تاريخ القسيمة */
+  .fuel-table col:nth-child(11) { width: 8%; }  /* العداد */
+  .fuel-table col:nth-child(12) { width: 6%; }  /* عسكري */
+
+  /* Title is the first row of the table, like the paper form */
+  .fuel-table .fuel-title-cell {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    background-color: #ffffff !important;
+    padding: 5px 4px !important;
+    height: 9mm;
+  }
+
+  /* Footer: same placement as the paper form, in columns from the right */
+  .fuel-sheet-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 5mm;
+    font-size: 12px;
+    line-height: 2.2;
+    page-break-inside: avoid;
+  }
+
+  .fuel-footer-col {
+    flex: 1;
+  }
+
+  .fuel-footer-returned {
+    flex: 1.2;
+  }
+
+  .fuel-footer-total {
+    flex: 1.3;
+    padding-top: 0;
+  }
+}

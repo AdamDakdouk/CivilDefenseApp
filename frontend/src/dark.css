@@ -252,6 +252,14 @@
     color:#fff;opacity:1;
   }
 
+  html[data-theme="dark"] .app .nav-links a.active {
+    color:#fff;border-bottom-color:#e52044 !important;background:rgba(255,255,255,.06);
+  }
+
+  html[data-theme="dark"] .app .nav-links {
+    border-top-color:#323b47;
+  }
+
   html[data-theme="dark"] .app .logout-btn {
     background:#2a323d !important;color:#e7eaee;border:1px solid #3a4552;box-shadow:none;
   }
@@ -378,6 +386,86 @@
 
   html[data-theme="dark"] .app .missions-subtitle-line {
     color:#9aa4b0 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-title,
+  html[data-theme="dark"] .app .fuel-screen .print-meta-title,
+  html[data-theme="dark"] .app .fuel-screen .fuel-list-table td,
+  html[data-theme="dark"] .app .fuel-modal h2,
+  html[data-theme="dark"] .app .fuel-modal .fuel-field label {
+    color:#e7eaee !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-subtitle-line,
+  html[data-theme="dark"] .app .fuel-screen .print-meta-field,
+  html[data-theme="dark"] .app .fuel-screen .vehicle-plate-sub,
+  html[data-theme="dark"] .app .fuel-screen .fuel-list-table thead th,
+  html[data-theme="dark"] .app .fuel-modal .chip-sub {
+    color:#9aa4b0 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .print-meta {
+    background:#1b2027 !important;border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-list-wrap {
+    background:#161b21 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-list-table thead th {
+    background:transparent !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-list-table td {
+    background:#1b2027 !important;border-top:1px solid #323b47 !important;border-bottom:1px solid #323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-list-table td:first-child {
+    border-right:1px solid #323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-list-table td:last-child {
+    border-left:1px solid #323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-list-table tbody tr:hover td {
+    background:#232a33 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-badge.type-fire {
+    background:#4a1d26 !important;color:#ff9aa8 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-badge.type-jeep {
+    background:#16324a !important;color:#7fc0f5 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-badge.fuel-gasoline {
+    background:#47370f !important;color:#f5c96b !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-screen .fuel-badge.fuel-diesel {
+    background:#18382a !important;color:#7ddc9a !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-modal .choice-chip {
+    background:#232a33 !important;color:#e7eaee !important;border-color:#323b47 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-modal .choice-chip:hover {
+    background:#2b3440 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-modal .choice-chip.selected {
+    background:#4a1d26 !important;color:#ff9aa8 !important;border-color:#e5506a !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-modal .choice-chip.selected .chip-sub {
+    color:#ff9aa8 !important;
+  }
+
+  html[data-theme="dark"] .app .fuel-modal .fuel-submit-error {
+    background:#4a1d26 !important;color:#ff9aa8 !important;
   }
 
   html[data-theme="dark"] .app .attendance-container,

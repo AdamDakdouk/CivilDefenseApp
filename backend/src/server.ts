@@ -17,6 +17,7 @@ import authRoutes from './routes//authRoutes';
 import usersRoutes from './routes/usersRoutes';
 import adminRoutes from './routes/adminRoutes';
 import vehicleRoutes from './routes/vehicleRoutes';
+import fuelRoutes from './routes/fuelRoutes';
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use('/public', express.static(path.join(__dirname, '../public')));
 app.use('/api/shifts', shiftRoutes);
 app.use('/api/missions', missionRoutes);
 app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/fuel', fuelRoutes);
 app.use('/api/monthly-reports', monthlyReportRoutes);
 app.use('/api/volunteer-stats', volunteerStatsRoutes);
 app.use('/api/attendance', attendanceRoutes);

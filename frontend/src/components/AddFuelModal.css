@@ -1,0 +1,153 @@
+.fuel-modal.modal-content {
+  max-width: 640px;
+  padding: 24px;
+  border-radius: 12px;
+}
+
+.fuel-modal h2 {
+  margin-bottom: 18px;
+  font-size: 20px;
+  color: #1f2933;
+}
+
+.fuel-modal .fuel-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+  min-width: 0;
+}
+
+.fuel-modal .fuel-field label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #344054;
+  margin: 0;
+}
+
+.fuel-modal .fuel-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 48px;
+}
+
+.fuel-modal .fuel-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fuel-modal .choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.fuel-modal .choice-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 16px;
+  background: #f2f4f7;
+  color: #344054;
+  border: 1.5px solid #e3e6ea;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.fuel-modal .choice-chip:hover {
+  background: #e8ecf1;
+  border-color: #cfd5dc;
+}
+
+.fuel-modal .choice-chip.selected {
+  background: #fdeef0;
+  color: #a01629;
+  border-color: #c41e3a;
+}
+
+.fuel-modal .chip-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: #667085;
+}
+
+.fuel-modal .choice-chip.selected .chip-sub {
+  color: #a01629;
+}
+
+.fuel-modal .fuel-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #d3d8de;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #f7f8fa;
+  color: #1f2933;
+}
+
+.fuel-modal .fuel-input:focus {
+  outline: none;
+  border-color: #c41e3a;
+  background: #fff;
+}
+
+.fuel-modal .count-input {
+  width: 80px;
+}
+
+.fuel-modal .voucher-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+}
+
+.fuel-modal .fuel-error {
+  color: #c41e3a;
+  font-size: 12.5px;
+}
+
+.fuel-modal .fuel-submit-error {
+  background: #fee4e2;
+  color: #b42318;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  .fuel-modal.modal-content {
+    padding: 18px;
+  }
+
+  .fuel-modal .fuel-row {
+    gap: 0;
+    flex-direction: column;
+  }
+}
+
+/* The shared settings button is absolutely positioned elsewhere; keep it inline here */
+.fuel-modal .settings-btn {
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  margin: 0;
+}
+
+.fuel-modal .odometer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fuel-modal .odometer-row .fuel-input {
+  flex: 1;
+  min-width: 140px;
+}

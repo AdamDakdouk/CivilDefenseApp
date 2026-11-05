@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, Mission, Shift, Vehicle } from '../types';
+import { User, Mission, Shift, Vehicle, FuelEntry } from '../types';
 
 // Check hostname at runtime (most reliable)
 const isLocalhost = window.location.hostname === 'localhost' || 
@@ -197,4 +197,29 @@ export const updateVehicle = async (id: string, vehicleData: { name: string; pla
 export const deleteVehicle = async (id: string): Promise<void> => {
   await api.delete(`/vehicles/${id}`);
 };
+
+export const getFuelByMonth = async (month: number, year: number): Promise<FuelEntry[]> => {
+  const response = await api.get(`/fuel/by-month?month=${month}&year=${year}`);
+  return response.data;
+};
+
+export const getFuelStations = async (): Promise<string[]> => {
+  const response = await api.get('/fuel/stations');
+  return response.data;
+};
+
+export const createFuelEntries = async (data: any): Promise<FuelEntry[]> => {
+  const response = await api.post('/fuel', data);
+  return response.data;
+};
+
+export const updateFuelEntry = async (id: string, data: any): Promise<FuelEntry> => {
+  const response = await api.put(`/fuel/${id}`, data);
+  return response.data;
+};
+
+export const deleteFuelEntry = async (id: string): Promise<void> => {
+  await api.delete(`/fuel/${id}`);
+};
+
 export default api;

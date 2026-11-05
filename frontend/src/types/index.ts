@@ -65,3 +65,17 @@ export interface Vehicle {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface FuelEntry {
+  _id: string;
+  date: string;              // YYYY-MM-DD, voucher date
+  stationName: string;
+  vehicleName: string;
+  vehiclePlate: string;
+  vehicleType: 'jeep' | 'fire';
+  fuelType: 'gasoline' | 'diesel';
+  liters: number;
+  voucherNumber: string;
+  odometer: string;          // a number as text, or 'معطل'
+  createdAt: string;
+}
