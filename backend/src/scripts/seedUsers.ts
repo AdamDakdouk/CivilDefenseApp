@@ -21,7 +21,7 @@ async function importUsers() {
         console.log(`📦 Loaded ${users.length} users\n`);
 
         // Get Ziad only
-        const ziad = await Admin.findOne({ email: 'ziad.civildefense@gmail.com' });
+        const ziad = await Admin.findOne({ email: 'adamdakdouk2003@gmail.com' });
 
         if (!ziad) {
             console.error('❌ Ziad admin not found');
